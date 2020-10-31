@@ -77,3 +77,12 @@
 #' }
 #' @source \url{http://www.data.drees.sante.gouv.fr/}
 "ASDEPsldepenses_description"
+
+#' Populations départementales
+#'
+#' Une base de données contenant les populations départementales par tranche d'âge, téléchargéex sur le site de l'Insee.
+#'
+#' @format Un data frame avec 2646 lignes et 12 variables
+#'
+#' @source \url{https://www.insee.fr/fr/statistiques/1893198}
+"PopDepartementales"

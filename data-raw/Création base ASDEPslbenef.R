@@ -6,7 +6,7 @@ library(openxlsx)
 library(reshape2)
 library(plyr)
 
-options(encoding = "utf8")
+#options(encoding = "utf8")
 
 setwd(paste(getwd(),"/data-raw/",sep=""))
 
@@ -17,8 +17,8 @@ fichierloc <- "Les bénéficiaires de l aide sociale départementale - séries l
 # --------------------------------------------------------------------------------------------------------------
 # Paramètres généraux et fonctions générales
 
-departements <- read.csv2("Liste des departements.csv",header=TRUE,sep=",",stringsAsFactors = FALSE)
-syndep <- read.csv2("Synonymes noms départements.csv",header=TRUE,sep=",",stringsAsFactors = FALSE)
+departements <- read.csv2("Liste des departements.csv",header=TRUE,sep=",",stringsAsFactors = FALSE,fileEncoding="utf8")
+syndep <- read.csv2("Synonymes noms départements.csv",header=TRUE,sep=",",stringsAsFactors = FALSE,fileEncoding="utf8")
 
 listesyn <- as.list(setNames(syndep$Nom.departement, syndep$Synonyme.nom))
 
@@ -32,7 +32,7 @@ CorrigeNumReg <- function(numreg){
 }
 
 CorrigeNomTerritoire <- function(nom){
-  return( trimws(nom, which=c("both")) )
+  return( trimws(CorrigeNom(nom), which=c("both")) )
 }
 
 # --------------------------------------------------------------------------------------------------------------
@@ -62,6 +62,7 @@ LitOnglet <- function(Nom.var,
   # identifie les lignes correspondant à des départements, des régions, ou la France entière, à partir d'une lecture de la premiÃ¨re colonne
 
   col1 <- read.xlsx(nomfich, sheet = nomsheet, cols= c(1),  colNames = FALSE, skipEmptyRows = FALSE, skipEmptyCols = TRUE)
+  col1$X1 <- gsub("&#10;","",col1$X1)
   col1$numligne <- seq(1,nrow(col1),1)
   col1 <- col1[!is.na(col1$X1),]
 
@@ -134,8 +135,10 @@ LitOnglet <- function(Nom.var,
   # extrait les données de l'onglet du fichier Excel
 
   tab.deb. <- read.xlsx(nomfich, sheet = nomsheet,
-                        rows = rowdep, colNames = TRUE, rowNames = FALSE, na.strings = "NA"                 )
+                        rows = rowdep, colNames = TRUE, rowNames = FALSE, na.strings = "NA"  )
+  names(tab.deb.) <- gsub("&#10;","",names(tab.deb.))
   if ("Départements" %in% names(tab.deb.)) { tab.deb. <- plyr::rename(tab.deb., c("D\u00E9partements"="D\u00E9partement") ) }
+  if ("Codedépartement" %in% names(tab.deb.)) { tab.deb. <- plyr::rename(tab.deb., c("Codedépartement"="Code.département") ) }
   tab.deb <- melt(tab.deb.,id=c("Code.r\u00E9gion" , "Code.d\u00E9partement","D\u00E9partement"))
   tab.deb <- tab.deb[!is.na(tab.deb$value),]
   tab.deb <- tab.deb[(tab.deb$value != "-"),]
@@ -150,6 +153,7 @@ LitOnglet <- function(Nom.var,
 
   tab.reg. <- read.xlsx(nomfich, sheet = nomsheet,
                         rows = rowregion, colNames = TRUE, rowNames = FALSE, na.strings = "NA" )
+  names(tab.reg.) <- gsub("&#10;","",names(tab.reg.))
   if ("R\u00E9gions" %in% names(tab.reg.)) { tab.reg. <- plyr::rename(tab.reg., c("R\u00E9gions"="R\u00E9gion") ) }
   tab.reg <- melt(tab.reg.,id=c("Code.r\u00E9gion","R\u00E9gion" ))
   tab.reg$Code.région <- sapply( as.numeric(as.character(tab.reg$Code.région)), CorrigeNumReg)
@@ -271,6 +275,9 @@ varbenef$Type.var <- c( rep("Nombres de bénéficiaires", nrow(varbenef) ) )
 
 varbenef$Unite.var <- c( rep("personnes",  nrow(varbenef)) )
 
+# --- verif
+# dep <- unique(BenefAidessociales$Territoire)
+# dep <- dep[order(dep)]
 
 #  --- ajout de variables
 

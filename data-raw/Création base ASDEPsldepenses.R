@@ -14,6 +14,30 @@ setwd(paste(getwd(),"/data-raw/",sep=""))
 fichierloc <- "Les dépenses d aide sociale départementale - séries longues (1999 -2018).xlsx"
 ongletdep <- "SL_depenses_2018"
 
+# --------------------------------------------------------------------------------------------------------------
+# Paramètres généraux et fonctions générales
+
+departements <- read.csv2("Liste des departements.csv",header=TRUE,sep=",",stringsAsFactors = FALSE,fileEncoding="utf8")
+syndep <- read.csv2("Synonymes noms départements.csv",header=TRUE,sep=",",stringsAsFactors = FALSE,fileEncoding="utf8")
+
+listesyn <- as.list(setNames(syndep$Nom.departement, syndep$Synonyme.nom))
+
+CorrigeNom <- function(nomdep){
+  if (nomdep %in% names(listesyn)) { return( listesyn[[nomdep]]  )  }
+  else { return( nomdep )}
+}
+
+CorrigeNumReg <- function(numreg){
+  if (numreg<10) { return(100+numreg) } else { return(numreg) }
+}
+
+CorrigeNomTerritoire <- function(nom){
+  return( trimws(CorrigeNom(nom), which=c("both")) )
+}
+
+# --------------------------------------------------------------------------------------------------------------
+
+
 
 # --------------------------------------------------------------------------------------------------------------
 # Fonction LitOnglet : lit un onglet du fichier Excel et restitue les données lues sous la forme de tables
@@ -185,6 +209,8 @@ LitOnglet <- function(Nom.var,
 
   tab$Annee <- as.numeric(as.character(tab$Annee))
 
+  tab$Territoire <- sapply( tab$Territoire, CorrigeNomTerritoire)
+
   infovar <- data.frame(Nom.var = c(Nom.var),
                         Intitule.var = c(Intitule.var),
                         Intitulecourt.var = c(""),
@@ -345,7 +371,9 @@ fPopref <- function(them){
 }
 vardepenses$Popref.var <- sapply(vardepenses$Thematique.var, fPopref)
 
-
+# --- verif
+# dep <- unique(DepensesAidessociales$Territoire)
+# dep <- dep[order(dep)]
 
 #  --- reste à faire
 
