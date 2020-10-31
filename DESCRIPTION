@@ -1,5 +1,5 @@
 Package: asdep
-Title: Fonctions et données pour l'analyse de l'aide sociale départementales en France, à partir des données statistiques publiés par la DREES et l'Insee
+Title: Fonctions et données pour l'analyse de l'aide sociale départementale en France, à partir des données statistiques publiées par la DREES et l'Insee
 Version: 0.0.0.9000
 Authors@R: 
     person(given = "Patrick",
