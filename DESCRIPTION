@@ -1,4 +1,5 @@
 Package: asdep
+Title: Package R pour l'analyse de l'aide sociale départementales, à partir des données statistiques de la DREES et de l'Insee
 Version: 0.0.0.9000
 Authors@R: 
     person(given = "Patrick",
@@ -6,6 +7,7 @@ Authors@R:
            role = c("aut", "cre"),
            email = "patrick.aubert@m4x.org",
            comment = structure("0000-0003-1777-8639", .Names = "ORCID"))
+Description: Ce package R contient des fonctions et des bases de données pour faciliter des analyses statistiques des aides sociales départementales, dans les domaines de la perte d'autonomie, du handicap, de l'ASE et de l'insertion. Les données sont extraites des résultats publiés par la DREES, notamment à partir de son enquête annuelle sur l'aide sociale des départements.
 License: EUPL
 Encoding: UTF-8
 LazyData: true
@@ -17,3 +19,6 @@ Suggests:
 VignetteBuilder: knitr
 Depends: 
     R (>= 2.10)
+Imports: 
+    dplyr,
+    magrittr

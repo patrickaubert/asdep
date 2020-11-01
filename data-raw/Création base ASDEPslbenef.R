@@ -380,7 +380,7 @@ varbenef$Popref.var <- sapply(varbenef$Thematique.var, fPopref)
 
 BenefAidessociales <- plyr::rename(BenefAidessociales, c("Code.région"="Code.region", "Code.département"="Code.departement"))
 
-BenefAidessociales$Annee <- as.character(BenefAidessociales$Annee)
+#BenefAidessociales$Annee <- as.character(BenefAidessociales$Annee)
 #BenefAidessociales <- BenefAidessociales[order(-BenefAidessociales$Annee),]
 
 #  --- sauvegarde les tables constituées

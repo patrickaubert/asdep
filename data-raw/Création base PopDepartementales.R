@@ -162,24 +162,21 @@ popdepartementales <- popdepartementales[,c("Code.departement","TypeTerritoire",
 #  else if (nom == "popPA") { return(Intitulepop("pop.60.99")) }
 #  else { return("")}
 #}
-#variables.pop <- data.frame(Nom.var=noms.varpop,
-#                            Intitule.var=paste("Population",sapply(noms.varpop, Intitulepop),sep=""),
-#                            Intitulecourt.var=paste("Population",sapply(noms.varpop, Intitulepop),sep=""),
-#                            Source.var=rep("Insee",NROW(noms.varpop)),
-#                            Champ.var=rep("",NROW(noms.varpop)),
-#                            Note.var=rep("",NROW(noms.varpop)),
-#                            TexteDenom=rep("",NROW(noms.varpop)),
-#                            ListeDenom.var=rep("",NROW(noms.varpop)),
-#                            ListeComposante.var=rep("",NROW(noms.varpop)),
-#                            Thematique.var= rep("Descripteur socio-économique",NROW(noms.varpop)),
-#                            Type.var=rep("Nombre de personnes",NROW(noms.varpop)),
-#                            Unite.var=rep("personnes",NROW(noms.varpop)),
-#                            Popref.var=rep("popTOT",NROW(noms.varpop)) )
-#
-#
-#variables <- rbind(variables,
-#                   variables.pop[,colnames(variables)])
-#
+
+PopDepartementales_description <- data.frame(
+  Nom.var=noms.varpop,
+  Intitule.var=paste("Population",sapply(noms.varpop, Intitulepop),sep=""),
+  Intitulecourt.var=paste("Population",sapply(noms.varpop, Intitulepop),sep=""),
+  Source.var=rep("Insee",NROW(noms.varpop)),
+  Champ.var=rep("",NROW(noms.varpop)),
+  Note.var=rep("",NROW(noms.varpop)),
+  TexteDenom=rep("",NROW(noms.varpop)),
+  ListeDenom.var=rep("",NROW(noms.varpop)),
+  ListeComposante.var=rep("",NROW(noms.varpop)),
+  Thematique.var= rep("Descripteur socio-économique",NROW(noms.varpop)),
+  Type.var=rep("Nombre de personnes",NROW(noms.varpop)),
+  Unite.var=rep("personnes",NROW(noms.varpop)),
+  Popref.var=rep("popTOT",NROW(noms.varpop)) )
 
 
 # -------------------------------------------------------------------------------------------------
@@ -189,5 +186,6 @@ PopDepartementales <- popdepartementales
 
 # ===================================================================================
 usethis::use_data(PopDepartementales,
+                  PopDepartementales_description,
                   overwrite = T)
 

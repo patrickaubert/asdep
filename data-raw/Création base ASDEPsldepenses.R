@@ -384,7 +384,7 @@ vardepenses$Popref.var <- sapply(vardepenses$Thematique.var, fPopref)
 
 DepensesAidessociales <- plyr::rename(DepensesAidessociales, c("Code.région"="Code.region", "Code.département"="Code.departement"))
 
-DepensesAidessociales$Annee <- as.character(DepensesAidessociales$Annee)
+#DepensesAidessociales$Annee <- as.character(DepensesAidessociales$Annee)
 #DepensesAidessociales <- DepensesAidessociales[order(-DepensesAidessociales$Annee),]
 
 # -------------------------------------------------------------------------------------------------
