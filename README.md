@@ -4,6 +4,8 @@ Ce package R contient des fonctions et des bases de données pour faciliter les 
 
 Le package inclut par ailleurs une application interactive permettant d'en illustrer les utilisations (application également accessible en ligne : ...).
 
+**ATTENTION** Ce package est encore en cours de développement. La version actuelle est donc très incomplète et très préliminaire !
+
 ## Pour installer le package :
 
 remotes::install_github("patrickaubert/asdep",ref='main')
