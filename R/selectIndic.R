@@ -2,6 +2,7 @@
 #'
 #' @param nomvariable le nom de la variable, parmi celles de la table ASDEPsl
 #' @param denom le nom d'une variable à utiliser au dénominateur de l'indicateur (si absent la variable est utilisée brute)
+#' @param keepvar un vecteur de noms de variables que l'on souhaite conserver dans la table
 #' @param options un vecteur d'options du calcul
 #' @param gpeDpt un vecteur de noms de départements : leur ensemble constituera le "groupe de comparaison"
 #' @param donnees la table de données en entrée (par défaut, la table ASDEPsl)
@@ -11,15 +12,16 @@
 #' @export
 #'
 #' @examples selectIndic(nomvariable="NbBenefAPA",denom="pop.60.99")
+#' @examples selectIndic(nomvariable="NbBenefAPA",denom="pop.60.99", keepvar = c("pop.60.99"))
 #' @examples selectIndic(nomvariable="DepBruteAPA",denom="NbBenefAPA",options="mensuel")
 #' @examples selectIndic(nomvariable="NbBenefAPA",denom="pop.60.99", gpeDpt=c("Meuse","Moselle"))
-selectIndic <- function(nomvariable, denom = "",
+selectIndic <- function(nomvariable, denom = "", keepvar=c(),
                         options = "", gpeDpt = c(),
                         donnees = ASDEPsl, variables = ASDEPsl_description) {
 
   # ------------------- traitements préliminaires -------------------
 
-  noms.variables.sortie <- c("Territoire","TypeTerritoire",nomvariable,"Annee")
+  noms.variables.sortie <- c("Territoire","TypeTerritoire",nomvariable,"Annee",keepvar)
 
   infovariable <- variables[variables$Nom.var == nomvariable,]
 
@@ -53,7 +55,7 @@ selectIndic <- function(nomvariable, denom = "",
 
   # ===
   # on ne conserve que les données non manquantes
-  nomsvarloc <- intersect( c(nomvariable, "denom", "Annee", "TypeTerritoire","Territoire"),
+  nomsvarloc <- intersect( c(nomvariable, "denom", "Annee", "TypeTerritoire","Territoire", keepvar),
                            names(donnees) )
   donneesloc <- donnees[,c( nomsvarloc) ]
   #donneesloc <- donnees[complete.cases(donneesloc), ]
@@ -81,7 +83,7 @@ selectIndic <- function(nomvariable, denom = "",
   if (NROW(gpeDpt) >= 1) {
     donneescomp <- donneesloc %>%
       filter(Territoire %in% gpeDpt)
-    donneescomp <- donneescomp[ , intersect( c(nomvariable, "denom", "Annee"), names(donneescomp) )]
+    donneescomp <- donneescomp[ , intersect( c(nomvariable, "denom", keepvar, "Annee"), names(donneescomp) )]
     donneescomp <- donneescomp %>%
       group_by(Annee) %>%
       summarise_all(sum) %>%
@@ -102,13 +104,13 @@ selectIndic <- function(nomvariable, denom = "",
 
     if (listetypevariables[[nomvariable]] %in% c("Nombres de bénéficiaires")) {
       donneesloc[,c(nomvariable)] <- 100* as.numeric(donneesloc[,c(nomvariable)])/donneesloc$denom
-      if (nomdenom %in% noms.varpop)  {
+      if (nomdenom %in% PopDepartementales_description$Nom.var )  {
         unitevar <- paste("% de la population",Intitulepop(nomdenom),sep="")
       }      else if (listetypevariables[[nomdenom]] == "Nombres de bénéficiaires")  {
         unitevar <- paste("% des ",variables[nomdenom,"TexteDenom"],sep="")
       }      else { unitevar <- "??" }
     }    else if (listetypevariables[[nomvariable]] %in% c("Montants")) {
-      if (nomdenom %in% noms.varpop)  {
+      if (nomdenom %in% PopDepartementales_description$Nom.var )  {
         donneesloc[,c(nomvariable)] <- donneesloc[,c(nomvariable)] / donneesloc$denom
         unitevar <- paste(infovariable$Unite.var," par habitant",Intitulepop(nomdenom),sep="")
       }      else if (listetypevariables[[nomdenom]] == "Nombres de bénéficiaires")  {

@@ -20,22 +20,6 @@ listeDenominateurs <- function(nomvariable,
     else {  return(x) }
   }
 
-  Intitulepop <- function(nom){
-    if (grepl("[0-9]\\.[0-9]",nom))  {
-      tr <- as.vector(unlist(strsplit(nom,split="\\.") ))
-      amin <- as.numeric(tr[2])
-      amax <- as.numeric(tr[3])
-      if (amin == 0) { return(paste(" de moins de ",(amax+1)," ans",sep="")) }
-      else if (amax >= 99) { return(paste(" de ",amin," ans et plus",sep="")) }
-      else { return(paste(" de ",amin," à ",amax," ans",sep="")) }
-    }
-    else if (nom == "popTOT") { return("") }
-    else if (nom == "popPH") { return(Intitulepop("pop.20.64")) }
-    else if (nom == "popASE") { return(Intitulepop("pop.00.19")) }
-    else if (nom == "popPA") { return(Intitulepop("pop.60.99")) }
-    else { return("")}
-  }
-
   # =====
   # liste des caractéristiques associées à chaque variables, d'après la table de métadonnées
   listetypevariables <- as.list(setNames(variables$Type.var, variables$Nom.var))

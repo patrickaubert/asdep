@@ -70,8 +70,8 @@
 #'   \item{Unite.var}{unité de la variable (personnes, €, ...)}
 #'   \item{Thematique.var}{thématique (perte d'autonomie, handicap, ...)}
 #'   \item{TexteDenom.var}{texte court lorsque la variable est utilisé comme dénominateur d'un ratio}
-#'   \item{ListeDenom.var}{liste des noms d'autres variables (séparés par un "_") pouvant servir comme dénominateur de la variable}
-#'   \item{ListeComposante.var}{listes de noms d'autres variables (séparés par un "_") dont la somme correspond à la variable}
+#'   \item{ListeDenom.var}{liste des noms d'autres variables (séparés par un '_') pouvant servir comme dénominateur de la variable}
+#'   \item{ListeComposante.var}{listes de noms d'autres variables (séparés par un '_') dont la somme correspond à la variable}
 #'   \item{Type.var}{type de variable (nombre, dépense...)}
 #'   \item{Popref.var}{population de référence (par exemple : "20-59" = les 20-59 ans)}
 #' }
