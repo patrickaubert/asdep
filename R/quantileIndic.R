@@ -22,12 +22,18 @@ quantileIndic <- function(
   #groupe="Annee"
   #poids="popTOT"
 
+  # ===
+  # Création des variables d'intérêt
+
   donneesQV$var <- as.numeric(donneesQV[,c(var)])
   donneesQV$groupe <- as.numeric(donneesQV[,c(groupe)])
   if (!(is.na(poids))) { donneesQV$poids <- as.numeric(donneesQV[,c(poids)])
   }  else { donneesQV$poids <- rep(1,nrow(donneesQV))  }
 
+  # ===
+  # sélection des données pour l'analyse
   donneesQV <- donneesQV[(complete.cases(donneesQV[,c(var,groupe,poids)])),]
+  donneesQV <- donneesQV[donneesQV$TypeTerritoire == "Département",]
 
   #liste.quantiles <- c(0.05,0.10,0.25,0.5,0.75,0.9,0.95)
   liste.quantiles <- unique( liste.quantiles, c(0.10,0.25,0.5,0.75,0.9) )
