@@ -17,3 +17,27 @@ knitr::opts_chunk$set(
 ```{r setup}
 library(asdep)
 ```
+
+# Les tables de données contenues dans le package
+
+## ASDEPslbenef et ASDEPslbenef_description
+
+## ASDEPsldepenses
+
+## Popdepartementales
+
+## ASDEPsl
+
+# Les fonctions de manipulations des données
+
+# selectIndic
+
+# quantileIndic
+
+# Les fonctions créant des graphiques pré-formatés
+
+## graphEvol
+
+## graphdynCamemembert
+
+
