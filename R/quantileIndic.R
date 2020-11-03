@@ -52,24 +52,18 @@ quantileIndic <- function(
 
     fdivise <- function(x,y) {if ((y==0)||(is.na(x))) {return(0)} else {return(x/y)} }
 
-    #tab   <- merge( dplyr::rename( aggregate(pondloc ~ groupe, donneesPart[( (donneesPart$val>=donneesPart$valmin) & (donneesPart$val<=donneesPart$valmax) ),], sum), num=pondloc ),
-    #                dplyr::rename( aggregate(pondloc ~ groupe, donneesPart, sum), denom=pondloc ),
-    #                by = "groupeloc")
     donnees.denom <- donneesPart %>%
       dplyr::group_by(groupeloc) %>%
-      dplyr::summarize(denom = sum(pondloc, na.rm = TRUE))
+      dplyr::summarize(denom = sum(pondloc, na.rm = TRUE)) %>%
+      dplyr::ungroup()
     donnees.num <- donneesPart %>%
       dplyr::filter(val>=valmin & val<valmax) %>%
       dplyr::group_by(groupeloc) %>%
-      dplyr::summarize(num = sum(pondloc, na.rm = TRUE))
+      dplyr::summarize(num = sum(pondloc, na.rm = TRUE)) %>%
+      dplyr::ungroup()
     if (nrow(donnees.num)==0) { tab <- donnees.denom %>% mutate(num=0)
     } else { tab <- donnees.denom %>% left_join(donnees.num,by = "groupeloc")}
 
-    #tab   <- dplyr::inner_join( (donneesPart[( (donneesPart$val>=donneesPart$valmin) & (donneesPart$val<=donneesPart$valmax) ),] %>% dplyr::group_by(groupeloc) %>% dplyr::summarize(num = sum(pondloc, na.rm = TRUE))) ,
-    #                            (donneesPart %>% dplyr::group_by(groupeloc) %>% dplyr::summarize(denom = sum(pondloc, na.rm = TRUE))),
-    #                            by = "groupeloc")
-
-    #return(  tab$num/tab$denom)
     return(  mapply(fdivise, tab$num, tab$denom ) )
     # RQ : dans certain cas la variable est nulle pour toutes les observations (ex APA avant 2002) => on construit donc une fonction de division "élargie" pour éviter le division par 0
 
