@@ -23,4 +23,5 @@ Imports:
     dplyr,
     magrittr,
     stats,
-    Hmisc
+    Hmisc,
+    ggplot2

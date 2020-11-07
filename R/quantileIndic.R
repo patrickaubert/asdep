@@ -17,10 +17,10 @@ quantileIndic <- function(
   poids,
   liste.quantiles = c(0.05,0.10,0.25,0.5,0.75,0.9,0.95)) {
 
-  #donnees <- donnees[(donnees$TypeTerritoire == "Département"),c("Annee","Territoire","popTOT","TotBenefPA")]
-  #var="TotBenefPA"
-  #groupe="Annee"
-  #poids="popTOT"
+  #donnees <- selectIndic(nomvariable="NbBenefAPA",denom="pop.60.99", keepvar = c("pop.60.99"))$var
+  #var<-NbBenefAPA"
+  #groupe<-Annee"
+  #poids<-"pop.60.99"
 
   # ===
   # Création des variables d'intérêt
@@ -77,8 +77,15 @@ quantileIndic <- function(
 
   # quantiles par année, avec pondération des départements selon leur taille
   if (!(is.na(poids))) {
-    q2 <- do.call("rbind", tapply(donneesQV$var, donneesQV$groupe, wtd.quantile, liste.quantiles, weight=donneesQV$poids, na.rm=TRUE))
-    colnames(q2) <- paste(noms.quantiles,"pond",sep="")
+    wtdquant <- function(gr,tab=donneesQV,li=liste.quantiles) {
+      w <- data.frame(groupe = gr, stringsAsFactors = FALSE)
+      w <- cbind(w,t(wtd.quantile(tab[tab$groupe==gr,"var"], weights=tab[tab$groupe==gr,"poids"], probs=li, na.rm=TRUE)))
+      return(w)
+    }
+    q2 <- do.call("rbind", lapply(unique(donneesQV$groupe),wtdquant))
+    colnames(q2) <- c(groupe, paste(noms.quantiles,"pond",sep=""))
+    #q2 <- do.call("rbind", tapply(donneesQV$var, donneesQV$groupe, wtd.quantile, probs=liste.quantiles, weight=donneesQV$poids, na.rm=TRUE))
+    #colnames(q2) <- paste(noms.quantiles,"pond",sep="")
   }
 
   # complément : zones autour de la médiane, part de la population dans chaque groupe
@@ -99,7 +106,7 @@ quantileIndic <- function(
     q1$pond.p50.pm20 <- PartEntre(donneesQV, "poids","groupe", "var", "p50.m20", "p50.p20")
     q1$pond.interquart <- PartEntre(donneesQV, "poids", "groupe", "var", "p25", "p75")
     q1$pond.interdec <- PartEntre(donneesQV, "poids", "groupe", "var", "p10", "p90")
-    q1 <- cbind(q1,q2)
+    q1 <- merge(q1,q2,by=groupe)
   }
 
   return( q1 )
