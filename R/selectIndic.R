@@ -72,7 +72,7 @@ selectIndic <- function(nomvariable, denom = "", keepvar=c(),
   #}
 
   # ------------------- Unité de temps -------------------
-  if ( (infovariable$Type.var == "Montants") & (grepl("[Pp]ar mois|[Mm]ensuel",options)) ) {
+  if ( (infovariable$Type.var == "Montants") & (grepl("[Pp]ar mois|[Mm]ensuel",paste(options,collapse=" "))) ) {
     donneesloc[,c(nomvariable)] <- donneesloc[,c(nomvariable)]/12
     if ( (nchar(nomdenom)>0) & (variables[(variables$Nom.var == nomdenom),"Type.var"] ==  "Montants")) {
       donneesloc$denom <- donneesloc$denom/12

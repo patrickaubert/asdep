@@ -27,13 +27,15 @@ quantileIndic <- function(
 
   donneesQV$var <- as.numeric(donneesQV[,c(var)])
   donneesQV$groupe <- as.numeric(donneesQV[,c(groupe)])
-  if (!(is.na(poids))) { donneesQV$poids <- as.numeric(donneesQV[,c(poids)])
+  if (!(is.null(poids))) { donneesQV$poids <- as.numeric(donneesQV[,c(poids)])
   }  else { donneesQV$poids <- rep(1,nrow(donneesQV))  }
 
   # ===
   # sélection des données pour l'analyse
   donneesQV <- donneesQV[(complete.cases(donneesQV[,c(var,groupe,poids)])),]
-  donneesQV <- donneesQV[donneesQV$TypeTerritoire == "Département",]
+  if ("TypeTerritoire" %in% names(donneesQV)) {
+    donneesQV <- donneesQV[donneesQV$TypeTerritoire == "Département",]
+  }
 
   #liste.quantiles <- c(0.05,0.10,0.25,0.5,0.75,0.9,0.95)
   liste.quantiles <- unique( liste.quantiles, c(0.10,0.25,0.5,0.75,0.9) )
@@ -76,7 +78,7 @@ quantileIndic <- function(
   colnames(q1) <- c(groupe, noms.quantiles)
 
   # quantiles par année, avec pondération des départements selon leur taille
-  if (!(is.na(poids))) {
+  if (!(is.null(poids))) {
     wtdquant <- function(gr,tab=donneesQV,li=liste.quantiles) {
       w <- data.frame(groupe = gr, stringsAsFactors = FALSE)
       w <- cbind(w,t(wtd.quantile(tab[tab$groupe==gr,"var"], weights=tab[tab$groupe==gr,"poids"], probs=li, na.rm=TRUE)))
@@ -101,7 +103,7 @@ quantileIndic <- function(
   q1$nbdep.p50.pm10 <- PartEntre(donneesQV, "nbdep", "groupe", "var", "p50.m10", "p50.p10")
   q1$nbdep.p50.pm20 <- PartEntre(donneesQV, "nbdep", "groupe", "var", "p50.m20", "p50.p20")
   # part de la population (variable "poids" en input) dans les zones : médiane +/- 10 resp. 20 %, et dans les zones interquartiles resp. interdéciles
-  if (!(is.na(poids))) {
+  if (!(is.null(poids))) {
     q1$pond.p50.pm10 <- PartEntre(donneesQV, "poids", "groupe", "var", "p50.m10", "p50.p10")
     q1$pond.p50.pm20 <- PartEntre(donneesQV, "poids","groupe", "var", "p50.m20", "p50.p20")
     q1$pond.interquart <- PartEntre(donneesQV, "poids", "groupe", "var", "p25", "p75")

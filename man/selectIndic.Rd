@@ -7,6 +7,7 @@
 selectIndic(
   nomvariable,
   denom = "",
+  keepvar = c(),
   options = "",
   gpeDpt = c(),
   donnees = ASDEPsl,
@@ -17,6 +18,8 @@ selectIndic(
 \item{nomvariable}{le nom de la variable, parmi celles de la table ASDEPsl}
 
 \item{denom}{le nom d'une variable à utiliser au dénominateur de l'indicateur (si absent la variable est utilisée brute)}
+
+\item{keepvar}{un vecteur de noms de variables que l'on souhaite conserver dans la table}
 
 \item{options}{un vecteur d'options du calcul}
 
@@ -34,6 +37,7 @@ Une fonction pour extraire et calculer un indicateur sur l'aide sociale
 }
 \examples{
 selectIndic(nomvariable="NbBenefAPA",denom="pop.60.99")
+selectIndic(nomvariable="NbBenefAPA",denom="pop.60.99", keepvar = c("pop.60.99"))
 selectIndic(nomvariable="DepBruteAPA",denom="NbBenefAPA",options="mensuel")
 selectIndic(nomvariable="NbBenefAPA",denom="pop.60.99", gpeDpt=c("Meuse","Moselle"))
 }
