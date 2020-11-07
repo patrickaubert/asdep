@@ -3,9 +3,9 @@ server <- function(input, output, session) {
   # ========================================================
   # mise en forme des graphiques dans l'appli
 
-  territoireComparaison <- function(terrcomp) {
+  territoireComparaison <- function(terrcomp,var) {
     switch(terrcomp,
-           "france" = "TOTAL estimé France entière (hors Mayotte)",
+           "france" = champFrance(var),
            "region" = "Grand Est",
            "choix" = "Groupe de comparaison")
   }
@@ -20,13 +20,24 @@ server <- function(input, output, session) {
     ggplot(...)
     # to be done: ajout mis en forme
   }
+  ggplotlylocal <- function(...) {
+    g <- ggplotly(...)
+    # on extrait les ajouts moches par plotly dans les intitulés de légende
+    for (i in 1:length(g$x$data)) {
+      g$x$data[[i]]$legendgroup <- gsub("^\\(|,[[:digit:]]*\\)$","",g$x$data[[i]]$legendgroup)
+      g$x$data[[i]]$name <- gsub("^\\(|,[[:digit:]]*\\)$","",g$x$data[[i]]$name)
+    }
+    return(g)
+  }
+
   graphEvolutionAppli <- function(...) {
     graphEvolution(
       ...,
       dept=input$dep, # département choisi par l'utilisateur
-      comp= territoireComparaison(input$terrcomp),
+      comp= territoireComparaison(input$terrcomp, nomvariable),
       gpecomp = gptDeptComparaison(input$terrcomp, input$listedepcomp),
-      options=c(input$affichedispers) # zone choisie par l'utilisateur
+      options=c(input$affichedispers), # zone choisie par l'utilisateur
+      typesortie="graphdyn"
       )
   }
 
@@ -62,7 +73,10 @@ server <- function(input, output, session) {
 
   # -- part des bénéficiaires de l'APA dans la population de 60 ans et plus, en série temporelle
   output$partAPApop <- renderPlotly({
-    ggplotly( graphEvolutionAppli(nomvariable="NbBenefAPA",denom="pop.60.99")    )
+    graphEvolutionAppli(nomvariable="NbBenefAPA",denom="pop.60.99")
+  })
+  output$partAPApop2 <- renderPlotly({
+    graphEvolutionAppli(nomvariable="NbBenefAPA",denom="pop.60.99",typesortie="graphdyn")
   })
   #output$partAPApop <- renderPlotly({
   #  tab <- selectIndic(
@@ -74,9 +88,7 @@ server <- function(input, output, session) {
   #  ggplotly(g)
   #})
   # -- part des bénéficiaires de l'APA à domicile dans l'ensemble des bénéficiaires de l'APA, en série temporelle
-  output$partAPAdom <- renderPlotly({
-    ggplotly( graphEvolutionAppli(nomvariable="NbBenefAPADomicile",denom="NbBenefAPA")    )
-  })
+  output$partAPAdom <- renderPlotly({  graphEvolutionAppli(nomvariable="NbBenefAPADomicile",denom="NbBenefAPA")   })
   #output$partAPAdom <- renderPlotly({
   #  tab <- selectIndic(
   #    nomvariable="NbBenefAPADomicile",denom="NbBenefAPA",

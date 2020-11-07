@@ -24,4 +24,5 @@ Imports:
     magrittr,
     stats,
     Hmisc,
-    ggplot2
+    ggplot2,
+    plotly
