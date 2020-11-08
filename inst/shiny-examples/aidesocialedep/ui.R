@@ -11,11 +11,8 @@ library(asdep)
 #source(paste(getwd(),"inst/shiny-examples/aidesocialedep/textesappli.R", sep="/"))
 source("textesappli.R",encoding="UTF8")
 
-
 listedepartements <- unique(ASDEPsl[ASDEPsl$TypeTerritoire == "Département", "Territoire"])
 listedepartements <- listedepartements[order(listedepartements)]
-
-
 
   # === partie UI de l'application
 ui <- dashboardPage(
@@ -59,24 +56,77 @@ ui <- dashboardPage(
             title = "Nb de bénéficiaires de l'APA, en % de la population de 60 ans et plus",
             width=12, collapsible = TRUE, solidHeader = TRUE,
             column(6, plotlyOutput("partAPApop")),
-            column(6, plotlyOutput("partAPAdom"))
+            column(6, )
           )
         ), # fin fluidRow part APA dans population
         fluidRow(
-          tabBox(
-            title = "APA",
-            id = "tabpartAPA", height = "300px",
-            tabPanel("Par année", HTML("Nb de bénéficiaires, en % de la population totale de 60 ans et plus"), plotlyOutput("partAPApop2")),
-            tabPanel("Dernière année", HTML("Nb de bénéficiaires, en % de la population totale de 60 ans et plus"))
-          ),
-          tabBox(
-            title = "APA à domicile",
-            id = "tabpartAPA", height = "300px",
-            tabPanel("Par année", HTML("Part parmi l'ensemble des bénéficiaires de l'APA (en %)"), plotlyOutput("partAPAdom2")),
-            tabPanel("Dernière année", HTML("Part parmi l'ensemble des bénéficiaires de l'APA (en %)"))
+          box(
+            title = "Proportion de bénéficiaires de l'APA à domicile, en % de l'ensemble des bénéficiaires de l'APA",
+            width=12, collapsible = TRUE, solidHeader = TRUE,
+            ASDEPsl_description[ASDEPsl_description$Nom.var=="NbBenefAPADomicile","Note.var"],
+            column(6, plotlyOutput("partAPAdom") ),
+            column(6, )
           )
-
-        )
+        ), # fin fluidRow ratio ASH / APA
+        #fluidRow(
+        #  tabBox(
+        #    title = "APA",
+        #    id = "tabpartAPA", height = "300px",
+        #    tabPanel("Par année", HTML("Nb de bénéficiaires, en % de la population totale de 60 ans et plus"), plotlyOutput("partAPApop2")),
+        #    tabPanel("Dernière année", HTML("Nb de bénéficiaires, en % de la population totale de 60 ans et plus"))
+        #  ),
+        #  tabBox(
+        #    title = "APA à domicile",
+        #    id = "tabpartAPA", height = "300px",
+        #    tabPanel("Par année", HTML("Part parmi l'ensemble des bénéficiaires de l'APA (en %)"), plotlyOutput("partAPAdom2")),
+        #    tabPanel("Dernière année", HTML("Part parmi l'ensemble des bénéficiaires de l'APA (en %)"))
+        #  )
+        #), # fin fluidRow expérimental
+        fluidRow(
+          tabBox(
+            title = "Montant moyen d'APA par bénéficiaire, en € par mois",
+            id = "tabmontAPA", width=12, # collapsible = TRUE, solidHeader = TRUE,
+            tabPanel("Ensemble",
+                     ASDEPsl_description[ASDEPsl_description$Nom.var=="DepBruteAPA","Note.var"],
+                     fluidRow(
+                       column(6, plotlyOutput("montAPAEvol")),
+                       column(6, plotlyOutput("montAPA"))
+                     )
+                     ),
+            tabPanel("Domicile",
+                     ASDEPsl_description[ASDEPsl_description$Nom.var=="DepBruteAPAdom","Note.var"],
+                     fluidRow(
+                       column(6, plotlyOutput("montAPAdomEvol")),
+                       column(6, plotlyOutput("montAPAdom"))
+                      )
+            ),
+            tabPanel("Etablissement",
+                     ASDEPsl_description[ASDEPsl_description$Nom.var=="DepBruteAPAetab","Note.var"],
+                     fluidRow(
+                       column(6, plotlyOutput("montAPAetabEvol")),
+                       column(6, plotlyOutput("montAPAetab"))
+                     )
+            )
+          )
+        ), # fin fluidRow montant APA
+        fluidRow(
+          box(
+            title = "Ratio du nb de bénéficiaires de l'ASH sur le nb de bénéficiaires de l'APA en établissement",
+            width=12,  collapsible = TRUE, solidHeader = TRUE,
+            ASDEPsl_description[ASDEPsl_description$Nom.var=="NbBenefASH","Note.var"],
+            column(6, plotlyOutput("ratioASHAPAEvol") ),
+            column(6, )
+          )
+        ), # fin fluidRow ratio ASH / APA
+        fluidRow(
+          box(
+            title = "Nb de bénéficiaires d'aides ménagères aux personnes âgées, en % de la population de 60 ans et plus",
+            width=12,  collapsible = TRUE, solidHeader = TRUE,
+            ASDEPsl_description[ASDEPsl_description$Nom.var=="NbBenefAideMenagerePA","Note.var"],
+            column(6, plotlyOutput("partAidesMenPAvol") ),
+            column(6, )
+          )
+        ) # fin fluidRow part Aides ménagères
       ),
       tabItem(
         tabName = "handicap",
@@ -178,7 +228,15 @@ ui <- dashboardPage(
               width = '70%'
               )
           ) # fin box paramétrage éléments dispersion affichés
-        ) # fin fluidRow  paramétrage éléments dispersion affichés
+        ), # fin fluidRow  paramétrage éléments dispersion affichés
+
+        fluidRow(
+          box(
+            title = "Afficher des les graphiques en base 100", solidHeader = TRUE,  collapsible = TRUE, collapsed = TRUE,
+            width = 12,
+          ) # fin box paramétrage graphiques en base 100
+        ), # fin fluidRow  paramétrage graphiques en base 100
+
       ), # fin tabItem paramétrage
 
 
