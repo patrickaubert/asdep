@@ -17,6 +17,8 @@ listedepartements <- listedepartements[order(listedepartements)]
   # === partie UI de l'application
 ui <- dashboardPage(
 
+  skin = "green",
+
   dashboardHeader(
     title = "Aide sociale des départements",
     titleWidth = 350
@@ -49,20 +51,41 @@ ui <- dashboardPage(
     tabItems(
 
       # === graphiques et indicateurs
+
+      # perte d'autonomie
       tabItem(
         tabName = "dependance",
         fluidRow(
-          box(
+          tabBox(
             title = "Nb de bénéficiaires de l'APA, en % de la population de 60 ans et plus",
-            width=12, collapsible = TRUE, solidHeader = TRUE,
-            column(6, plotlyOutput("partAPApopEvol")),
-            column(6, plotlyOutput("partAPApop") )
+            id = "tabpartAPA", width=12, # collapsible = TRUE, solidHeader = TRUE,
+            tabPanel("Ensemble",
+                     ASDEPsl_description[ASDEPsl_description$Nom.var=="NbBenefAPA","Note.var"],
+                     fluidRow(
+                       column(6, plotlyOutput("partAPApopEvol")),
+                       column(6, plotlyOutput("partAPApop"))
+                     )
+            ),
+            tabPanel("Domicile",
+                     ASDEPsl_description[ASDEPsl_description$Nom.var=="NbBenefAPADomicile","Note.var"],
+                     fluidRow(
+                       column(6, plotlyOutput("partAPAdompopEvol")),
+                       column(6, plotlyOutput("partAPAdompop"))
+                     )
+            ),
+            tabPanel("Etablissement",
+                     ASDEPsl_description[ASDEPsl_description$Nom.var=="NbBenefAPAEtab","Note.var"],
+                     fluidRow(
+                       column(6, plotlyOutput("partAPAetabpopEvol")),
+                       column(6, plotlyOutput("partAPAetabpop"))
+                     )
+            )
           )
         ), # fin fluidRow part APA dans population
         fluidRow(
           box(
             title = "Proportion de bénéficiaires de l'APA à domicile, en % de l'ensemble des bénéficiaires de l'APA",
-            width=12, collapsible = TRUE, solidHeader = TRUE,
+            width=12, collapsible = TRUE, solidHeader = TRUE,  collapsed = TRUE,
             ASDEPsl_description[ASDEPsl_description$Nom.var=="NbBenefAPADomicile","Note.var"],
             column(6, plotlyOutput("partAPAdomEvol") ),
             column(6, plotlyOutput("partAPAdom") )
@@ -112,7 +135,7 @@ ui <- dashboardPage(
         fluidRow(
           box(
             title = "Ratio du nb de bénéficiaires de l'ASH sur le nb de bénéficiaires de l'APA en établissement",
-            width=12,  collapsible = TRUE, solidHeader = TRUE,
+            width=12,  collapsible = TRUE, solidHeader = TRUE, collapsed = TRUE,
             ASDEPsl_description[ASDEPsl_description$Nom.var=="NbBenefASH","Note.var"],
             column(6, plotlyOutput("ratioASHAPAEvol") ),
             column(6, plotlyOutput("ratioASHAPA") )
@@ -137,11 +160,102 @@ ui <- dashboardPage(
           )
         ) # fin fluidRow part Aides ménagères
       ),
+
+
       tabItem(
         tabName = "handicap",
       ),
+
+
       tabItem(
         tabName = "ase",
+        fluidRow(
+          tabBox(
+            title = "Part d'enfants placés dans la population",
+            id = "tabplac", width=12, # collapsible = TRUE, solidHeader = TRUE,
+            tabPanel(
+              "Ensemble",
+              ASDEPsl_description[ASDEPsl_description$Nom.var=="TotEnfAccueillisASE","Note.var"],
+              fluidRow(column(6, plotlyOutput("partAccueilASEpopEvol")), column(6, plotlyOutput("partAccueilASEpop"))       )
+            ),
+            tabPanel(
+              "Hors placements directs par le juge",
+              ASDEPsl_description[ASDEPsl_description$Nom.var=="TotEnfConfiesASE","Note.var"],
+              fluidRow(column(6, plotlyOutput("partConfiesASEpopEvol")), column(6, plotlyOutput("partConfiesASEpop")) )
+            )
+          )
+        ), # fin fluidRow part enfants accueillis et confiés
+        fluidRow(
+          tabBox(
+            title = "Proportion des enfants confiés à l'ASE par mode de placement",
+            id = "tabplac", width=12, # collapsible = TRUE, solidHeader = TRUE,
+            tabPanel(
+              "Familles d'accueil",
+              ASDEPsl_description[ASDEPsl_description$Nom.var=="TotEnfASEPlacesFamillesAccueil","Note.var"],
+              fluidRow(column(6, plotlyOutput("partAssFamEvol")), column(6, plotlyOutput("partAssFam"))       )
+            ),
+            tabPanel(
+              "Etablissements",
+              ASDEPsl_description[ASDEPsl_description$Nom.var=="TotEnfASEPlacesEtab","Note.var"],
+              fluidRow(column(6, plotlyOutput("partEtabEvol")), column(6, plotlyOutput("partEtab")) )
+            )
+          )
+        ), # fin fluidRow part mode de placement
+        fluidRow(
+          tabBox(
+            title = "Nb de bénéficiaires d'actions éducatives, en % de la population moins de 20 ans",
+            id = "tabpartAE", width=12, # collapsible = TRUE, solidHeader = TRUE,
+            tabPanel(
+              "Ensemble",
+              ASDEPsl_description[ASDEPsl_description$Nom.var=="TotBenefAE","Note.var"],
+              fluidRow(column(6, plotlyOutput("partAEpopEvol")), column(6, plotlyOutput("partAEpop"))       )
+            ),
+            tabPanel(
+              "AED",
+              ASDEPsl_description[ASDEPsl_description$Nom.var=="TotBenefAED","Note.var"],
+              fluidRow(column(6, plotlyOutput("partAEDpopEvol")), column(6, plotlyOutput("partAEDpop")) )
+            ),
+            tabPanel(
+              "AEMO",
+              ASDEPsl_description[ASDEPsl_description$Nom.var=="TotBenefAEMO","Note.var"],
+              fluidRow(column(6, plotlyOutput("partAEMOpopEvol")), column(6, plotlyOutput("partAEMOpop")) )
+            )
+          )
+        ), # fin fluidRow part actions éducatives
+        fluidRow(
+          tabBox(
+            title = "Dépenses d'actions éducatives, en €",
+            id = "tabdepAE", width=12, # collapsible = TRUE, solidHeader = TRUE,
+            tabPanel(
+              "Par bénéficiaire",
+              ASDEPsl_description[ASDEPsl_description$Nom.var=="DepBruteAEDAEMO","Note.var"],
+              fluidRow(column(6, plotlyOutput("depAEEvol")), column(6, plotlyOutput("depAE"))       )
+            ),
+            tabPanel(
+              "Par enfant du département",
+              ASDEPsl_description[ASDEPsl_description$Nom.var=="DepBruteAEDAEMO","Note.var"],
+              fluidRow(column(6, plotlyOutput("depAEpopEvol")), column(6, plotlyOutput("depAEpop")) )
+            )
+          )
+        ), # fin fluidRow dépenses actions éducatives
+        fluidRow(
+          box(
+            title = "Dépenses de prévention spécialisée (en €), par enfants dans le département",
+            width=12,  collapsible = TRUE, solidHeader = TRUE, collapsed = TRUE,
+            ASDEPsl_description[ASDEPsl_description$Nom.var=="DepBrutePrevSpe","Note.var"],
+            column(6, plotlyOutput("depprevspeEvol") ),
+            column(6, plotlyOutput("depprevspe") )
+          )
+        ), # fin fluidRow dep prév spé
+        fluidRow(
+          box(
+            title = "Dépenses d'allocations (en €), par enfants dans le département",
+            width=12,  collapsible = TRUE, solidHeader = TRUE, collapsed = TRUE,
+            ASDEPsl_description[ASDEPsl_description$Nom.var=="DepBrutePrevSpe","Note.var"],
+            column(6, plotlyOutput("depallocASEEvol") ),
+            column(6, plotlyOutput("depallocASE") )
+          )
+        ) # fin fluidRow dep alloc ASE
       ),
       tabItem(
         tabName = "insertion",
@@ -230,7 +344,7 @@ ui <- dashboardPage(
                              "Zone interdécile (pondérée par la population départementale)" = "interdecilespond",
                              "Zone médiane +/- 10 %" = "medianePM10",
                              "Zone médiane +/- 20 %" = "medianePM20"),
-              selected = c("interdeciles"),
+              selected = c("interdeciles","interquartiles"),
               direction = "vertical",
               justified = TRUE,
               checkIcon = list(yes = icon("check")),

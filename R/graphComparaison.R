@@ -86,11 +86,23 @@ graphComparaison <- function(
 
   optionszones <- intersect(options,ParamGraphiquesAsdep$noms)
 
-  couleursloc <- ParamGraphiquesAsdep[c("dept","comp","autres",optionszones),"couleur"]
-  names(couleursloc) <- c(dept, comp, "Autres départements",ParamGraphiquesAsdep[c(optionszones),"intitules"])
+  ParamGraphiques <- ParamGraphiquesAsdep %>%
+    filter(noms %in% c("dept","comp","autres",optionszones)) %>%
+    mutate(intitules = recode(intitules,
+                         "Territoire de référence" = dept,
+                         "Groupe de comparaison" = comp,
+                         "Autres territoires" = "Autres départements"))
+  rownames(ParamGraphiques) <- ParamGraphiques$noms
 
-  alphasloc <- ParamGraphiquesAsdep[c("dept","comp","autres",optionszones),"alpha"]
-  names(alphasloc) <- c(dept, comp, "Autres départements",ParamGraphiquesAsdep[c(optionszones),"intitules"])
+  couleursloc <- ParamGraphiques[c("dept","comp","autres",optionszones),"couleur"]
+  names(couleursloc) <- ParamGraphiques[c("dept","comp","autres",optionszones),"intitules"]
+  couleursloc <- couleursloc[names(couleursloc) != ""]
+  #names(couleursloc) <- c(dept, comp, "Autres départements",ParamGraphiquesAsdep[c(optionszones),"intitules"])
+
+  alphasloc <- ParamGraphiques[c("dept","comp","autres",optionszones),"alpha"]
+  names(alphasloc) <- ParamGraphiques[c("dept","comp","autres",optionszones),"intitules"]
+  alphasloc <- alphasloc[names(alphasloc) != ""]
+  #names(alphasloc) <- c(dept, comp, "Autres départements",ParamGraphiquesAsdep[c(optionszones),"intitules"])
 
  # table avec les zones représentées sur le graphique
 
@@ -115,8 +127,7 @@ graphComparaison <- function(
 
   gstat <- ggplotAsdep() +
     geom_point(data=tabg,
-               aes(x=rang,y=indicateur,size=size,colour=type,text=paste(Territoire," en ",annee," :<br>",indicateur," ",tabs$unitevar,sep="")),
-               alpha=0.5) +
+               aes(x=rang,y=indicateur,size=size,colour=type,alpha=type,text=paste(Territoire," en ",annee," :<br>",indicateur," ",tabs$unitevar,sep=""))) +
     geom_ribbon(data=tabq3,
                 aes(ymin=ymin, ymax=ymax, x=rang, fill=intitules, alpha=intitules, text=paste(intitules," : entre ",ymin," et ",ymax," ",tabs$unitevar,sep=""))) +
     guides(size = FALSE , alpha = FALSE) +

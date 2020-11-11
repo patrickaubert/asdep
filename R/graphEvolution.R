@@ -64,11 +64,21 @@ graphEvolution <- function(nomvariable, denom = "", options = c(), poidsobs = c(
 
   optionszones <- intersect(options,ParamGraphiquesAsdep$noms)
 
-  couleursloc <- ParamGraphiquesAsdep[c("dept","comp","autres",optionszones),"couleur"]
-  names(couleursloc) <- c(dept, comp, "Autres départements",ParamGraphiquesAsdep[c(optionszones),"intitules"])
+  ParamGraphiques <- ParamGraphiquesAsdep %>%
+    filter(noms %in% c("dept","comp","autres",optionszones)) %>%
+    mutate(intitules = recode(intitules,
+                              "Territoire de référence" = dept,
+                              "Groupe de comparaison" = comp,
+                              "Autres territoires" = "Autres départements"))
+  rownames(ParamGraphiques) <- ParamGraphiques$noms
 
-  alphasloc <- ParamGraphiquesAsdep[c("dept","comp","autres",optionszones),"alpha"]
-  names(alphasloc) <- c(dept, comp, "Autres départements",ParamGraphiquesAsdep[c(optionszones),"intitules"])
+  couleursloc <- ParamGraphiques[c("dept","comp","autres",optionszones),"couleur"]
+  names(couleursloc) <- ParamGraphiques[c("dept","comp","autres",optionszones),"intitules"]
+  couleursloc <- couleursloc[names(couleursloc) != ""]
+
+  alphasloc <- ParamGraphiques[c("dept","comp","autres",optionszones),"alpha"]
+  names(alphasloc) <- ParamGraphiques[c("dept","comp","autres",optionszones),"intitules"]
+  alphasloc <- alphasloc[names(alphasloc) != ""]
 
   # table avec les zones représentées sur le graphique
 

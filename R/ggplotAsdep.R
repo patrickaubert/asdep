@@ -8,7 +8,13 @@
 #' @examples
 ggplotAsdep <- function(...) {
   ggplot(...) +
-    theme(legend.position="top") +
+    #theme_light() +
+    theme_minimal(
+      base_family = "Arial Narrow",
+      base_size = 11.5) +
+    theme(
+      legend.position="top"
+    ) +
     labs(fill = "",
          colour = "",
          size = "",
