@@ -79,7 +79,7 @@ graphEvolution <- function(nomvariable, denom = "", options = c(), poidsobs = c(
   zonesloc <- zones %>% filter(noms %in% options)
 
   g <- ggplotAsdep() +
-    geom_line(data=tabg2,aes(x=Annee,y=indicateur,colour=Territoire),size=1)
+    geom_line(data=tabg2,aes(x=Annee,y=indicateur,colour=Territoire),size=1) #,text=paste(Territoire,", ",Annee,"<br>",indicateur," ",tabs$unitevar,sep="")
 
   # === le graphique, version statique (ggplot)
 

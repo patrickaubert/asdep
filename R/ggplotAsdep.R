@@ -11,6 +11,7 @@ ggplotAsdep <- function(...) {
     theme(legend.position="top") +
     labs(fill = "",
          colour = "",
+         size = "",
          axis.title.x = element_text(size=10),
          axis.title.y = element_text(size=10)
     )

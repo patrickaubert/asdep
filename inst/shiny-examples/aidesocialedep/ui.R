@@ -55,8 +55,8 @@ ui <- dashboardPage(
           box(
             title = "Nb de bénéficiaires de l'APA, en % de la population de 60 ans et plus",
             width=12, collapsible = TRUE, solidHeader = TRUE,
-            column(6, plotlyOutput("partAPApop")),
-            column(6, )
+            column(6, plotlyOutput("partAPApopEvol")),
+            column(6, plotlyOutput("partAPApop") )
           )
         ), # fin fluidRow part APA dans population
         fluidRow(
@@ -64,8 +64,8 @@ ui <- dashboardPage(
             title = "Proportion de bénéficiaires de l'APA à domicile, en % de l'ensemble des bénéficiaires de l'APA",
             width=12, collapsible = TRUE, solidHeader = TRUE,
             ASDEPsl_description[ASDEPsl_description$Nom.var=="NbBenefAPADomicile","Note.var"],
-            column(6, plotlyOutput("partAPAdom") ),
-            column(6, )
+            column(6, plotlyOutput("partAPAdomEvol") ),
+            column(6, plotlyOutput("partAPAdom") )
           )
         ), # fin fluidRow ratio ASH / APA
         #fluidRow(
@@ -115,16 +115,25 @@ ui <- dashboardPage(
             width=12,  collapsible = TRUE, solidHeader = TRUE,
             ASDEPsl_description[ASDEPsl_description$Nom.var=="NbBenefASH","Note.var"],
             column(6, plotlyOutput("ratioASHAPAEvol") ),
-            column(6, )
+            column(6, plotlyOutput("ratioASHAPA") )
           )
         ), # fin fluidRow ratio ASH / APA
+        fluidRow(
+          box(
+            title = "Montant moyen d'ASH, en € par bénéficiaire",
+            width=12,  collapsible = TRUE, solidHeader = TRUE,
+            ASDEPsl_description[ASDEPsl_description$Nom.var=="DepNetteASH","Note.var"],
+            column(6, plotlyOutput("montASHEvol") ),
+            column(6, plotlyOutput("montASH") )
+          )
+        ), # fin fluidRow montant ASH
         fluidRow(
           box(
             title = "Nb de bénéficiaires d'aides ménagères aux personnes âgées, en % de la population de 60 ans et plus",
             width=12,  collapsible = TRUE, solidHeader = TRUE,
             ASDEPsl_description[ASDEPsl_description$Nom.var=="NbBenefAideMenagerePA","Note.var"],
-            column(6, plotlyOutput("partAidesMenPAvol") ),
-            column(6, )
+            column(6, plotlyOutput("partAidesMenPAEvol") ),
+            column(6, plotlyOutput("partAidesMenPA") )
           )
         ) # fin fluidRow part Aides ménagères
       ),

@@ -45,8 +45,17 @@ server <- function(input, output, session) {
       )
   }
 
-  graphComparaisonAppli <- function(...) {
-    ggplot(...)
+  graphComparaisonAppli <- function(nomvariable, ...) {
+    graphComparaison(
+      nomvariable = nomvariable,
+      ...,
+      annee=input$anneeref,
+      dept=input$dep, # département choisi par l'utilisateur
+      comp= territoireComparaison(input$terrcomp, nomvariable),
+      gpecomp = gptDeptComparaison(input$terrcomp, input$listedepcomp),
+      options=c(input$affichedispers), # zone choisie par l'utilisateur
+      typesortie="graphdyn"
+    )
   }
 
   # ========================================================
@@ -80,12 +89,9 @@ server <- function(input, output, session) {
   # === Perte d'autonomie
 
   # -- part des bénéficiaires de l'APA dans la population de 60 ans et plus, en série temporelle
-  output$partAPApop <- renderPlotly({
-    graphEvolutionAppli(nomvariable="NbBenefAPA",denom="pop.60.99")
-  })
-  output$partAPApop2 <- renderPlotly({
-    graphEvolutionAppli(nomvariable="NbBenefAPA",denom="pop.60.99",typesortie="graphdyn")
-  })
+  output$partAPApopEvol <- renderPlotly({graphEvolutionAppli(nomvariable="NbBenefAPA",denom="pop.60.99")  })
+  output$partAPApop <- renderPlotly({graphComparaisonAppli(nomvariable="NbBenefAPA",denom="pop.60.99")  })
+
   #output$partAPApop <- renderPlotly({
   #  tab <- selectIndic(
   #    nomvariable="NbBenefAPA",denom="pop.60.99",
@@ -96,7 +102,8 @@ server <- function(input, output, session) {
   #  ggplotly(g)
   #})
   # -- part des bénéficiaires de l'APA à domicile dans l'ensemble des bénéficiaires de l'APA, en série temporelle
-  output$partAPAdom <- renderPlotly({  graphEvolutionAppli(nomvariable="NbBenefAPADomicile",denom="NbBenefAPA")   })
+  output$partAPAdomEvol <- renderPlotly({  graphEvolutionAppli(nomvariable="NbBenefAPADomicile",denom="NbBenefAPA")   })
+  output$partAPAdom <- renderPlotly({  graphComparaisonAppli(nomvariable="NbBenefAPADomicile",denom="NbBenefAPA")   })
   #output$partAPAdom <- renderPlotly({
   #  tab <- selectIndic(
   #    nomvariable="NbBenefAPADomicile",denom="NbBenefAPA",
@@ -106,7 +113,7 @@ server <- function(input, output, session) {
   #    geom_line()
   #  ggplotly(g)
   #})
-  # -- montant moyen d'APA (à domicile)dom + étab)
+  # -- montant moyen d'APA (à domicile + étab)
   output$montAPAEvol <- renderPlotly({  graphEvolutionAppli(nomvariable="DepBruteAPA",denom="NbBenefAPA")   })
   output$montAPA <- renderPlotly({  graphComparaisonAppli(nomvariable="DepBruteAPA",denom="NbBenefAPA")   })
 
@@ -122,8 +129,12 @@ server <- function(input, output, session) {
   output$ratioASHAPAEvol <- renderPlotly({  graphEvolutionAppli(nomvariable="NbBenefASH",denom="NbBenefAPAEtab")   })
   output$ratioASHAPAetab <- renderPlotly({  graphComparaisonAppli(nomvariable="NbBenefASH",denom="NbBenefAPAEtab")   })
 
+  # -- montant moyen d'ASH
+  output$montASHEvol <- renderPlotly({  graphEvolutionAppli(nomvariable="DepNetteASH",denom="NbBenefASH")   })
+  output$montASH <- renderPlotly({  graphComparaisonAppli(nomvariable="DepNetteASH",denom="NbBenefASH")   })
+
   # -- proportion bénéf aides ménages dans la population
-  output$partAidesMenPAvol <- renderPlotly({  graphEvolutionAppli(nomvariable="NbBenefAideMenagerePA",denom="pop.60.99")   })
+  output$partAidesMenPAEvol <- renderPlotly({  graphEvolutionAppli(nomvariable="NbBenefAideMenagerePA",denom="pop.60.99")   })
   output$partAidesMenPA <- renderPlotly({  graphComparaisonAppli(nomvariable="NbBenefAideMenagerePA",denom="pop.60.99")   })
 
 }

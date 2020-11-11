@@ -8,7 +8,7 @@
 #' @examples
 ggplotlyAsdep <- function(...) {
 
-  gdyn <- ggplotly(...) %>%
+  gdyn <- ggplotly(... , tooltip = c("text")) %>%
     layout(legend = list(
       orientation = 'h',
       x = 0.5,
@@ -16,8 +16,12 @@ ggplotlyAsdep <- function(...) {
 
   # traitements pour améliorer le rendu graphique
   for (i in 1:length(gdyn$x$data)) {
+    # correction de type "(blabl,1)"
     gdyn$x$data[[i]]$legendgroup <- gsub("^\\(|,[[:digit:]]*\\)$","",gdyn$x$data[[i]]$legendgroup)
     gdyn$x$data[[i]]$name <- gsub("^\\(|,[[:digit:]]*\\)$","",gdyn$x$data[[i]]$name)
+    # correction de type "(blabl,1,NA)"
+    gdyn$x$data[[i]]$legendgroup <- gsub("^\\(|,[[:digit:]]*,NA\\)$","",gdyn$x$data[[i]]$legendgroup)
+    gdyn$x$data[[i]]$name <- gsub("^\\(|,[[:digit:]]*,NA\\)$","",gdyn$x$data[[i]]$name)
   }
 
   return(gdyn)
