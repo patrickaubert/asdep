@@ -2,7 +2,7 @@
 % Please edit documentation in R/ggplotAsdep.R
 \name{ggplotAsdep}
 \alias{ggplotAsdep}
-\title{Une fonction permettant de mettre en forme des graphiques ggplot}
+\title{Une fonction auxiliaire permettant de mettre en forme des graphiques ggplot}
 \usage{
 ggplotAsdep(...)
 }
@@ -13,5 +13,5 @@ ggplotAsdep(...)
 un graphique ggplot
 }
 \description{
-Une fonction permettant de mettre en forme des graphiques ggplot
+Une fonction auxiliaire permettant de mettre en forme des graphiques ggplot
 }
