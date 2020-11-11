@@ -1,4 +1,4 @@
-#' Une fonction permettant de mettre en forme des graphiques ggplot
+#' Une fonction auxiliaire permettant de mettre en forme des graphiques ggplot
 #'
 #' @param ... les paramètres en input de la fonction ggplot
 #'
@@ -7,5 +7,11 @@
 #'
 #' @examples
 ggplotAsdep <- function(...) {
-  ggplot(...)
+  ggplot(...) +
+    theme(legend.position="top") +
+    labs(fill = "",
+         colour = "",
+         axis.title.x = element_text(size=10),
+         axis.title.y = element_text(size=10)
+    )
 }

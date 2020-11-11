@@ -29,9 +29,10 @@ graphEvolution <- function(nomvariable, denom = "", options = c(), poidsobs = c(
   # === Récupération des données pour l'indicateur
   if (NROW(gpecomp)>=1) {comp <- "Groupe de comparaison"}
   if (nchar(denom)>0) {poidsobs <- c(poidsobs,denom)}
-  tab <- selectIndic(nomvariable = nomvariable, denom = denom, keepvar=c(poidsobs),
+  tabs <- selectIndic(nomvariable = nomvariable, denom = denom, keepvar=c(poidsobs),
                      options = options, gpeDpt = gpecomp,
-                     donnees = donnees, variables = variables)$var
+                     donnees = donnees, variables = variables)
+  tab <- tabs$var
   tabd <- tab[,c("Annee","Territoire",nomvariable)] %>%
     filter(Territoire %in% c(dept,comp))
 
@@ -78,7 +79,7 @@ graphEvolution <- function(nomvariable, denom = "", options = c(), poidsobs = c(
   zonesloc <- zones %>% filter(noms %in% options)
 
   g <- ggplotAsdep() +
-    geom_line(data=tabg2,aes(x=Annee,y=indicateur,colour=Territoire))
+    geom_line(data=tabg2,aes(x=Annee,y=indicateur,colour=Territoire),size=1)
 
   # === le graphique, version statique (ggplot)
 
@@ -101,7 +102,10 @@ graphEvolution <- function(nomvariable, denom = "", options = c(), poidsobs = c(
   #      alpha = zonesloc[z,"alpha"])
   #}
 
-  gstat <- gstat + scale_fill_manual(values = couleursloc)
+  gstat <- gstat +
+    scale_fill_manual(values = couleursloc) +
+    labs(x = "année",
+         y = paste("En",tabs$unitevar,sep=" "))
 
   # === le graphique, version dynamique (plotly)
 
@@ -111,13 +115,7 @@ graphEvolution <- function(nomvariable, denom = "", options = c(), poidsobs = c(
   #                                  name = "zone interdécile", text = ~paste("80 % des départements (",round(100*pond.interdec,0)," % de la population) entre ",round(p10,1)," et ",round(p90,1),", en ",Annee,sep=""), hoverinfo ="text" )
   #}
 
-  gdyn <- ggplotly(gstat)
-
-  # traitements pour améliorer le rendu graphique
-  for (i in 1:length(gdyn$x$data)) {
-    gdyn$x$data[[i]]$legendgroup <- gsub("^\\(|,[[:digit:]]*\\)$","",gdyn$x$data[[i]]$legendgroup)
-    gdyn$x$data[[i]]$name <- gsub("^\\(|,[[:digit:]]*\\)$","",gdyn$x$data[[i]]$name)
-  }
+  gdyn <- ggplotlyAsdep(gstat)
 
   # === objet en sortie de la fonction
 
