@@ -82,29 +82,19 @@ graphComparaison <- function(
 
   # === production des graphiques en output
 
-  couleursloc <- c(dept = "red",
-                   comp = "blue",
-                   "Autres départements" = "grey",
-                   "Zone interdécile" = "blue",
-                   "Zone interquartile" = "blue",
-                   "Zone interdécile (pondérée)" = "green",
-                   "Zone interquartile (pondérée)" = "green",
-                   "Médiane +/- 20 %" = "red",
-                   "Médiane +/- 10 %" = "red"
-  )
-  names(couleursloc) <- c(dept, comp, names(couleursloc)[3:9])
-  zones <- data.frame(
-    intitules = c("Zone interdécile","Zone interquartile","Zone interdécile (pondérée)","Zone interquartile (pondérée)","Médiane +/- 20 %","Médiane +/- 10 %"),
-    noms = c("interdeciles","interquartiles","interdecilespond","interquartilespond","medianePM20","medianePM10"),
-    ymin = c("p10","p25","p10pond","p25pond","p50.m20","p50.m10"),
-    ymax = c("p90","p75","p90pond","p75pond","p50.p20","p50.p10"),
-    alpha = c(0.1, 0.2, 0.1, 0.2, 0.1, 0.2),
-    couleur = c("blue","blue","green","green","red","red"),
-    stringsAsFactors = FALSE
-  )
-  alphasloc <- zones$alpha
-  names(alphasloc) <- zones$intitules
-  zonesloc <- zones %>% filter(noms %in% options)
+  # récupération des paramètres graphiques
+
+  optionszones <- intersect(options,ParamGraphiquesAsdep$noms)
+
+  couleursloc <- ParamGraphiquesAsdep[c("dept","comp","autres",optionszones),"couleur"]
+  names(couleursloc) <- c(dept, comp, "Autres départements",ParamGraphiquesAsdep[c(optionszones),"intitules"])
+
+  alphasloc <- ParamGraphiquesAsdep[c("dept","comp","autres",optionszones),"alpha"]
+  names(alphasloc) <- c(dept, comp, "Autres départements",ParamGraphiquesAsdep[c(optionszones),"intitules"])
+
+ # table avec les zones représentées sur le graphique
+
+  zonesloc <- ParamGraphiquesAsdep %>% filter(noms %in% options)
   typezone <- function(tab,defzone) {
     t <- tab
   }
@@ -121,28 +111,15 @@ graphComparaison <- function(
                    ))
   }
 
-
-  g <- ggplotAsdep() +
-    geom_point(data=tabg,
-               aes(x=rang,y=indicateur,size=size,colour=type,text=paste(Territoire," en ",annee," :<br>",indicateur," ",tabs$unitevar,sep="")),
-               alpha=0.5)
-
   # === le graphique, version statique (ggplot)
 
-  gstat <- g +
+  gstat <- ggplotAsdep() +
+    geom_point(data=tabg,
+               aes(x=rang,y=indicateur,size=size,colour=type,text=paste(Territoire," en ",annee," :<br>",indicateur," ",tabs$unitevar,sep="")),
+               alpha=0.5) +
     geom_ribbon(data=tabq3,
                 aes(ymin=ymin, ymax=ymax, x=rang, fill=intitules, alpha=intitules, text=paste(intitules," : entre ",ymin," et ",ymax," ",tabs$unitevar,sep=""))) +
-    guides(size = FALSE , alpha = FALSE) #+
-  #scale_size(name=popref)
-
-  #if ("interdeciles" %in% options) {gstat <- gstat + geom_ribbon(data=tabq2,aes(ymin=p10, ymax=p90, x=rang, fill="Zone interdécile"), alpha = 0.1)}
-  #if ("interquartiles" %in% options) {gstat <- gstat + geom_ribbon(data=tabq2,aes(ymin=p25, ymax=p75, x=rang, fill="Zone interquartile"), alpha = 0.2)}
-  #if ("interdecilespond" %in% options) {gstat <- gstat + geom_ribbon(data=tabq2,aes(ymin=p10pond, ymax=p90pond, x=rang, fill="Zone interdécile (pondérée)"), alpha = 0.1)}
-  #if ("interquartilespond" %in% options) {gstat <- gstat + geom_ribbon(data=tabq2,aes(ymin=p25pond, ymax=p75pond, x=rang, fill="Zone interquartile (pondérée)"), alpha = 0.2)}
-  #if ("medianePM20" %in% options) {gstat <- gstat + geom_ribbon(data=tabq2,aes(ymin=p50.m20, ymax=p50.p20, x=rang, fill="Médiane +/- 20 %"), alpha = 0.1)}
-  #if ("medianePM10" %in% options) {gstat <- gstat + geom_ribbon(data=tabq2,aes(ymin=p50.m10, ymax=p50.p10, x=rang, fill="Médiane +/- 10 %", text=paste("Médiane +/- 10 % : entre ",p50.m10," et ",p50.p10," ",tabs$unitevar,sep="")), alpha = 0.2)}
-
-  gstat <- gstat +
+    guides(size = FALSE , alpha = FALSE) +
     scale_fill_manual(values = couleursloc) +
     scale_color_manual(values = couleursloc) +
     scale_alpha_manual(values = alphasloc) +

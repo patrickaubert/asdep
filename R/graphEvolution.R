@@ -60,37 +60,76 @@ graphEvolution <- function(nomvariable, denom = "", options = c(), poidsobs = c(
 
   # === production des graphiques en output
 
-  couleursloc <- c("Zone interdécile" = "blue",
-                   "Zone interquartile" = "blue",
-                   "Zone interdécile (pondérée)" = "green",
-                   "Zone interquartile (pondérée)" = "green",
-                   "Médiane +/- 20 %" = "red",
-                   "Médiane +/- 10 %" = "red"
-                   )
-  zones <- data.frame(
-    intitules = c("Zone interdécile","Zone interquartile","Zone interdécile (pondérée)","Zone interquartile (pondérée)","Médiane +/- 20 %","Médiane +/- 10 %"),
-    noms = c("interdeciles","interquartiles","interdecilespond","interquartilespond","medianePM20","medianePM10"),
-    ymin = c("p10","p25","p10pond","p25pond","p50.m20","p50.m10"),
-    ymax = c("p90","p75","p90pond","p75pond","p50.p20","p50.p10"),
-    alpha = c(0.1, 0.2, 0.1, 0.2, 0.1, 0.2),
-    couleur = c("blue","blue","green","green","red","red"),
-    stringsAsFactors = FALSE
-  )
-  zonesloc <- zones %>% filter(noms %in% options)
+  # récupération des paramètres graphiques
 
-  g <- ggplotAsdep() +
-    geom_line(data=tabg2,aes(x=Annee,y=indicateur,colour=Territoire),size=1) #,text=paste(Territoire,", ",Annee,"<br>",indicateur," ",tabs$unitevar,sep="")
+  optionszones <- intersect(options,ParamGraphiquesAsdep$noms)
+
+  couleursloc <- ParamGraphiquesAsdep[c("dept","comp","autres",optionszones),"couleur"]
+  names(couleursloc) <- c(dept, comp, "Autres départements",ParamGraphiquesAsdep[c(optionszones),"intitules"])
+
+  alphasloc <- ParamGraphiquesAsdep[c("dept","comp","autres",optionszones),"alpha"]
+  names(alphasloc) <- c(dept, comp, "Autres départements",ParamGraphiquesAsdep[c(optionszones),"intitules"])
+
+  # table avec les zones représentées sur le graphique
+
+  zonesloc <- ParamGraphiquesAsdep %>% filter(noms %in% options)
+  typezone <- function(tab,defzone) {
+    t <- tab
+  }
+  tabq3 <- data.frame()
+  for (i in 1:nrow(zonesloc)){
+    tabq3 <- rbind(tabq3,
+                   data.frame(
+                     Annee = tabq$Annee,
+                     intitules = rep(zonesloc$intitules[i] , nrow(tabq)),
+                     noms = rep(zonesloc$noms[i] , nrow(tabq)),
+                     ymin = tabq[,zonesloc$ymin[i]],
+                     ymax = tabq[,zonesloc$ymax[i]],
+                     alpha = rep(zonesloc$alpha[i] , nrow(tabq))
+                   ))
+  }
+
+  #couleursloc <- c("Zone interdécile" = "blue",
+  #                 "Zone interquartile" = "blue",
+  #                 "Zone interdécile (pondérée)" = "green",
+  #                 "Zone interquartile (pondérée)" = "green",
+  #                 "Médiane +/- 20 %" = "red",
+  #                 "Médiane +/- 10 %" = "red"
+  #                 )
+  #zones <- data.frame(
+  #  intitules = c("Zone interdécile","Zone interquartile","Zone interdécile (pondérée)","Zone interquartile (pondérée)","Médiane +/- 20 %","Médiane +/- 10 %"),
+  #  noms = c("interdeciles","interquartiles","interdecilespond","interquartilespond","medianePM20","medianePM10"),
+  #  ymin = c("p10","p25","p10pond","p25pond","p50.m20","p50.m10"),
+  #  ymax = c("p90","p75","p90pond","p75pond","p50.p20","p50.p10"),
+  #  alpha = c(0.1, 0.2, 0.1, 0.2, 0.1, 0.2),
+  #  couleur = c("blue","blue","green","green","red","red"),
+  #  stringsAsFactors = FALSE
+  #)
+  #zonesloc <- zones %>% filter(noms %in% options)
+#
 
   # === le graphique, version statique (ggplot)
 
-  gstat <- g
+  gstat <- ggplotAsdep() +
+    geom_line(
+      data=tabg2,
+      aes(x=Annee,y=indicateur,colour=Territoire),size=1) + #,text=paste(Territoire,", ",Annee,"<br>",indicateur," ",tabs$unitevar,sep="")
+    geom_ribbon(
+      data=tabq3,
+      aes(ymin=ymin, ymax=ymax, x=Annee, fill=intitules, alpha=intitules)) +  # , text=paste(intitules," : entre ",ymin," et ",ymax," ",tabs$unitevar,sep="")
+    scale_fill_manual(values = couleursloc) +
+    scale_color_manual(values = couleursloc) +
+    scale_alpha_manual(values = alphasloc) +
+    guides(size = FALSE , alpha = FALSE) +
+    labs(x = "année",
+         y = paste("En",tabs$unitevar,sep=" "))
 
-  if ("interdeciles" %in% options) {gstat <- gstat + geom_ribbon(data=tabq,aes(ymin=p10, ymax=p90, x=Annee, fill="Zone interdécile"), alpha = 0.1)}
-  if ("interquartiles" %in% options) {gstat <- gstat + geom_ribbon(data=tabq,aes(ymin=p25, ymax=p75, x=Annee, fill="Zone interquartile"), alpha = 0.2)}
-  if ("interdecilespond" %in% options) {gstat <- gstat + geom_ribbon(data=tabq,aes(ymin=p10pond, ymax=p90pond, x=Annee, fill="Zone interdécile (pondérée)"), alpha = 0.1)}
-  if ("interquartilespond" %in% options) {gstat <- gstat + geom_ribbon(data=tabq,aes(ymin=p25pond, ymax=p75pond, x=Annee, fill="Zone interquartile (pondérée)"), alpha = 0.2)}
-  if ("medianePM20" %in% options) {gstat <- gstat + geom_ribbon(data=tabq,aes(ymin=p50.m20, ymax=p50.p20, x=Annee, fill="Médiane +/- 20 %"), alpha = 0.1)}
-  if ("medianePM10" %in% options) {gstat <- gstat + geom_ribbon(data=tabq,aes(ymin=p50.m10, ymax=p50.p10, x=Annee, fill="Médiane +/- 10 %"), alpha = 0.2)}
+  #if ("interdeciles" %in% options) {gstat <- gstat + geom_ribbon(data=tabq,aes(ymin=p10, ymax=p90, x=Annee, fill="Zone interdécile"), alpha = 0.1)}
+  #if ("interquartiles" %in% options) {gstat <- gstat + geom_ribbon(data=tabq,aes(ymin=p25, ymax=p75, x=Annee, fill="Zone interquartile"), alpha = 0.2)}
+  #if ("interdecilespond" %in% options) {gstat <- gstat + geom_ribbon(data=tabq,aes(ymin=p10pond, ymax=p90pond, x=Annee, fill="Zone interdécile (pondérée)"), alpha = 0.1)}
+  #if ("interquartilespond" %in% options) {gstat <- gstat + geom_ribbon(data=tabq,aes(ymin=p25pond, ymax=p75pond, x=Annee, fill="Zone interquartile (pondérée)"), alpha = 0.2)}
+  #if ("medianePM20" %in% options) {gstat <- gstat + geom_ribbon(data=tabq,aes(ymin=p50.m20, ymax=p50.p20, x=Annee, fill="Médiane +/- 20 %"), alpha = 0.1)}
+  #if ("medianePM10" %in% options) {gstat <- gstat + geom_ribbon(data=tabq,aes(ymin=p50.m10, ymax=p50.p10, x=Annee, fill="Médiane +/- 10 %"), alpha = 0.2)}
   #for (z in 1:nrow(zonesloc)) {
   #  gstat <- gstat +
   #    geom_ribbon(
@@ -101,11 +140,6 @@ graphEvolution <- function(nomvariable, denom = "", options = c(), poidsobs = c(
   #          fill=zonesloc[z,"intitules"]),
   #      alpha = zonesloc[z,"alpha"])
   #}
-
-  gstat <- gstat +
-    scale_fill_manual(values = couleursloc) +
-    labs(x = "année",
-         y = paste("En",tabs$unitevar,sep=" "))
 
   # === le graphique, version dynamique (plotly)
 
