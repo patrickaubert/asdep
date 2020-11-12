@@ -405,6 +405,16 @@ ui <- dashboardPage(
 
       tabItem(
         tabName = "info",
+        HTML("Cette application fait partie du package R <i>asdep</i>, dont elle illustre l'utilisation.
+             Le package peut être téléchargé sous <a href='https://github.com/patrickaubert/asdep'>https://github.com/patrickaubert/asdep</a>,
+             et l'application utilisée en local par la commande <i>asdep::runExample()</i>.
+             <br><br>
+             Toutes les données présentées dans l'application sont des données publiques diffusées
+             par la <a href='https://drees.solidarites-sante.gouv.fr/etudes-et-statistiques/'>DREES</a> ou par l'<a href='https://www.insee.fr/fr/accueil'>Insee</a>.
+             Le code source de l'application et du package <i>asdep</i> ont
+             été développés par <a href='https://sites.google.com/site/patrickauber/'>Patrick Aubert</a>
+             et sont diffusés sous la license <a href='https://eur-lex.europa.eu/legal-content/FR/TXT/?uri=uriserv:OJ.L_.2017.128.01.0059.01.FRA&toc=OJ:L:2017:128:TOC'>EUPL</a>.
+             Ces développements sont encore en cours et des erreurs peuvent subsister.")
       )
     ) # fin tabItems
   ) #fin body
