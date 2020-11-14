@@ -291,7 +291,8 @@ ui <- dashboardPage(
                 inputId = "terrcomp", label = "Groupe de comparaison",
                 choices = list("France" = "france",
                                "Région" = "region",
-                               "Groupe de comparaison ad-hoc" = "choix"),
+                               "Groupe de comparaison ad-hoc" = "choix",
+                               "Départements similaires" = "proche"),
                 selected = "france",
                 width = "100%")
               ),
@@ -312,17 +313,21 @@ ui <- dashboardPage(
                                      `select-all-text` = "Tout sélectionner"        ),
                   multiple = TRUE   ,
                   width = "100%"   )
-                )#,
-              #conditionalPanel(
-              #  condition = "input.comp == 'proche'",
-              #  selectInput("varcomp",
-              #              #label = input$var,
-              #              label = "... similaires du point de vue de :",
-              #              choices = listenomsvariablescontexte,
-              #              selected = listenomsvariablescontexte[[1]],
-              #              width = "100%")        )
-#
-              #)
+                ),
+              conditionalPanel(
+                condition = "input.terrcomp == 'proche'",
+                selectInput("varcomp",
+                            label = "... similaires du point de vue de :",
+                            choices = setNames(ASDEPsl_description$Nom.var, ASDEPsl_description$Intitule.var),
+                            width = "100%"),
+                selectInput("denomvarcomp",
+                            label = "... exprimé :",
+                            choices = list("En niveau" = "nb", "Par habitant" = "popTOT"),
+                            width = "100%"),
+                sliderInput("nbcomp",
+                            label = "Nb de départements similaires retenus :",
+                            min = 1, max = 15, value = 5, animate=FALSE, step=1)
+                )
             )
           ) # fin box paramétrage territoire comp
         ), # fin fluidrow paramétrage territoire comp

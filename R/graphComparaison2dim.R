@@ -20,7 +20,7 @@
 #' @param variables la table de métadonnées de la table de données en entrée (par défaut, la table ASDEPsl_description)
 #'
 #' @return un graphique (format ggplot ou plotly), ou éventuellement un tableau (selon les options retenues)
-#' @export
+#' @export graphComparaison2dim
 #'
 #' @examples graphComparaison2dim(nomvariable="NbBenefAPA",dept="Vosges",comp="Grand Est",typesortie="tab")
 #' @examples graphComparaison2dim(nomvariable1="NbBenefAPADomicile",denom="pop.60.99",nomvariable2="NbBenefAPAEtab",dept="Vosges",comp="Grand Est")

@@ -10,13 +10,15 @@ server <- function(input, output, session) {
     switch(terrcomp,
            "france" = champFrance(var),
            "region" = "Grand Est",
-           "choix" = "Groupe de comparaison")
+           "choix" = "Groupe de comparaison",
+           "proche" = "Départements similaires")
   }
   gptDeptComparaison <- function(terrcomp,gpeDept) {
     switch(terrcomp,
            "france" = c(),
            "region" = c(),
-           "choix" = c(gpeDept))
+           "choix" = c(gpeDept),
+           "proche" = c())
   }
 
   ggplotlocal <- function(...) {
