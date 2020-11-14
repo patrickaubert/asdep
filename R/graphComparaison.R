@@ -24,7 +24,7 @@
 #' @examples graphComparaison(nomvariable="NbBenefAPA",denom="pop.60.99",dept="Vosges",gpecomp=c("Meuse","Moselle"),options=c("medianePM10","medianePM20"),typesortie="graphdyn")
 graphComparaison <- function(
   nomvariable, denom = "",
-  annee = max(ASDEPsl[is.na(ASDEPsl[,nomvariable]),"Annee"]),
+  annee = max(ASDEPsl[is.na(ASDEPsl[,nomvariable]),"Annee"],na.rm=TRUE),
   options = c(), poidsobs = c(),
   dept, comp = "TOTAL estimé France entière (hors Mayotte)", gpecomp = c(),
   typesortie = "graph",
