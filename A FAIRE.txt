@@ -1,0 +1,11 @@
+- ajout indicateurs handicap dans appli
+- ajout indicateurs insertion dans appli
+- fonction selectRegion
+- ajout sélection région de référence dans appli
+- ajout sélection groupe de départements proches dans appli
+- ajout graphique camembert
+- ajout graphique radar
+- ajout données minima sociaux
+- ajout données oarsa
+- ajout indicateurs minima sociaux dans appli
+- ajout indicateurs oarsa dans appli

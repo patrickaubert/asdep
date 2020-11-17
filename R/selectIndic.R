@@ -86,7 +86,8 @@ selectIndic <- function(nomvariable, denom = "", keepvar=c(),
     donneescomp <- donneescomp[ , intersect( c(nomvariable, "denom", keepvar, "Annee"), names(donneescomp) )]
     donneescomp <- donneescomp %>%
       group_by(Annee) %>%
-      summarise_all(sum) %>%
+      #summarise_all(sum) %>%
+      summarise_all(mean) %>%
       ungroup() %>%
       mutate(Territoire = "Groupe de comparaison",
              TypeTerritoire = "Groupe de départements")

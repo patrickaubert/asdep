@@ -15,6 +15,14 @@ knitr::opts_chunk$set(
 ```
 
 ```{r setup}
+library(tidyverse)
+library(dplyr)
+library(shiny)
+library(shinyWidgets)
+library(Hmisc)
+library(ggplot2)
+library(shinydashboard)
+library(plotly)
 library(asdep)
 ```
 
@@ -28,16 +36,36 @@ library(asdep)
 
 ## ASDEPsl
 
-# Les fonctions de manipulations des données
-
-# selectIndic
-
-# quantileIndic
-
 # Les fonctions créant des graphiques pré-formatés
 
-## graphEvol
+## graphEvolution
 
-## graphdynCamemembert
+La fonction *graphEvolution* produit un graphique présentant l'évolution d'un indicateur d'aide sociale au cours du temps, pour un département de référence donné, un territoire de comparaison (la France, une région, un groupe de département...). Elle permet aussi de représenter sur le graphique des éléments de distribution (par exemple, les zones interdécile ou interquartile). Le format de l'objet en sortie peut être paramétré par l'utilisateur : un graphique statique (format ggplot), un graphique dynamique (format plotly), une table de données, etc. 
+
+Par exemple, l'appel suivant produit un graphique dynamique représentant la part des bénéficiaires de l'APA dans la population de 60 ans et plus, pour le département des Vosges comparé à la moyenne des départements de la Meuse et de la Moselle, avec une représentation graphique des zones situées autour de la médiane départementale +/- 10 et +/- 20 %.
+
+```{r}
+graphEvolution(nomvariable="NbBenefAPA",denom="pop.60.99",
+               dept="Vosges",gpecomp=c("Meuse","Moselle"),
+               options=c("medianePM10","medianePM20"),
+               typesortie="graphdyn") 
+```
+
+
+
+## graphComparaison
+
+## graphComparaison2Dim
+
+
+# Les fonctions auxiliaires
+
+Ces fonctions peuvent être utiles en soi, mais elles servent surtout comme fonctions auxiliaires pour les fonctions de création de graphiques sur l'aide sociale
+
+## selectIndic
+
+## quantileIndic
+
+
 
 

@@ -18,8 +18,12 @@ server <- function(input, output, session) {
            "france" = c(),
            "region" = c(),
            "choix" = c(gpeDept),
-           "proche" = c())
+           "proche" = c( departementsProches(
+             dept = input$dep,
+             nomvariable = input$varcomp, denom = input$denomvarcomp, nb = input$nbcomp,
+             annee = input$anneeref) ))
   }
+  output$gpecomparaison <- renderText({ paste(gptDeptComparaison(input$terrcomp, input$listedepcomp),collapse="; ") })
 
   ggplotlocal <- function(...) {
     ggplot(...)
@@ -82,7 +86,12 @@ server <- function(input, output, session) {
   # ========================================================
   # options dynamiques
 
-
+  deptProches <- reactive({
+    departementsProches(
+      dept = input$dep,
+      nomvariable = input$varcomp, denom = input$denomvarcomp, nb = input$nbcomp,
+      annee = input$anneeref)
+  })
 
 
   # ========================================================

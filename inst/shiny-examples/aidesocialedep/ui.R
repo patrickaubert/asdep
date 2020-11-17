@@ -282,8 +282,11 @@ ui <- dashboardPage(
             title = "Choisir le territoire auquel se comparer", solidHeader = TRUE,  collapsible = TRUE, collapsed = TRUE,
             width = 12,
             HTML("Vous pouvez choisir le territoire auquel vous souhaitez comparer les données relatives
-            au département sélectionn : France entière, région, groupe de département défini de façon <i>ad-hoc</i>.
+            au département sélectionné : France entière, région, groupe de département défini de façon <i>ad-hoc</i>.
             Ce territoire de comparaison sera représenté sur tous les graphiques, si les données sont disponibles."),
+            br(),br(),
+            HTML("Les territoires qui constituent le groupe de comparaison sont les suivants : "),
+            htmlOutput("gpecomparaison"),
             br(),br(),
             column(
               4,
@@ -360,7 +363,7 @@ ui <- dashboardPage(
 
         fluidRow(
           box(
-            title = "Afficher des les graphiques en base 100", solidHeader = TRUE,  collapsible = TRUE, collapsed = TRUE,
+            title = "Afficher les graphiques en base 100", solidHeader = TRUE,  collapsible = TRUE, collapsed = TRUE,
             width = 12,
           ) # fin box paramétrage graphiques en base 100
         ), # fin fluidRow  paramétrage graphiques en base 100
