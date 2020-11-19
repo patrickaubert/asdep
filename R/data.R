@@ -86,3 +86,19 @@
 #'
 #' @source \url{https://www.insee.fr/fr/statistiques/1893198}
 "PopDepartementales"
+
+#' Liste des départements et territoires
+#'
+#' Une base de données contenant la liste des départements (et territoires gérant l'aide sociale départementale)
+#'
+#' @format Un data frame avec 104 lignes et 4 variables
+#' \describe{
+#'   \item{NumReg}{Code numérique de la région}
+#'   \item{NumDept}{Code alphnumérique du département (ou territoire)}
+#'   \item{Departement}{Nom du département}
+#'   \item{Region}{Nom de la région}
+#' }
+#'
+#' @source \url{}
+"departementsFR"
+

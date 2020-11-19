@@ -27,7 +27,7 @@ graphEvolution <- function(nomvariable, denom = "", options = c(), poidsobs = c(
                            donnees = ASDEPsl, variables = ASDEPsl_description) {
 
   # === Récupération des données pour l'indicateur
-  if (NROW(gpecomp)>=1) {comp <- "Groupe de comparaison"}
+  #if (NROW(gpecomp)>=1) {comp <- "Groupe de comparaison"}
   if (nchar(denom)>0) {poidsobs <- c(poidsobs,denom)}
   tabs <- selectIndic(nomvariable = nomvariable, denom = denom, keepvar=c(poidsobs),
                      options = options, gpeDpt = gpecomp,

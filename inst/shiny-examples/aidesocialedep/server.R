@@ -3,27 +3,33 @@ server <- function(input, output, session) {
   listedepartements <- unique(ASDEPsl[ASDEPsl$TypeTerritoire == "Département", "Territoire"])
   listedepartements <- listedepartements[order(listedepartements)]
 
+  region <- function(dep) {departementsFR[departementsFR$Departement == dep,"Region"]}
+  autresdepRegion <- function(dep) {
+    depreg <- departementsFR[departementsFR$Region == region(dep),]$Departement
+    return(depreg[depreg != dep])
+  }
+
   # ========================================================
   # mise en forme des graphiques dans l'appli
 
-  territoireComparaison <- function(terrcomp,var) {
+  territoireComparaison <- function(terrcomp,var,dep) {
     switch(terrcomp,
            "france" = champFrance(var),
-           "region" = "Grand Est",
+           "region" = region(dep),
            "choix" = "Groupe de comparaison",
            "proche" = "Départements similaires")
   }
-  gptDeptComparaison <- function(terrcomp,gpeDept) {
+  gptDeptComparaison <- function(terrcomp,gpeDept,dep) {
     switch(terrcomp,
            "france" = c(),
-           "region" = c(),
+           "region" = autresdepRegion(dep),
            "choix" = c(gpeDept),
            "proche" = c( departementsProches(
              dept = input$dep,
              nomvariable = input$varcomp, denom = input$denomvarcomp, nb = input$nbcomp,
              annee = input$anneeref) ))
   }
-  output$gpecomparaison <- renderText({ paste(gptDeptComparaison(input$terrcomp, input$listedepcomp),collapse="; ") })
+  output$gpecomparaison <- renderText({ paste(gptDeptComparaison(input$terrcomp, input$listedepcomp, input$dep),collapse="; ") })
 
   ggplotlocal <- function(...) {
     ggplot(...)
@@ -44,8 +50,8 @@ server <- function(input, output, session) {
       nomvariable = nomvariable,
       ...,
       dept=input$dep, # département choisi par l'utilisateur
-      comp= territoireComparaison(input$terrcomp, nomvariable),
-      gpecomp = gptDeptComparaison(input$terrcomp, input$listedepcomp),
+      comp= territoireComparaison(input$terrcomp, nomvariable,input$dep),
+      gpecomp = gptDeptComparaison(input$terrcomp, input$listedepcomp, input$dep),
       options=c(input$affichedispers), # zone choisie par l'utilisateur
       typesortie="graphdyn"
       )
@@ -57,8 +63,8 @@ server <- function(input, output, session) {
       ...,
       annee=input$anneeref,
       dept=input$dep, # département choisi par l'utilisateur
-      comp= territoireComparaison(input$terrcomp, nomvariable),
-      gpecomp = gptDeptComparaison(input$terrcomp, input$listedepcomp),
+      comp= territoireComparaison(input$terrcomp, nomvariable, input$dep),
+      gpecomp = gptDeptComparaison(input$terrcomp, input$listedepcomp, input$dep),
       options=c(input$affichedispers), # zone choisie par l'utilisateur
       typesortie="graphdyn"
     )

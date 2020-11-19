@@ -36,7 +36,7 @@ graphComparaison2dim <- function(
 
   # === Récupération des données pour l'indicateur
 
-  if (NROW(gpecomp)>=1) {comp <- "Groupe de comparaison"}
+  #if (NROW(gpecomp)>=1) {comp <- "Groupe de comparaison"}
   if (nchar(denom)>0) {poidsobs <- c(poidsobs,denom)}
 
   # détermine la population de référence (pour la taille des bulles sur le graphique, celles-ci étant proportionnelles à la population)
