@@ -83,6 +83,13 @@ server <- function(input, output, session) {
                       selected = listedepartements[newval] )
   })
 
+  observeEvent(input$varcomp, {
+    listDenom <- listeDenominateurs(input$varcomp)
+    updateSelectInput(session, "denomvarcomp",
+                     choices = as.list(setNames(listDenom$denominateurs, listDenom$intitules)) )
+  })
+
+
   # ========================================================
   # options dynamiques
 
