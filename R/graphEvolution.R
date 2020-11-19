@@ -10,7 +10,7 @@
 #' @param options un vecteur d'options du calcul (valeurs en euros courant ou constant, mensuels ou annuels, etc.) et d'options de représentation (représenter les zones interdécile, interquartile, médiane +/- 10 %, etc)
 #' @param dept le nom du département qu'on souhaite représenter
 #' @param comp le nom du territoire qu'on souhaite représenter en comparaison (par défaut, "TOTAL estimé France entière (hors Mayotte)")
-#' @param gpecomp un vecteur de noms de départements : leur ensemble constituera le "groupe de comparaison" (si cette variable est renseignée, la variable 'comp' est automatiquement égale à "groupe de comparaison")
+#' @param gpecomp un vecteur de noms de départements : leur ensemble constituera le "groupe de comparaison"
 #' @param typesortie détermine l'objet en sortie de la fonction : un graphique si l'option "graph" est retenue (option par défaut), une table de donnée (data frame) si l'option "tab" est retenue. Les options "tabcomplet" (une liste de tables) et "graphdyn" (un graphique Plotly) sont également disponibles
 #' @param donnees la table de données en entrée (par défaut, la table ASDEPsl)
 #' @param variables la table de métadonnées de la table de données en entrée (par défaut, la table ASDEPsl_description)
@@ -98,6 +98,7 @@ graphEvolution <- function(nomvariable, denom = "", options = c(), poidsobs = c(
                      alpha = rep(zonesloc$alpha[i] , nrow(tabq))
                    ))
   }
+  tabq3 <- tabq3 %>% arrange(intitules,Annee)
 
   #couleursloc <- c("Zone interdécile" = "blue",
   #                 "Zone interquartile" = "blue",
@@ -123,14 +124,14 @@ graphEvolution <- function(nomvariable, denom = "", options = c(), poidsobs = c(
   gstat <- ggplotAsdep() +
     geom_line(
       data=tabg2,
-      aes(x=Annee,y=indicateur,colour=Territoire),size=1) + #,text=paste(Territoire,", ",Annee,"<br>",indicateur," ",tabs$unitevar,sep="")
+      aes(x=Annee,y=indicateur,colour=Territoire,label=paste(Territoire,", ",Annee,"<br>",indicateur," ",tabs$unitevar,sep="")),size=1) + #
     geom_ribbon(
       data=tabq3,
-      aes(ymin=ymin, ymax=ymax, x=Annee, fill=intitules, alpha=intitules)) +  # , text=paste(intitules," : entre ",ymin," et ",ymax," ",tabs$unitevar,sep="")
+      aes(ymin=ymin, ymax=ymax, x=Annee, fill=intitules, alpha=intitules, label=paste(intitules," : entre ",ymin," et ",ymax," ",tabs$unitevar,sep=""))) +  #
+    guides(size = FALSE , alpha = FALSE) +
     scale_fill_manual(values = couleursloc) +
     scale_color_manual(values = couleursloc) +
     scale_alpha_manual(values = alphasloc) +
-    guides(size = FALSE , alpha = FALSE) +
     labs(x = "année",
          y = paste("En",tabs$unitevar,sep=" "))
 

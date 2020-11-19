@@ -14,7 +14,7 @@
 #' @param options un vecteur d'options du calcul (valeurs en euros courant ou constant, mensuels ou annuels, etc.)
 #' @param dept le nom du département qu'on souhaite représenter
 #' @param comp le nom du territoire qu'on souhaite représenter en comparaison (par défaut, "TOTAL estimé France entière (hors Mayotte)")
-#' @param gpecomp un vecteur de noms de départements : leur ensemble constituera le "groupe de comparaison" (si cette variable est renseignée, la variable 'comp' est automatiquement égale à "groupe de comparaison")
+#' @param gpecomp un vecteur de noms de départements : leur ensemble constituera le "groupe de comparaison"
 #' @param typesortie détermine l'objet en sortie de la fonction : un graphique si l'option "graph" est retenue (option par défaut), une table de donnée (data frame) si l'option "tab" est retenue. Les options "tabcomplet" (une liste de tables) et "graphdyn" (un graphique Plotly) sont également disponibles
 #' @param donnees la table de données en entrée (par défaut, la table ASDEPsl)
 #' @param variables la table de métadonnées de la table de données en entrée (par défaut, la table ASDEPsl_description)
