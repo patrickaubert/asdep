@@ -161,11 +161,47 @@ ui <- dashboardPage(
         ) # fin fluidRow part Aides ménagères
       ),
 
-
+      # handicap
       tabItem(
         tabName = "handicap",
-      ),
+        fluidRow(
+          tabBox(
+            title = "Nb de bénéficiaires de la PCH ou de l'ACTP, en % de la population de 60 ans et plus",
+            id = "tabpartPCHACTP", width=12, # collapsible = TRUE, solidHeader = TRUE,
+            tabPanel("PCH et ACTP",
+                     ASDEPsl_description[ASDEPsl_description$Nom.var=="TotBenefACTPPCH","Note.var"],
+                     fluidRow(
+                       column(6, plotlyOutput("partPCHACTPpopEvol")),
+                       column(6, plotlyOutput("partPCHACTPpop"))
+                     )
+            ),
+            tabPanel("PCH",
+                     ASDEPsl_description[ASDEPsl_description$Nom.var=="NbBenefPCH","Note.var"],
+                     fluidRow(
+                       column(6, plotlyOutput("partPCHpopEvol")),
+                       column(6, plotlyOutput("partPCHpop"))
+                     )
+            ),
+            tabPanel("ACTP",
+                     ASDEPsl_description[ASDEPsl_description$Nom.var=="NbBenefACTP","Note.var"],
+                     fluidRow(
+                       column(6, plotlyOutput("partACTPpopEvol")),
+                       column(6, plotlyOutput("partACTPpop"))
+                     )
+            )
+          )
+        ), # fin fluidRow part ACTP+PCH
+        fluidRow(
+          box(
+            title = "Proportion de bénéficiaires de l'ACTP, en % de l'ensemble des bénéficiaires de la PCH ou l'ACTP",
+            width=12, collapsible = TRUE, solidHeader = TRUE,  collapsed = TRUE,
+            ASDEPsl_description[ASDEPsl_description$Nom.var=="NbBenefACTP","Note.var"],
+            column(6, plotlyOutput("partACTPprestaEvol") ),
+            column(6, plotlyOutput("partACTPpresta") )
+          )
+        ) # fin fluidRow part ACTP dans total PCH+ACTP
 
+      ), # fin tabItem sur le handicap
 
       tabItem(
         tabName = "ase",

@@ -110,7 +110,7 @@ server <- function(input, output, session) {
   # ========================================================
   # Graphiques
 
-  # === Perte d'autonomie
+  # === 1) Perte d'autonomie
 
   # -- part des bénéficiaires de l'APA dans la population de 60 ans et plus, en série temporelle
   output$partAPApopEvol <- renderPlotly({graphEvolutionAppli(nomvariable="NbBenefAPA",denom="pop.60.99")  })
@@ -151,7 +151,7 @@ server <- function(input, output, session) {
   output$partAidesMenPAEvol <- renderPlotly({  graphEvolutionAppli(nomvariable="NbBenefAideMenagerePA",denom="pop.60.99")   })
   output$partAidesMenPA <- renderPlotly({  graphComparaisonAppli(nomvariable="NbBenefAideMenagerePA",denom="pop.60.99")   })
 
-  # === Aide sociale à l'enfance
+  # === 2) Aide sociale à l'enfance
 
   # -- part des enfants accueillis ou confiés à l'ASE dans la population
   output$partAccueilASEpopEvol <- renderPlotly({graphEvolutionAppli(nomvariable="TotEnfAccueillisASE",denom="pop.0.20")  })
@@ -196,5 +196,41 @@ server <- function(input, output, session) {
   output$depallocASE <- renderPlotly({graphComparaisonAppli(nomvariable="DepBruteAllocASE",denom="pop.0.20")  })
 
   # -- part des mesures judiciaires parmi l'ensemble des mesures
+
+
+  # === 3) Handicap
+
+  # -- part des bénéficiaires de la PCH et/ou de l'ACTP dans la population
+  output$partPCHACTPpopEvol <- renderPlotly({graphEvolutionAppli(nomvariable="TotBenefACTPPCH",denom="popTOT")  })
+  output$partPCHACTPpop <- renderPlotly({graphComparaisonAppli(nomvariable="TotBenefACTPPCH",denom="popTOT")  })
+
+  output$partPCHpopEvol <- renderPlotly({graphEvolutionAppli(nomvariable="NbBenefPCH",denom="popTOT")  })
+  output$partPCHpop <- renderPlotly({graphComparaisonAppli(nomvariable="NbBenefPCH",denom="popTOT")  })
+
+  output$partACTPpopEvol <- renderPlotly({graphEvolutionAppli(nomvariable="NbBenefACTP",denom="popTOT")  })
+  output$partACTPpop <- renderPlotly({graphComparaisonAppli(nomvariable="NbBenefACTP",denom="popTOT")  })
+
+  # -- part des bénéficiaires de la PCH parmi l'ensemble ACTP+PCH
+  output$partACTPprestaEvol <- renderPlotly({graphEvolutionAppli(nomvariable="NbBenefACTP",denom="TotBenefACTPPCH")  })
+  output$partACTPpresta <- renderPlotly({graphComparaisonAppli(nomvariable="NbBenefACTP",denom="TotBenefACTPPCH")  })
+
+  # -- part des bénéficiaires d'aide à l'accueil (ASH+accueil particulier et de jour) hors ACTP dans la population
+  output$partAcchorsactppopEvol <- renderPlotly({graphEvolutionAppli(nomvariable="TotBenefPHEtab.horsACTP",denom="popTOT")  })
+  output$partAcchorsactppop <- renderPlotly({graphComparaisonAppli(nomvariable="TotBenefPHEtab.horsACTP",denom="popTOT")  })
+
+  # -- dépense moyenne par bénéficiaire ACTP et PCH
+  #output$depmoyPCHACTPEvol <- renderPlotly({graphEvolutionAppli(nomvariable="",denom="TotBenefACTPPCH")  })
+  #output$depmoyPCHACTP <- renderPlotly({graphComparaisonAppli(nomvariable="",denom="TotBenefACTPPCH")  })
+  # !! reste à créer variable agrégée dep ACTP+PCH
+
+  output$depmoyPCHEvol <- renderPlotly({graphEvolutionAppli(nomvariable="DepBrutePCH",denom="NbBenefPCH")  })
+  output$depmoyPCH <- renderPlotly({graphComparaisonAppli(nomvariable="DepBrutePCH",denom="NbBenefPCH")  })
+
+  output$depmoyACTPEvol <- renderPlotly({graphEvolutionAppli(nomvariable="DepBruteACTP",denom="NbBenefACTP")  })
+  output$depmoyACTP <- renderPlotly({graphComparaisonAppli(nomvariable="DepBruteACTP",denom="NbBenefACTP")  })
+
+  # -- dépense moyenne par bénéficiaire d'aide à l'accueil
+  output$depmoyAccueiletabPHEvol <- renderPlotly({graphEvolutionAppli(nomvariable="DepBruteAidesAccueiletabPH",denom="NbBenefAideHebergementPH	")  })
+  output$depmoyAccueiletabPH <- renderPlotly({graphComparaisonAppli(nomvariable="DepBruteAidesAccueiletabPH",denom="NbBenefAideHebergementPH	")  })
 
 }
