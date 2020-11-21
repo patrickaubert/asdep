@@ -8,11 +8,42 @@ library(shinydashboard)
 library(plotly)
 library(asdep)
 
+# === sources et variables
+
 #source(paste(getwd(),"inst/shiny-examples/aidesocialedep/textesappli.R", sep="/"))
 source("textesappli.R",encoding="UTF8")
 
 listedepartements <- unique(ASDEPsl[ASDEPsl$TypeTerritoire == "Département", "Territoire"])
 listedepartements <- listedepartements[order(listedepartements)]
+
+
+# === fonction de mise en forme des boîtes
+
+texteintroductif <- function(var,varnum,vardenum) {
+  txt <- ""
+  #if (!is.null(var)) txt <- paste(txt,ASDEPsl_description[ASDEPsl_description$Nom.var==var,"Note.var"],"<br>",sep="")
+  #if (!is.null(varnum)) txt <- paste(txt,"Numérateur : ",ASDEPsl_description[ASDEPsl_description$Nom.var==varnum,"Note.var"],"<br>",sep="")
+  #if (!is.null(vardenum)) txt <- paste(txt,"Dénominateur : ",ASDEPsl_description[ASDEPsl_description$Nom.var==vardenum,"Note.var"],"<br>",sep="")
+  txtvar <- if (!is.null(var)){ASDEPsl_description[ASDEPsl_description$Nom.var==var,"Note.var"]}else{""}
+  txtvarnum <- if (!is.null(varnum)){ASDEPsl_description[ASDEPsl_description$Nom.var==varnum,"Note.var"]}else{""}
+  txtvardenum <- if (!is.null(vardenum)){ASDEPsl_description[ASDEPsl_description$Nom.var==vardenum,"Note.var"]}else{""}
+  if (nchar(txtvar)>1) txt <- paste(txt,txtvar,"<br>",sep="")
+  if (nchar(txtvarnum)>1) txt <- paste(txt,"Numérateur : ",txtvarnum,"<br>",sep="")
+  if (nchar(txtvardenum)>1) txt <- paste(txt,"Dénominateur : ",txtvardenum,"<br>",sep="")
+  return(txt)
+}
+
+boite <- function(titre="",var=NULL,varnum=NULL,vardenum=NULL,graph,collapsed=FALSE) {
+  fluidRow(
+    box(
+      title = titre,
+      width=12, collapsible = TRUE, solidHeader = TRUE,  collapsed = collapsed,
+      HTML( texteintroductif(var,varnum,vardenum) ),
+      column(6, plotlyOutput(paste(graph,"Evol",sep="")) ),
+      column(6, plotlyOutput(graph) )
+    )
+  )
+}
 
   # === partie UI de l'application
 ui <- dashboardPage(
@@ -166,7 +197,7 @@ ui <- dashboardPage(
         tabName = "handicap",
         fluidRow(
           tabBox(
-            title = "Nb de bénéficiaires de la PCH ou de l'ACTP, en % de la population de 60 ans et plus",
+            title = "Bénéficiaires de la PCH ou de l'ACTP, en % de la population de 60 ans et plus",
             id = "tabpartPCHACTP", width=12, # collapsible = TRUE, solidHeader = TRUE,
             tabPanel("PCH et ACTP",
                      ASDEPsl_description[ASDEPsl_description$Nom.var=="TotBenefACTPPCH","Note.var"],
@@ -191,16 +222,49 @@ ui <- dashboardPage(
             )
           )
         ), # fin fluidRow part ACTP+PCH
-        fluidRow(
-          box(
-            title = "Proportion de bénéficiaires de l'ACTP, en % de l'ensemble des bénéficiaires de la PCH ou l'ACTP",
-            width=12, collapsible = TRUE, solidHeader = TRUE,  collapsed = TRUE,
-            ASDEPsl_description[ASDEPsl_description$Nom.var=="NbBenefACTP","Note.var"],
-            column(6, plotlyOutput("partACTPprestaEvol") ),
-            column(6, plotlyOutput("partACTPpresta") )
-          )
-        ) # fin fluidRow part ACTP dans total PCH+ACTP
 
+        boite(titre = "Proportion de bénéficiaires de l'ACTP, en % de l'ensemble des bénéficiaires de la PCH ou l'ACTP",
+              varnum = "NbBenefACTP",
+              vardenum = "TotBenefACTPPCH",
+              graph = "partACTPpresta",
+              collapsed = TRUE),
+
+        fluidRow(
+          tabBox(
+            title = "Dépenses moyennes de PCH et d'ACTP par bénéficiaire, en €",
+            id = "tabdepmoyPCHACTP", width=12, # collapsible = TRUE, solidHeader = TRUE,
+            tabPanel("PCH",
+                     ASDEPsl_description[ASDEPsl_description$Nom.var=="DepBrutePCH","Note.var"],
+                     fluidRow(
+                       column(6, plotlyOutput("depmoyPCHEvol")),
+                       column(6, plotlyOutput("depmoyPCH"))
+                     )
+            ),
+            tabPanel("ACTP",
+                     ASDEPsl_description[ASDEPsl_description$Nom.var=="DepBruteACTP","Note.var"],
+                     fluidRow(
+                       column(6, plotlyOutput("depmoyACTPEvol")),
+                       column(6, plotlyOutput("depmoyACTP"))
+                     )
+            ),
+            tabPanel("PCH et ACTP",
+                     ASDEPsl_description[ASDEPsl_description$Nom.var=="TotBenefACTPPCH","Note.var"],
+                     fluidRow(
+                       column(6, ),
+                       column(6, )
+                     )
+            )
+          )
+        ), # fin fluidRow dépenses moyennes par aide ACTP ou PCH
+
+        boite(titre = "Bénéficiaires d'aides à l'accueil, en % de la population",
+              var = "TotBenefPHEtab.horsACTP",
+              graph = "partAcchorsactppop"),
+
+        boite(titre = "Dépenses moyennes d'aide à l'accueil par bénéficiaire, en €",
+              varnum = "DepBruteAidesAccueiletabPH",
+              vardenum = "NbBenefAideHebergementPH",
+              graph = "depmoyAccueiletabPH")
       ), # fin tabItem sur le handicap
 
       tabItem(
