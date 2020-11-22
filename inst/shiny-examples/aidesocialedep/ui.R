@@ -113,15 +113,21 @@ ui <- dashboardPage(
             )
           )
         ), # fin fluidRow part APA dans population
-        fluidRow(
-          box(
-            title = "Proportion de bénéficiaires de l'APA à domicile, en % de l'ensemble des bénéficiaires de l'APA",
-            width=12, collapsible = TRUE, solidHeader = TRUE,  collapsed = TRUE,
-            ASDEPsl_description[ASDEPsl_description$Nom.var=="NbBenefAPADomicile","Note.var"],
-            column(6, plotlyOutput("partAPAdomEvol") ),
-            column(6, plotlyOutput("partAPAdom") )
-          )
-        ), # fin fluidRow ratio ASH / APA
+
+        boite(titre = "Proportion de bénéficiaires de l'APA à domicile, en % de l'ensemble des bénéficiaires de l'APA",
+              varnum = "NbBenefAPADomicile",
+              vardenum = "NbBenefAPA",
+              graph = "partAPAdom",
+              collapsed = TRUE),
+        #fluidRow(
+        #  box(
+        #    title = "Proportion de bénéficiaires de l'APA à domicile, en % de l'ensemble des bénéficiaires de l'APA",
+        #    width=12, collapsible = TRUE, solidHeader = TRUE,  collapsed = TRUE,
+        #    ASDEPsl_description[ASDEPsl_description$Nom.var=="NbBenefAPADomicile","Note.var"],
+        #    column(6, plotlyOutput("partAPAdomEvol") ),
+        #    column(6, plotlyOutput("partAPAdom") )
+        #  )
+        #), # fin fluidRow ratio ASH / APA
         #fluidRow(
         #  tabBox(
         #    title = "APA",

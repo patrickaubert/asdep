@@ -230,7 +230,7 @@ server <- function(input, output, session) {
   output$depmoyACTP <- renderPlotly({graphComparaisonAppli(nomvariable="DepBruteACTP",denom="NbBenefACTP")  })
 
   # -- dépense moyenne par bénéficiaire d'aide à l'accueil
-  output$depmoyAccueiletabPHEvol <- renderPlotly({graphEvolutionAppli(nomvariable="DepBruteAidesAccueiletabPH",denom="NbBenefAideHebergementPH	")  })
-  output$depmoyAccueiletabPH <- renderPlotly({graphComparaisonAppli(nomvariable="DepBruteAidesAccueiletabPH",denom="NbBenefAideHebergementPH	")  })
+  output$depmoyAccueiletabPHEvol <- renderPlotly({graphEvolutionAppli(nomvariable="DepBruteAidesAccueiletabPH",denom="NbBenefAideHebergementPH")  })
+  output$depmoyAccueiletabPH <- renderPlotly({graphComparaisonAppli(nomvariable="DepBruteAidesAccueiletabPH",denom="NbBenefAideHebergementPH")  })
 
 }
