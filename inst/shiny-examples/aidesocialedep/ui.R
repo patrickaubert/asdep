@@ -1,12 +1,16 @@
 library(tidyverse)
 library(dplyr)
+library(magrittr)
+library(stats)
 library(shiny)
 library(shinyWidgets)
 library(Hmisc)
 library(ggplot2)
 library(shinydashboard)
 library(plotly)
+# devtools::install_github("patrickaubert/asdep",ref='main')
 library(asdep)
+
 
 # === sources et variables
 
@@ -17,7 +21,7 @@ listedepartements <- unique(ASDEPsl[ASDEPsl$TypeTerritoire == "Département", "T
 listedepartements <- listedepartements[order(listedepartements)]
 
 
-# === fonction de mise en forme des boîtes
+# === fonction de mise en forme des boîtes (box et tabBox dans le dashboard)
 
 texteintroductif <- function(var,varnum,vardenum) {
   txt <- ""
@@ -55,21 +59,29 @@ multiboite <- function(titre="",id="",var=NULL,varnum=NULL,vardenum=NULL,graph,i
   } else if (nb == 1) {
     return( boite(titre=titre,var=var[1],varnum=varnum[1],vardenum=vardenum[1],graph=graph[1],collapsed=collapsed) )
   } else if (nb > 1) {
+    #tabBoxLoc <- function(...) {  }
     return(
     fluidRow(
-      tabBox(
-        title = titre,
-        id = id, width=12,
-        for (i in 1:nb) {
-          tabPanel(intitules[i],
-                   HTML( texteintroductif(var[i],varnum[i],vardenum[i]) ),
-                   fluidRow(
-                     column(6, plotlyOutput(paste(graph[i],"Evol",sep="")) ),
-                     column(6, plotlyOutput(graph[i]) )
+      do.call(
+        tabBox,
+        c(
+          title = titre,
+          id = id,
+          width=12,
+          lapply(c(1:nb),
+                 function(i) {
+                   tabPanel(
+                     intitules[i],
+                     HTML( texteintroductif(var[i],varnum[i],vardenum[i]) ),
+                     fluidRow(
+                       column(6, plotlyOutput(paste(graph[i],"Evol",sep="")) ),
+                       column(6, plotlyOutput(graph[i]) )
+                     )
                    )
-          )
-        }
-      ) # fin du tabbox
+                 } # fin function
+                 )  # fin lapply
+          ) # fin c()
+        ) # fin do.call
     ) # fin Fluidrow
   ) # fin du return
   }
@@ -231,40 +243,13 @@ ui <- dashboardPage(
       # handicap
       tabItem(
         tabName = "handicap",
-        fluidRow(
-          tabBox(
-            title = "Bénéficiaires de la PCH ou de l'ACTP, en % de la population de 60 ans et plus",
-            id = "tabpartPCHACTP", width=12, # collapsible = TRUE, solidHeader = TRUE,
-            tabPanel("PCH et ACTP",
-                     ASDEPsl_description[ASDEPsl_description$Nom.var=="TotBenefACTPPCH","Note.var"],
-                     fluidRow(
-                       column(6, plotlyOutput("partPCHACTPpopEvol")),
-                       column(6, plotlyOutput("partPCHACTPpop"))
-                     )
-            ),
-            tabPanel("PCH",
-                     ASDEPsl_description[ASDEPsl_description$Nom.var=="NbBenefPCH","Note.var"],
-                     fluidRow(
-                       column(6, plotlyOutput("partPCHpopEvol")),
-                       column(6, plotlyOutput("partPCHpop"))
-                     )
-            ),
-            tabPanel("ACTP",
-                     ASDEPsl_description[ASDEPsl_description$Nom.var=="NbBenefACTP","Note.var"],
-                     fluidRow(
-                       column(6, plotlyOutput("partACTPpopEvol")),
-                       column(6, plotlyOutput("partACTPpop"))
-                     )
-            )
-          )
-        ), # fin fluidRow part ACTP+PCH
 
-        #multiboite(
-        #  titre = "Bénéficiaires de la PCH ou de l'ACTP, en % de la population de 60 ans et plus",
-        #  intitules = c("PCH et ACTP","PCH","ACTP"),
-        #  graph = c("partPCHACTPpop","partPCHpop","partACTPpop"),
-        #  var = c("TotBenefACTPPCH","NbBenefPCH","NbBenefACTP"),
-        #  collapsed = TRUE),
+        multiboite(
+          titre = "Bénéficiaires de la PCH ou de l'ACTP, en % de la population de 60 ans et plus",
+          intitules = c("PCH et ACTP","PCH","ACTP"),
+          graph = c("partPCHACTPpop","partPCHpop","partACTPpop"),
+          var = c("TotBenefACTPPCH","NbBenefPCH","NbBenefACTP"),
+          collapsed = TRUE),
 
         boite(titre = "Proportion de bénéficiaires de l'ACTP, en % de l'ensemble des bénéficiaires de la PCH ou l'ACTP",
               varnum = "NbBenefACTP",
@@ -272,33 +257,13 @@ ui <- dashboardPage(
               graph = "partACTPpresta",
               collapsed = TRUE),
 
-        fluidRow(
-          tabBox(
-            title = "Dépenses moyennes de PCH et d'ACTP par bénéficiaire, en €",
-            id = "tabdepmoyPCHACTP", width=12, # collapsible = TRUE, solidHeader = TRUE,
-            tabPanel("PCH",
-                     ASDEPsl_description[ASDEPsl_description$Nom.var=="DepBrutePCH","Note.var"],
-                     fluidRow(
-                       column(6, plotlyOutput("depmoyPCHEvol")),
-                       column(6, plotlyOutput("depmoyPCH"))
-                     )
-            ),
-            tabPanel("ACTP",
-                     ASDEPsl_description[ASDEPsl_description$Nom.var=="DepBruteACTP","Note.var"],
-                     fluidRow(
-                       column(6, plotlyOutput("depmoyACTPEvol")),
-                       column(6, plotlyOutput("depmoyACTP"))
-                     )
-            ),
-            tabPanel("PCH et ACTP",
-                     ASDEPsl_description[ASDEPsl_description$Nom.var=="TotBenefACTPPCH","Note.var"],
-                     fluidRow(
-                       column(6 ),
-                       column(6 )
-                     )
-            )
-          )
-        ), # fin fluidRow dépenses moyennes par aide ACTP ou PCH
+        multiboite(
+          titre = "Dépenses moyennes de PCH et d'ACTP par bénéficiaire, en €",
+          intitules = c("PCH","ACTP"),
+          graph = c("depmoyPCH","depmoyACTP"),
+          varnum = c("DepBrutePCH","DepBruteACTP"),
+          vardenum = c("NbBenefPCH","NbBenefACTP"),
+          collapsed = TRUE),
 
         boite(titre = "Bénéficiaires d'aides à l'accueil, en % de la population",
               var = "TotBenefPHEtab.horsACTP",
@@ -308,6 +273,7 @@ ui <- dashboardPage(
               varnum = "DepBruteAidesAccueiletabPH",
               vardenum = "NbBenefAideHebergementPH",
               graph = "depmoyAccueiletabPH")
+
       ), # fin tabItem sur le handicap
 
       tabItem(
