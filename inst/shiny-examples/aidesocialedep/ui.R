@@ -45,6 +45,36 @@ boite <- function(titre="",var=NULL,varnum=NULL,vardenum=NULL,graph,collapsed=FA
   )
 }
 
+multiboite <- function(titre="",id="",var=NULL,varnum=NULL,vardenum=NULL,graph,intitules,collapsed=FALSE) {
+  nb <- case_when(
+    is.null(var) ~ min(NROW(varnum),NROW(vardenum),NROW(graph),NROW(intitules)),
+    is.null(varnum) | is.null(vardenum) ~ min(NROW(var),NROW(graph),NROW(intitules)),
+    TRUE ~ min(NROW(var),NROW(varnum),NROW(vardenum),NROW(graph),NROW(intitules))
+  )
+  if (nb==0) {return()
+  } else if (nb == 1) {
+    return( boite(titre=titre,var=var[1],varnum=varnum[1],vardenum=vardenum[1],graph=graph[1],collapsed=collapsed) )
+  } else if (nb > 1) {
+    return(
+    fluidRow(
+      tabBox(
+        title = titre,
+        id = id, width=12,
+        for (i in 1:nb) {
+          tabPanel(intitules[i],
+                   HTML( texteintroductif(var[i],varnum[i],vardenum[i]) ),
+                   fluidRow(
+                     column(6, plotlyOutput(paste(graph[i],"Evol",sep="")) ),
+                     column(6, plotlyOutput(graph[i]) )
+                   )
+          )
+        }
+      ) # fin du tabbox
+    ) # fin Fluidrow
+  ) # fin du return
+  }
+}
+
   # === partie UI de l'application
 ui <- dashboardPage(
 
@@ -229,6 +259,13 @@ ui <- dashboardPage(
           )
         ), # fin fluidRow part ACTP+PCH
 
+        #multiboite(
+        #  titre = "Bénéficiaires de la PCH ou de l'ACTP, en % de la population de 60 ans et plus",
+        #  intitules = c("PCH et ACTP","PCH","ACTP"),
+        #  graph = c("partPCHACTPpop","partPCHpop","partACTPpop"),
+        #  var = c("TotBenefACTPPCH","NbBenefPCH","NbBenefACTP"),
+        #  collapsed = TRUE),
+
         boite(titre = "Proportion de bénéficiaires de l'ACTP, en % de l'ensemble des bénéficiaires de la PCH ou l'ACTP",
               varnum = "NbBenefACTP",
               vardenum = "TotBenefACTPPCH",
@@ -256,8 +293,8 @@ ui <- dashboardPage(
             tabPanel("PCH et ACTP",
                      ASDEPsl_description[ASDEPsl_description$Nom.var=="TotBenefACTPPCH","Note.var"],
                      fluidRow(
-                       column(6, ),
-                       column(6, )
+                       column(6 ),
+                       column(6 )
                      )
             )
           )
@@ -364,7 +401,7 @@ ui <- dashboardPage(
         ) # fin fluidRow dep alloc ASE
       ),
       tabItem(
-        tabName = "insertion",
+        tabName = "insertion"
       ),
 
       # === paramétrage des graphiques affichés
@@ -470,7 +507,7 @@ ui <- dashboardPage(
         fluidRow(
           box(
             title = "Afficher les graphiques en base 100", solidHeader = TRUE,  collapsible = TRUE, collapsed = TRUE,
-            width = 12,
+            width = 12
           ) # fin box paramétrage graphiques en base 100
         ), # fin fluidRow  paramétrage graphiques en base 100
 
