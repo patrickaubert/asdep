@@ -30,7 +30,7 @@ graphEvolution(
 
 \item{comp}{le nom du territoire qu'on souhaite représenter en comparaison (par défaut, "TOTAL estimé France entière (hors Mayotte)")}
 
-\item{gpecomp}{un vecteur de noms de départements : leur ensemble constituera le "groupe de comparaison" (si cette variable est renseignée, la variable 'comp' est automatiquement égale à "groupe de comparaison")}
+\item{gpecomp}{un vecteur de noms de départements : leur ensemble constituera le "groupe de comparaison"}
 
 \item{typesortie}{détermine l'objet en sortie de la fonction : un graphique si l'option "graph" est retenue (option par défaut), une table de donnée (data frame) si l'option "tab" est retenue. Les options "tabcomplet" (une liste de tables) et "graphdyn" (un graphique Plotly) sont également disponibles}
 

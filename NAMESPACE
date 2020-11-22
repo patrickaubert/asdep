@@ -2,9 +2,11 @@
 
 export(Intitulepop)
 export(champFrance)
+export(departementsProches)
 export(ggplotAsdep)
 export(ggplotlyAsdep)
 export(graphComparaison)
+export(graphComparaison2dim)
 export(graphEvolution)
 export(listeDenominateurs)
 export(quantileIndic)
