@@ -367,7 +367,17 @@ ui <- dashboardPage(
         ) # fin fluidRow dep alloc ASE
       ),
       tabItem(
-        tabName = "insertion"
+        tabName = "insertion",
+
+        boite(titre = "Dépense nette d'allocation et d'insertion par habitant, en €",
+              var = "DepNetteInsertion",
+              graph = "depmoyAllocIns",
+              collapsed = FALSE),
+
+        boite(titre = "Part des dépenses d'allocation dans le total des dépenses d'insertion, en %",
+              varnum = "DepBruteRSA",  vardenum = "DepBruteInsertion",
+              graph = "partdepAlloc",
+              collapsed = FALSE)
       ),
 
       # === paramétrage des graphiques affichés

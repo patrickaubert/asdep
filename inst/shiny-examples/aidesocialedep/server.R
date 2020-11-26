@@ -233,4 +233,15 @@ server <- function(input, output, session) {
   output$depmoyAccueiletabPHEvol <- renderPlotly({graphEvolutionAppli(nomvariable="DepBruteAidesAccueiletabPH",denom="NbBenefAideHebergementPH")  })
   output$depmoyAccueiletabPH <- renderPlotly({graphComparaisonAppli(nomvariable="DepBruteAidesAccueiletabPH",denom="NbBenefAideHebergementPH")  })
 
+  # === 4) insertion
+
+  # -- dépense moyenne nette d'allocation et d'insertion par habitant
+  output$depmoyAllocInsEvol <- renderPlotly({graphEvolutionAppli(nomvariable="DepNetteInsertion",denom="popTOT")  })
+  output$depmoyAllocIns <- renderPlotly({graphComparaisonAppli(nomvariable="DepNetteInsertion",denom="popTOT")  })
+
+  # -- part des dépenses d'allocation dans le total des dépenses d'insertion
+  output$partdepAllocEvol <- renderPlotly({graphEvolutionAppli(nomvariable="DepBruteRSA",denom="DepBruteInsertion")  })
+  output$partdepAlloc <- renderPlotly({graphComparaisonAppli(nomvariable="DepBruteRSA",denom="DepBruteInsertion")  })
+
+
 }
