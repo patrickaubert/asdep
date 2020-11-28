@@ -383,6 +383,13 @@ BenefAidessociales <- plyr::rename(BenefAidessociales, c("Code.région"="Code.re
 #BenefAidessociales$Annee <- as.character(BenefAidessociales$Annee)
 #BenefAidessociales <- BenefAidessociales[order(-BenefAidessociales$Annee),]
 
+#  --- encodage en UTF-8 des noms de territoire
+
+#Encoding(BenefAidessociales$Territoire)
+#Encoding(BenefAidessociales$TypeTerritoire)
+BenefAidessociales$Territoire <- enc2utf8(BenefAidessociales$Territoire)
+BenefAidessociales$TypeTerritoire <- enc2utf8(BenefAidessociales$TypeTerritoire)
+
 #  --- sauvegarde les tables constituées
 
 ASDEPslbenef <- BenefAidessociales

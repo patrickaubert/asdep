@@ -387,6 +387,13 @@ DepensesAidessociales <- plyr::rename(DepensesAidessociales, c("Code.région"="C
 #DepensesAidessociales$Annee <- as.character(DepensesAidessociales$Annee)
 #DepensesAidessociales <- DepensesAidessociales[order(-DepensesAidessociales$Annee),]
 
+#  --- encodage en UTF-8 des noms de territoire
+
+#Encoding(DepensesAidessociales$Territoire)
+#Encoding(DepensesAidessociales$TypeTerritoire)
+DepensesAidessociales$Territoire <- enc2utf8(DepensesAidessociales$Territoire)
+DepensesAidessociales$TypeTerritoire <- enc2utf8(DepensesAidessociales$TypeTerritoire)
+
 # -------------------------------------------------------------------------------------------------
 # sauvegarde les tables constituées
 

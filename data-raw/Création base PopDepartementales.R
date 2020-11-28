@@ -179,6 +179,12 @@ PopDepartementales_description <- data.frame(
   Popref.var=rep("popTOT",NROW(noms.varpop)) )
 
 
+#  --- encodage en UTF-8 des noms de territoire
+
+popdepartementales$Territoire <- enc2utf8(popdepartementales$Territoire)
+popdepartementales$TypeTerritoire <- enc2utf8(popdepartementales$TypeTerritoire)
+
+
 # -------------------------------------------------------------------------------------------------
 # sauvegarde les tables constituées
 

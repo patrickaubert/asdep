@@ -6,6 +6,8 @@
 library(openxlsx)
 library(reshape2)
 library(plyr)
+library(dplyr)
+library(tidyr)
 
 options(encoding = "utf8")
 
@@ -61,6 +63,11 @@ for (i in 1:NROW(lisheets)) {
 
 verifnom <- unique(tabOarsa$Territoire)
 verifnom[!(verifnom %in% departements$Departement)]
+
+#  --- encodage en UTF-8 des noms de territoire
+
+tabOarsa$Territoire <- enc2utf8(tabOarsa$Territoire)
+tabOarsa$TypeTerritoire <- enc2utf8(tabOarsa$TypeTerritoire)
 
 # -------------------------------------------------------------------------------------------------
 # sauvegarde les tables constituées

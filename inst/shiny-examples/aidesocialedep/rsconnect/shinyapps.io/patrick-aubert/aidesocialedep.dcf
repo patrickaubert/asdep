@@ -4,7 +4,7 @@ username:
 account: patrick-aubert
 server: shinyapps.io
 hostUrl: https://api.shinyapps.io/v1
-appId: 3282560
-bundleId: 3891290
+appId: 3292828
+bundleId: 3916273
 url: https://patrick-aubert.shinyapps.io/aidesocialedep/
-when: 1606061878.16141
+when: 1606577253.48473
