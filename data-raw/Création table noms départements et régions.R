@@ -2,7 +2,7 @@
 # Création base des noms de départements
 # --------------------------------------------------------------------------------------------------------------
 
-library(tidyverse)
+library(dplyr)
 #library(asdep)
 
 dir <- getwd()

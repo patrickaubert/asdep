@@ -4,8 +4,6 @@
 #'
 #' @return un graphique ggplot
 #' @export
-#'
-#' @examples
 ggplotAsdep <- function(...) {
   ggplot(...) +
     #theme_light() +

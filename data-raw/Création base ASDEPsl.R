@@ -2,8 +2,8 @@
 # Création de la base des données d'aide sociale, à partir des bases déjà extraites et incluses dans le package
 # --------------------------------------------------------------------------------------------------------------
 
-library(tidyverse)
-#library(asdep)
+#library(tidyverse)
+library(dplyr)
 
 #varcom <- intersect( names(ASDEPslbenef), names(ASDEPsldepenses) )
 #

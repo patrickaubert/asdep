@@ -4,8 +4,6 @@
 #'
 #' @return un graphique plotly
 #' @export
-#'
-#' @examples
 ggplotlyAsdep <- function(...) {
 
   gdyn <- ggplotly(... , tooltip = c("label","text")) %>%

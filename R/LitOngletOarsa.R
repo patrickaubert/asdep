@@ -12,8 +12,6 @@
 #'
 #' @return une liste de deux tables : "tab" = la table des données, "infovar" = la table des métadonnées (intitulé complet, source, unité, etc.)
 #' @export
-#'
-#' @examples
 LitOngletOarsa <- function(Nom.var,
                            nomfich = FichierSource,
                            nomsheet,
