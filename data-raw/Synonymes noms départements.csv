@@ -58,6 +58,7 @@ Indre-et-Loire,Indre-et-Loire
 Isère,Isère
 Jura,Jura
 La Réunion,La Réunion
+La Réunion,La-Réunion
 Landes,Landes
 Loir-et-Cher,Loir-et-Cher
 Loire,Loire
@@ -67,13 +68,14 @@ Lot,Lot
 Lot-et-Garonne,Lot-et-Garonne
 Lot-et-Garonne,Lot-et-Graonne
 Lozère,Lozère
-Métropole de Lyon,Lyon Métropole 
+Métropole de Lyon,Lyon Métropole
+Métropole de Lyon,Métropole de Lyon
+Métropole de Lyon,Métropole-de-Lyon
 Maine-et-Loire,Maine-et-Loire
 Manche,Manche
 Marne,Marne
 Martinique,Martinique
 Mayenne,Mayenne
-Métropole de Lyon,Métropole de Lyon
 Meurthe-et-Moselle,Meurthe-et-Moselle
 Meuse,Meuse
 Morbihan,Morbihan
@@ -81,6 +83,7 @@ Moselle,Moselle
 Nièvre,Nièvre
 Nord,Nord
 Rhône hors métropole de Lyon,Nouveau Rhône
+Rhône hors métropole de Lyon,Nouveau-Rhône
 Oise,Oise
 Orne,Orne
 Paris,Paris
@@ -91,6 +94,9 @@ Pyrénées-Orientales,Pyrénées-Orientales
 La Réunion,Réunion
 Rhône,Rhône
 Rhône,Département du Rhône
+Saint-Pierre-et-Miquelon,Saint-Pierre-et-Miquelon
+Saint-Barthélemy,Saint-Barthélemy
+Saint-Martin,Saint-Martin
 Saône-et-Loire,Saône-et-Loire
 Sarthe,Sarthe
 Savoie,Savoie
@@ -101,6 +107,7 @@ Somme,Somme
 Tarn,Tarn
 Tarn-et-Garonne,Tarn-et-Garonne
 Territoire de Belfort,Territoire de Belfort
+Territoire de Belfort,Territoire-de-Belfort
 Val-d'Oise,Val-d'Oise
 Val-de-Marne,Val-de-Marne
 Var,Var

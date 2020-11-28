@@ -32,6 +32,22 @@
 #' @source \url{http://www.data.drees.sante.gouv.fr/}
 "ASDEPsldepenses"
 
+#' Orientation et accompagnement des bénéficiaires du RSA
+#'
+#' Une base de données issues de l'enquête annuelle 'Orientation et accompagnement des bénéficiaires du RSA' de la DREES,
+#' contenant des indicateurs sur les parts de bénéficiaires orientés par les départements et les délais moyens d'orientation.
+#' Les noms des variables, correspondant aux différents types d'aide, sont décrits dans la table 'OARSAsl_description'.
+#'
+#' @format Un data frame avec 416 lignes et 23 variables:
+#' \describe{
+#'   \item{Annee}{année (format character)}
+#'   \item{TypeTerritoire}{type de territoire ("département","région",...)}
+#'   \item{Territoire}{nom complet du territoire}
+#'   \item{nom.variable}{voir la table OARSAsl_description}
+#' }
+#' @source \url{http://www.data.drees.sante.gouv.fr/}
+"OARSAsl"
+
 #' Intitulés des variables des bases sur les Bénéficiaires d'aides sociales départementales
 #'
 #' Une base de métadonnées sur les variables de la base ASDEPslbenef
@@ -77,6 +93,29 @@
 #' }
 #' @source \url{http://www.data.drees.sante.gouv.fr/}
 "ASDEPsldepenses_description"
+
+#' Intitulés des variables des bases sur l'orientation et l'accompagnement des bénéficiaires du RSA par les départements
+#'
+#' Une base de métadonnées sur les variables de la base OARSAsl
+#'
+#' @format Un data frame avec 20 lignes et 13 variables:
+#' \describe{
+#'   \item{nom.var}{nom de la variable}
+#'   \item{Intitule.var}{intitulé complet de la variable}
+#'   \item{Intitulecourt.var}{intitulé court de la variable}
+#'   \item{Source.var}{source (= enquête OARSA, DREES)}
+#'   \item{Champ.var}{champ de la variable}
+#'   \item{Note.var}{notes explicatives sur la variable, récupérées du fichier Excel diffusé par la DREES}
+#'   \item{Unite.var}{unité de la variable (personnes, €, ...)}
+#'   \item{Thematique.var}{thématique (perte d'autonomie, handicap, ...)}
+#'   \item{TexteDenom.var}{texte court lorsque la variable est utilisé comme dénominateur d'un ratio}
+#'   \item{ListeDenom.var}{liste des noms d'autres variables (séparés par un "_") pouvant servir comme dénominateur de la variable}
+#'   \item{ListeComposante.var}{listes de noms d'autres variables (séparés par un "_") dont la somme correspond à la variable}
+#'   \item{Type.var}{type de variable (nombre, dépense...)}
+#'   \item{Popref.var}{population de référence (par exemple : "20-59" = les 20-59 ans)}
+#' }
+#' @source \url{http://www.data.drees.sante.gouv.fr/}
+"OARSAsl_description"
 
 #' Populations départementales
 #'

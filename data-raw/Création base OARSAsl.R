@@ -11,8 +11,8 @@ options(encoding = "utf8")
 
 setwd(paste(getwd(),"/data-raw/",sep=""))
 
-nomfich <- "OARSA – Principaux indicateurs de 2015 à 2018.xlsx"
-nomsheet <- "Tableau B1"
+#nomfich <- "OARSA – Principaux indicateurs de 2015 à 2018.xlsx"
+#nomsheet <- "Tableau B1"
 
 # --------------------------------------------------------------------------------------------------------------
 # Paramètres généraux et fonctions générales
@@ -32,63 +32,43 @@ CorrigeNumReg <- function(numreg){
 }
 
 CorrigeNomTerritoire <- function(nom){
-  return( trimws(CorrigeNom(nom), which=c("both")) )
+  #return( trimws(CorrigeNom(nom), which=c("both")) )
+  return( CorrigeNom(gsub("^[[:space:]]*|[[:space:]]*$","",nom)) )
 }
 
 # --------------------------------------------------------------------------------------------------------------
 
-
-LitOngletOarsa <- function(Nom.var,
-                           nomfich = FichierSource,
-                           nomsheet) {
-
-  # valeurs des indicateurs
-
-  vals <- read.xlsx(nomfich, sheet = nomsheet, rows = c(5:109), cols= c(2:6),
-                    colNames = TRUE, skipEmptyRows = FALSE, skipEmptyCols = TRUE)
-  colnames(vals)[1] <- "terr"
-  valdep <- vals %>%
-    mutate(Territoire = gsub("^[[:alnum:]]{2,3}\\-","",terr)) %>%
-    select(-terr) %>%
-    pivot_longer(cols=-c(Territoire), names_to="Annee",values_to = "Indic" ) %>%
-    mutate(Indic = gsub("[[:alpha:]]*","",Indic),
-           Indic = as.numeric(Indic),
-           TypeTerritoire = "Département")
-  names(valdep)[3] <- Nom.var
-  valdep$Territoire <- unlist(lapply( valdep$Territoire, CorrigeNomTerritoire))
-
-  # métadonnées
-
-  Intitule.var <- read.xlsx(nomfich, sheet = nomsheet, rows = c(2), cols= c(2), colNames = FALSE)
-  Intitule.var <- gsub("^Tableau [[:alnum:]]+ \\- ","",Intitule.var)
-  Intitule.var <- gsub("au 31/12 de l'année","",Intitule.var)
-
-  Unite.var <- read.xlsx(nomfich, sheet = nomsheet, rows = c(4), cols= c(2), colNames = FALSE)
-  Unite.var <- gsub("^[Ee]n ","",Unite.var)
-
-  infovar <- data.frame(Nom.var = c(Nom.var),
-                        Intitule.var = c(Intitule.var),
-                        Intitulecourt.var = c(""),
-                        Source.var = c("DREES, enquête OARSA"),
-                        Champ.var = c("France"),
-                        Note.var = c(""),
-                        Unite.var = c(Unite.var),
-                        Thematique.var = c("Insertion"),
-                        TexteDenom = c(""),
-                        ListeDenom.var = c(""),
-                        ListeComposante.var = c(""),
-                        Type.var = c("Parts"),
-                        Popref.var = c(""),
-                        stringsAsFactors = FALSE
-  )
-
-  return( list(tab = valdep, infovar = infovar))
-
-}
-
+# contenu du fichier Excel
 
 lisheets <- getSheetNames(nomfich)
 lisheets <- lisheets[5:NROW(lisheets)]
 namesindic <- gsub("^Tableau ","OarsaTab",lisheets)
 
-truc <- LitOngletOarsa("Part1", nomfich, nomsheet)
+# boucle d'extraction des données
+
+for (i in 1:NROW(lisheets)) {
+  tabs <- LitOngletOarsa(Nom.var=namesindic[i], nomfich=nomfich, nomsheet=lisheets[i], corrigenom=CorrigeNomTerritoire)
+  if (i == 1) {
+    tabOarsa <- tabs$tab
+    descrOarsa <- tabs$infovar
+  } else {
+    tabOarsa <- full_join(tabOarsa, tabs$tab, by = c("Territoire", "Annee","TypeTerritoire") )
+    descrOarsa <- rbind(descrOarsa, tabs$infovar)
+  }
+}
+
+# vérifications que tous les noms de départements sont corrects
+
+verifnom <- unique(tabOarsa$Territoire)
+verifnom[!(verifnom %in% departements$Departement)]
+
+# -------------------------------------------------------------------------------------------------
+# sauvegarde les tables constituées
+
+OARSAsl <- tabOarsa
+OARSAsl_description <- descrOarsa
+
+# ===================================================================================
+usethis::use_data(OARSAsl,
+                  OARSAsl_description,
+                  overwrite = T)
