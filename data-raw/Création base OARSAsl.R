@@ -11,7 +11,7 @@ options(encoding = "utf8")
 
 setwd(paste(getwd(),"/data-raw/",sep=""))
 
-#nomfich <- "OARSA – Principaux indicateurs de 2015 à 2018.xlsx"
+nomfich <- "OARSA – Principaux indicateurs de 2015 à 2018.xlsx"
 #nomsheet <- "Tableau B1"
 
 # --------------------------------------------------------------------------------------------------------------
