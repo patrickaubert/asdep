@@ -243,5 +243,19 @@ server <- function(input, output, session) {
   output$partdepAllocEvol <- renderPlotly({graphEvolutionAppli(nomvariable="DepBruteRSA",denom="DepBruteInsertion")  })
   output$partdepAlloc <- renderPlotly({graphComparaisonAppli(nomvariable="DepBruteRSA",denom="DepBruteInsertion")  })
 
+  # -- part des personnes orientées parmi les BRSA aux droits et devoirs
+  output$partBRSAorientesEvol <- renderPlotly({graphEvolutionAppli(nomvariable="OarsaTabB1")  })
+  output$partBRSAorientes <- renderPlotly({graphComparaisonAppli(nomvariable="OarsaTabB1")  })
 
+  # -- part des personnes orientées vers Pôle Emploi parmi les BRSA aux droits et devoirs orientés
+  output$partBRSAorientesPEEvol <- renderPlotly({graphEvolutionAppli(nomvariable="OarsaTabB5")  })
+  output$partBRSAorientesPE <- renderPlotly({graphComparaisonAppli(nomvariable="OarsaTabB5")  })
+
+  # -- part des personnes orientées vers le CD parmi les BRSA aux droits et devoirs orientés
+  output$partBRSAorientesCDEvol <- renderPlotly({graphEvolutionAppli(nomvariable="OarsaTabB7")  })
+  output$partBRSAorientesCD <- renderPlotly({graphComparaisonAppli(nomvariable="OarsaTabB7")  })
+
+  # -- part des personnes ayant un CER parmi les personnes orientées hors Pôle Emploi
+  output$partBRSACEREvol <- renderPlotly({graphEvolutionAppli(nomvariable="OarsaTabB9")  })
+  output$partBRSACER <- renderPlotly({graphComparaisonAppli(nomvariable="OarsaTabB9")  })
 }

@@ -12,7 +12,8 @@
 #' @examples champFrance("NbBenefAPA",2005)
 champFrance <- function(var,annee=max(ASDEPsl$Annee),tab=ASDEPsl) {
   tab <- tab[,c(var,"TypeTerritoire","Territoire","Annee")] %>%
-    filter(Annee == annee, !is.na(var) )
+    filter(Annee == annee)
+  tab <- tab[!is.na(tab[,var]),]
 
   case_when(
     ("TOTAL estim\u00E9 France enti\u00E8re" %in% tab$Territoire) ~ "TOTAL estim\u00E9 France enti\u00E8re",

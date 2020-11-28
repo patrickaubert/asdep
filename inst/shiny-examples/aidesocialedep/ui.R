@@ -102,7 +102,7 @@ ui <- dashboardPage(
 
   dashboardSidebar(
     sidebarMenu(
-      selectInput("dep", label = NULL, choices = listedepartements, selected = listedepartements[101]),
+      selectInput("dep", label = NULL, choices = listedepartements, selected = listedepartements[108]),
       fluidRow(
         column(6, align="left", actionButton("dep.moins", label = NULL, icon = icon("caret-left")) ),
         column(6, align="right", actionButton("dep.plus", label = NULL, icon = icon("caret-right")) )
@@ -377,7 +377,23 @@ ui <- dashboardPage(
         boite(titre = "Part des dépenses d'allocation dans le total des dépenses d'insertion, en %",
               varnum = "DepBruteRSA",  vardenum = "DepBruteInsertion",
               graph = "partdepAlloc",
-              collapsed = FALSE)
+              collapsed = FALSE),
+
+        boite(titre = "Part des personnes orientées parmi les personnes soumises aux droits et devoirs, en %",
+              var = "OarsaTabB1",
+              graph = "partBRSAorientes"),
+
+        boite(titre = "Part des personnes orientées vers Pôle Emploi parmi les bénéficiaires du RSA orientés, en %",
+              var = "OarsaTabB5",
+              graph = "partBRSAorientesPE"),
+
+        boite(titre = "Part des personnes orientées vers le conseil départemental ou territorial parmi les bénéficiaires du RSA orientés, en %",
+              var = "OarsaTabB7",
+              graph = "partBRSAorientesCD"),
+
+        boite(titre = "Part des personnes ayant un CER parmi les personnes orientées vers un autre organisme que Pôle Emploi, en %",
+              var = "OarsaTabB9",
+              graph = "partBRSACER")
       ),
 
       # === paramétrage des graphiques affichés
