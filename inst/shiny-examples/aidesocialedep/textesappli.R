@@ -129,4 +129,22 @@ provisoires et au niveau national, au quatrième trimestre de l\'année <i>n+1</
 étant mises à disposition au premier trimestre de l\'année <i>n+2</i>. En ce qui concerne les dépenses de l\'aide sociale
 départementale, les résultats provisoires nationales sont diffusés en janvier de l\'année <i>n+2</i> et les données définitives
 par département sont mises à disposition au deuxième trimestre de l\'année <i>n+2</i>. </li>
+<br><br>
+<li> L\'enquête sur
+<a href='https://drees.solidarites-sante.gouv.fr/etudes-et-statistiques/open-data/aide-et-action-sociale/article/enquete-annuelle-sur-orientation-et-accompagnement-des-beneficiaires-du-RSA'>
+l'orientation et l'accompagnement des bénéficiaires du RSA (OARSA) </a>
+fait partie du système de suivi statistique prévu par la loi du 1er décembre 2008
+généralisant le revenu de solidarité active et réformant les politiques d’insertion.
+Il s’agit d’une remontée administrative exhaustive portant sur la France. L’ensemble des
+collectivités en charge de l’insertion des bénéficiaires du RSA sur leur territoire sont
+interrogées chaque année, de manière à couvrir exhaustivement les territoires français
+au sein desquels le RSA existe. Les principaux indicateurs demandés dans l’enquête
+portent sur les thématiques suivantes : Présence ou absence d’orientation pour les
+personnes soumises aux droits et devoirs au 31/12 de l’année, Organisme d’appartenance
+du référent unique, Présence ou absence de contrat d’engagements réciproques (CER),
+Organisme d’appartenance du référent unique, Durée inscrite dans les CER,
+Actions inscrites dans les CE, Délai moyen au cours de l’année entre la date d’entrée
+dans le RSA et la date de primo-orientation, Délai moyen au cours de l’année entre
+la date de primo-orientation et la date de signature du primo-CER, Réorientations au
+cours de l’année.
 "
