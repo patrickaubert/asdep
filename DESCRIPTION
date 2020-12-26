@@ -25,4 +25,7 @@ Imports:
     stats,
     Hmisc,
     ggplot2,
-    plotly
+    plotly,
+    stringr,
+    openxlsx,
+    tidyr
