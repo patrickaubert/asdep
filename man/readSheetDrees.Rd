@@ -2,9 +2,9 @@
 % Please edit documentation in R/readSheetDrees.R
 \name{readSheetDrees}
 \alias{readSheetDrees}
-\title{Une fonction extrayant le contenu d'un onglet d'un fichier Excel diffusé sur data.drees}
+\title{Fonction extrayant le contenu d'un onglet d'un fichier Excel diffusé sur data.drees}
 \usage{
-readSheetDrees(fich, sheet, nlignetitre)
+readSheetDrees(fich, sheet, nlignetitre = NULL, options = "")
 }
 \arguments{
 \item{fich}{nom du fichier Excel}
@@ -12,16 +12,28 @@ readSheetDrees(fich, sheet, nlignetitre)
 \item{sheet}{nom de l'onglet}
 
 \item{nlignetitre}{nombres de lignes pour les intitulés de colonnes : si une valeur est renseignée, les 'nlignetitre' premières lignes sont utilisées comme intitulés des colonnes}
+
+\item{options}{type de fichier data.drees particulier ("ASDEPslbenef", "ASDEPsldepenses", "OARSAsl", etc.)}
 }
 \value{
 une liste contenant un tableau de donnée (élément "tab") et des métadonnées (éléments "intitule","numtab","source","champ", etc.)
 }
 \description{
-Une fonction extrayant le contenu d'un onglet d'un fichier Excel diffusé sur data.drees
+Cette fonction sert à extraire le contenu d'un onglet d'un fichier Excel de données départementales diffusé sous data.Drees.
+Le produit est une liste contenant un élément "tab" correspondant au tableau de données,
+et divers éléments correspondant aux métadonnées ("source","note","champ", etc.)
+Si le tableau "tab" contient des colonnes dont les intitulés correspondent à des années,
+un autre élément "tablong" est disponible, dans lequel les années sont transposées en ligne plutôt qu'en colonnes.
+}
+\details{
+La fonction inclut des traitements complémentaires de mise en forme pour certains fichiers Excel
+particuliers ('options' = "ASDEPslbenef", "ASDEPsldepenses", "OARSAsl", etc.)
 }
 \examples{
 readSheetDrees(fich="data-raw/DonnÃ©es mensuelles des prestations de solidaritÃ©.xlsx", sheet="Tableau 2" , nlignetitre=3)
-readSheetDrees(fich="data-raw/Les bÃ©nÃ©ficiaires de l aide sociale dÃ©partementale - sÃ©ries longues (1996-2018).xlsx", sheet="Tab6-pa" , nlignetitre=1)
-readSheetDrees(fich="data-raw/Minima sociaux - donnees departementales par dispositif.xlsx", sheet="Tableau 17", nlignetitre=2)
+readSheetDrees(fich="data-raw/Les bÃ©nÃ©ficiaires de l aide sociale dÃ©partementale - sÃ©ries longues (1996-2018).xlsx", sheet="Tab6-pa" , options = "ASDEPslbenef", nlignetitre=1)
+readSheetDrees(fich="data-raw/Les dÃ©penses d aide sociale dÃ©partementale - sÃ©ries longues (1999 -2018).xlsx", sheet="PA-tab3" , options = "ASDEPsldepenses", nlignetitre=1)
+readSheetDrees(fich="data-raw/Minima sociaux - donnees departementales par dispositif.xlsx", sheet="Tableau 10", nlignetitre=1)
 readSheetDrees(fich="data-raw/OARSA â€“ Principaux indicateurs de 2015 Ã  2018.xlsx", sheet="Tableau B10" , nlignetitre=1)
+readSheetDrees(fich="data-raw/Le personnel dÃ©partemental de l'action sociale et mÃ©dico-sociale de 2014 Ã  2018.xlsx", sheet="eff - pers medical" , nlignetitre=1)
 }

@@ -1,6 +1,6 @@
 #' Fonction extrayant le contenu d'un onglet d'un fichier Excel diffusé sur data.drees
 #'
-#' Cette fonction sert à extraire le contenu d'un fichier Excel de données départementales diffusé sous data.Drees.
+#' Cette fonction sert à extraire le contenu d'un onglet d'un fichier Excel de données départementales diffusé sous data.Drees.
 #' Le produit est une liste contenant un élément "tab" correspondant au tableau de données,
 #' et divers éléments correspondant aux métadonnées ("source","note","champ", etc.)
 #' Si le tableau "tab" contient des colonnes dont les intitulés correspondent à des années,
@@ -12,17 +12,18 @@
 #' @param fich nom du fichier Excel
 #' @param sheet nom de l'onglet
 #' @param nlignetitre nombres de lignes pour les intitulés de colonnes : si une valeur est renseignée, les 'nlignetitre' premières lignes sont utilisées comme intitulés des colonnes
-#' @param options type de fichier data.drees particulier ()
+#' @param options type de fichier data.drees particulier ("ASDEPslbenef", "ASDEPsldepenses", "OARSAsl", etc.)
 #'
 #' @return une liste contenant un tableau de donnée (élément "tab") et des métadonnées (éléments "intitule","numtab","source","champ", etc.)
 #' @export
 #'
 #' @examples readSheetDrees(fich="data-raw/Données mensuelles des prestations de solidarité.xlsx", sheet="Tableau 2" , nlignetitre=3)
-#' @examples readSheetDrees(fich="data-raw/Les bénéficiaires de l aide sociale départementale - séries longues (1996-2018).xlsx", sheet="Tab6-pa" , nlignetitre=1)
+#' @examples readSheetDrees(fich="data-raw/Les bénéficiaires de l aide sociale départementale - séries longues (1996-2018).xlsx", sheet="Tab6-pa" , options = "ASDEPslbenef", nlignetitre=1)
+#' @examples readSheetDrees(fich="data-raw/Les dépenses d aide sociale départementale - séries longues (1999 -2018).xlsx", sheet="PA-tab3" , options = "ASDEPsldepenses", nlignetitre=1)
 #' @examples readSheetDrees(fich="data-raw/Minima sociaux - donnees departementales par dispositif.xlsx", sheet="Tableau 10", nlignetitre=1)
 #' @examples readSheetDrees(fich="data-raw/OARSA – Principaux indicateurs de 2015 à 2018.xlsx", sheet="Tableau B10" , nlignetitre=1)
 #' @examples readSheetDrees(fich="data-raw/Le personnel départemental de l'action sociale et médico-sociale de 2014 à 2018.xlsx", sheet="eff - pers medical" , nlignetitre=1)
-readSheetDrees <- function(fich , sheet, nlignetitre, options = "") {
+readSheetDrees <- function(fich , sheet, nlignetitre = NULL, options = "") {
 
   # fich <- "data-raw/Données mensuelles des prestations de solidarité.xlsx"
   # sheet <- "Tableau 2"
@@ -48,19 +49,21 @@ readSheetDrees <- function(fich , sheet, nlignetitre, options = "") {
     "ongletsource" = sheet
   )
 
-
   # ========================================
   # suppression des infos inutiles
-  inutile <- c("^(Retour au s|S)ommaire$","^(R|r)etour en haut de page$")
+  inutile <- c("^[[:punct:][:space:]]*([Rr]etour au s|[Rr]etour s|S)ommaire$",
+               "^(R|r)etour en haut de page$")
   for (i in 1:NROW(inutile)) { tabcompl <- tabcompl %>% mutate_all(function(x){ifelse(grepl(inutile[i],x),NA,x)}) }
 
   # ========================================
   # séparation des données
+
   lignesremplies <- rowSums(!is.na(tabcompl))
   info <- tabcompl[(lignesremplies == 1),]
 
   # ========================================
   # lecture et traitement de la table de données
+
   tab <- tabcompl[(lignesremplies > 1),]
   tab <- tab[,(colSums(is.na(tab))<nrow(tab))]
   if (!is.null(nlignetitre)) {
@@ -87,31 +90,87 @@ readSheetDrees <- function(fich , sheet, nlignetitre, options = "") {
 
   # ========================================
   # traitements complémentaires pour certains types de data.drees spécifiques
-  if (options == "ASDEPslbenef") {
 
-  } else if (options == "ASDEPsldepenses") {
+  options <- tolower(options)
+  if (options %in% c("asdepslbenef","asdepsldepenses")) {
 
-  } else if (options == "OARSAsl") {
+    # fichier Excel "bénéficiaires de l'aide sociale séries longues"
+    names(tab)[grepl("^[Cc]ode(.*)[Rr][ée]gion$",names(tab))] <- "code.region"
+    names(tab)[grepl("^[Cc]ode(.*)[Dd][ée]partement$",names(tab))] <- "code.departement"
+    names(tab)[grepl("^[Dd][ée]partement($|s$)",names(tab))] <- "Territoire"
 
-  } else if (options == "MSsl") {
+    tab <- tab %>%
+      mutate_at(vars(-c("code.region","code.departement","Territoire")),as.numeric)
 
-  } else if (options == "PrestaSolMens") {
+    departements <- tab %>%
+      filter(grepl("^[[:digit:]][AB[:digit:]]($|[[:digit:]]$|[MDmd]$)",code.departement)) %>%
+      mutate(TypeTerritoire = "Département")
+    regions <- tab  %>%
+      filter(!grepl("^[[:digit:]][AB[:digit:]]($|[[:digit:]]$|[MDmd]$)",code.departement)) %>%
+      filter(grepl("^[[:digit:]]{2,3}$",code.region)) %>%
+      select(-Territoire) %>%
+      rename(Territoire = code.departement) %>%
+      mutate(TypeTerritoire = "Région",
+             code.departement = NA)
+    nation <- tab  %>%
+      filter(!grepl("^[[:digit:]][AB[:digit:]]($|[[:digit:]]$|[MDmd]$)",code.departement)) %>%
+      filter(!grepl("^[[:digit:]]{2,3}$",code.region)) %>%
+      filter(!grepl("^[Cc]ode(.*)[Rr][ée]gion$",code.region)) %>%
+      select(-c(Territoire,code.departement)) %>%
+      rename(Territoire = code.region) %>%
+      mutate(TypeTerritoire = "France",
+             code.region = NA,
+             code.departement = NA)
+
+    tab <- bind_rows(departements, regions, nation)
+
+  } else if (options %in% c("oarsasl")) {
+
+  } else if (options %in% c("mssl","minsocsl")) {
+
+  } else if ((options %in% c("prestasolsens","msmens","minsocmens")) & (nlignetitre == 3)) {
+
+    # onglets avec données par départements dans le fichier de suivi mensuel des prestations de solidarité
+    #tab<-truc[1:10]
+    names(tab)[1] <- "date"
+    tab <- tab %>%
+      mutate(info.date = str_extract(date,"(\\*)*$"),
+             date0 = gsub("(\\*)*$","",date),
+             date = case_when(
+               grepl("^[[:digit:]]+$",date0) ~ as.Date(as.numeric(date0),origin = "1900-01-01"),
+               TRUE ~ rep(NA,nrow(tab))
+             )) %>%
+      pivot_longer(cols=-c("date","info.date"),names_to="noms",values_to="val")
+    noms <- as.data.frame(t(as.data.frame(str_split( tab$noms,"\\.",n=3))))
+    tab$code.departement <- noms[,1]
+    tab$territoire <- noms[,2]
+    tab$variable <- noms[,3]
+    tab <- tab %>%
+      select(-noms) %>%
+      pivot_wider(id_cols=c("date","info.date","code.departement","territoire"),
+                  names_from="variable",
+                  values_from="val")
 
   }
 
   # ========================================
-  # enregistrement d'une 2 table de données (transposée) si des années sont détectées comme noms de colonne
+  # enregistrement d'une deuxième table de données (transposée) si des années sont détectées comme noms de colonne
+
   patternannee <- "^(19|20|21)[[:digit:]]{2}(\\.|[[:space:]]|\\*|\\(|$)"
   #patternannee <- "^(19|20|21)[[:digit:]]{2}[[:space:]]*(\\**|\\(([[:digit:]]|p|d|sd)\\))$"
   colsannee <- names(tab)[grepl(patternannee,names(tab))]
+  result$containstablong <- FALSE
   if (NROW(colsannee)>=1) {
     tablong <- tab %>%
       mutate_at(vars(colsannee),as.numeric) %>%
       pivot_longer(cols=c(colsannee),
                    names_to="annee",
-                   values_to=paste0("valeur_sheet_",sheet),
+                   values_to="valeur",
                    values_drop_na = TRUE) %>%
+      mutate(info.annee = gsub("^(19|20|21)[[:digit:]]{2}([[:space:]]|\\.)*","",annee),
+             annee = as.numeric(str_extract(annee,"^(19|20|21)[[:digit:]]{2}"))) %>%
       distinct()
+    result$containstablong <- (nrow(tablong)>0)
     result$tablong <- tablong
   }
 
@@ -120,7 +179,7 @@ readSheetDrees <- function(fich , sheet, nlignetitre, options = "") {
   info <- info[,(colSums(is.na(info))<nrow(info))]
   info <- as.vector(t(info))
   info <- info[!is.na(info)]
-  info <- unique(info)
+  info <- unique(info) %>% trimws()
 
   rubriques <- data.frame(
     rubrique = c("intitule","note","source","champ","lecture"),
@@ -146,5 +205,6 @@ readSheetDrees <- function(fich , sheet, nlignetitre, options = "") {
 
   # ========================================
   result$tab <- tab
+  result$containstab <- (nrow(result$tab)>0)
   return(result)
 }
