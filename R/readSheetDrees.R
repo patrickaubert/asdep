@@ -17,6 +17,7 @@
 #' @return une liste contenant un tableau de donnée (élément "tab") et des métadonnées (éléments "intitule","numtab","source","champ", etc.)
 #' @export
 #'
+#' @examples readSheetDrees(fich="data-raw/Données mensuelles des prestations de solidarité.xlsx", sheet="Tableau 1" , nlignetitre=2, options="PrestaSolMens")
 #' @examples readSheetDrees(fich="data-raw/Données mensuelles des prestations de solidarité.xlsx", sheet="Tableau 2" , nlignetitre=3)
 #' @examples readSheetDrees(fich="data-raw/Les bénéficiaires de l aide sociale départementale - séries longues (1996-2018).xlsx", sheet="Tab6-pa" , options = "ASDEPslbenef", nlignetitre=1)
 #' @examples readSheetDrees(fich="data-raw/Les dépenses d aide sociale départementale - séries longues (1999 -2018).xlsx", sheet="PA-tab3" , options = "ASDEPsldepenses", nlignetitre=1)
@@ -26,7 +27,7 @@
 readSheetDrees <- function(fich , sheet, nlignetitre = NULL, options = "") {
 
   # fich <- "data-raw/Données mensuelles des prestations de solidarité.xlsx"
-  # sheet <- "Tableau 2"
+  # sheet <- "Tableau 1"
   # fich <- "data-raw/Les bénéficiaires de l aide sociale départementale - séries longues (1996-2018).xlsx"
   # fich <- "data-raw/Minima sociaux - donnees departementales par dispositif.xlsx"
   # sheet <- getSheetNames(fich)[4]
@@ -128,7 +129,7 @@ readSheetDrees <- function(fich , sheet, nlignetitre = NULL, options = "") {
 
   } else if (options %in% c("mssl","minsocsl")) {
 
-  } else if ((options %in% c("prestasolsens","msmens","minsocmens")) & (nlignetitre == 3)) {
+  } else if ((options %in% c("prestasolmens","msmens","minsocmens")) & (nlignetitre == 3)) {
 
     # onglets avec données par départements dans le fichier de suivi mensuel des prestations de solidarité
     #tab<-truc[1:10]
@@ -151,6 +152,23 @@ readSheetDrees <- function(fich , sheet, nlignetitre = NULL, options = "") {
                   names_from="variable",
                   values_from="val")
 
+  } else if ((options %in% c("prestasolmens","msmens","minsocmens")) & (nlignetitre == 2)) {
+
+    # onglets avec données nationales dans le fichier de suivi mensuel des prestations de solidarité
+    names(tab)[1] <- "date"
+    tab <- tab %>%
+      mutate(date = as.Date(as.numeric(date),origin = "1900-01-01")) %>%
+      pivot_longer(cols=-c("date"),names_to="noms",values_to="val")
+    noms <- as.data.frame(t(as.data.frame(str_split( tab$noms,"\\.",n=2))))
+    tab$prestation <- noms[,1]
+    tab$variable <- noms[,2]
+    tab <- tab %>%
+      select(-noms) %>%
+      mutate(val = as.numeric(gsub("\\*|[[:space:]]","",val)),
+             prestation = trimws(prestation,"both")) %>%
+      pivot_wider(id_cols=c("date","prestation"),
+                  names_from="variable",
+                  values_from="val")
   }
 
   # ========================================
