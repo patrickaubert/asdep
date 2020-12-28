@@ -5,6 +5,9 @@
 library(openxlsx)
 library(reshape2)
 library(plyr)
+library(dplyr)
+library(tidyr)
+library(stringr)
 
 #options(encoding = "utf8")
 

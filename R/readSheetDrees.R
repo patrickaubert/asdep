@@ -27,7 +27,7 @@
 readSheetDrees <- function(fich , sheet, nlignetitre = NULL, options = "") {
 
   # fich <- "data-raw/Données mensuelles des prestations de solidarité.xlsx"
-  # sheet <- "Tableau 1"
+  # sheet <- "Tableau 2"
   # fich <- "data-raw/Les bénéficiaires de l aide sociale départementale - séries longues (1996-2018).xlsx"
   # fich <- "data-raw/Minima sociaux - donnees departementales par dispositif.xlsx"
   # sheet <- getSheetNames(fich)[4]
@@ -143,7 +143,8 @@ readSheetDrees <- function(fich , sheet, nlignetitre = NULL, options = "") {
              ),
              date = case_when(
                grepl("^[[:digit:]]+$",date0) ~ format.Date(as.Date(as.numeric(date0),origin = "1899-12-30"),"%b %Y"),
-               grepl("^[[:alpha:]]+\\-[[:digit:]]+$",date0) ~ format.Date(as.Date(paste0("01-",date0),"%d-%b-%y"),"%b %Y"),
+               grepl("^[[:alpha:]]+\\-[[:digit:]]+$",date0) ~ format.Date(as.Date(paste0("01-",date0),"%d-%B-%y"),"%b %Y"),
+               grepl("^[[:alpha:]]+\\.\\-[[:digit:]]+$",date0) ~ format.Date(as.Date(paste0("01-",date0),"%d-%b-%y"),"%b %Y"),
                TRUE ~ date0
                )
              ) %>%
