@@ -41,4 +41,5 @@ particuliers ('options' = "ASDEPslbenef", "ASDEPsldepenses", "OARSAsl", etc.)
 readExcelDrees(fich="data-raw/Les bÃ©nÃ©ficiaires de l aide sociale dÃ©partementale - sÃ©ries longues (1996-2018).xlsx",options = "ASDEPslbenef")
 readExcelDrees(fich="data-raw/Le personnel dÃ©partemental de l'action sociale et mÃ©dico-sociale de 2014 Ã  2018.xlsx",options = "ASDEPslperso")
 readExcelDrees(fich="data-raw/Les dÃ©penses d aide sociale dÃ©partementale - sÃ©ries longues (1999 -2018).xlsx",options = "ASDEPsldepenses")
+readExcelDrees(fich="data-raw/DonnÃ©es mensuelles des prestations de solidaritÃ©.xlsx",options = "PrestaSolMens")
 }

@@ -30,7 +30,8 @@ La fonction inclut des traitements complémentaires de mise en forme pour certai
 particuliers ('options' = "ASDEPslbenef", "ASDEPsldepenses", "OARSAsl", etc.)
 }
 \examples{
-readSheetDrees(fich="data-raw/DonnÃ©es mensuelles des prestations de solidaritÃ©.xlsx", sheet="Tableau 2" , nlignetitre=3)
+readSheetDrees(fich="data-raw/DonnÃ©es mensuelles des prestations de solidaritÃ©.xlsx", sheet="Tableau 1" , nlignetitre=2, options="PrestaSolMens")
+readSheetDrees(fich="data-raw/DonnÃ©es mensuelles des prestations de solidaritÃ©.xlsx", sheet="Tableau 2" , nlignetitre=3, options="PrestaSolMens")
 readSheetDrees(fich="data-raw/Les bÃ©nÃ©ficiaires de l aide sociale dÃ©partementale - sÃ©ries longues (1996-2018).xlsx", sheet="Tab6-pa" , options = "ASDEPslbenef", nlignetitre=1)
 readSheetDrees(fich="data-raw/Les dÃ©penses d aide sociale dÃ©partementale - sÃ©ries longues (1999 -2018).xlsx", sheet="PA-tab3" , options = "ASDEPsldepenses", nlignetitre=1)
 readSheetDrees(fich="data-raw/Minima sociaux - donnees departementales par dispositif.xlsx", sheet="Tableau 10", nlignetitre=1)

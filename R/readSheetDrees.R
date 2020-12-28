@@ -18,7 +18,7 @@
 #' @export
 #'
 #' @examples readSheetDrees(fich="data-raw/Données mensuelles des prestations de solidarité.xlsx", sheet="Tableau 1" , nlignetitre=2, options="PrestaSolMens")
-#' @examples readSheetDrees(fich="data-raw/Données mensuelles des prestations de solidarité.xlsx", sheet="Tableau 2" , nlignetitre=3)
+#' @examples readSheetDrees(fich="data-raw/Données mensuelles des prestations de solidarité.xlsx", sheet="Tableau 2" , nlignetitre=3, options="PrestaSolMens")
 #' @examples readSheetDrees(fich="data-raw/Les bénéficiaires de l aide sociale départementale - séries longues (1996-2018).xlsx", sheet="Tab6-pa" , options = "ASDEPslbenef", nlignetitre=1)
 #' @examples readSheetDrees(fich="data-raw/Les dépenses d aide sociale départementale - séries longues (1999 -2018).xlsx", sheet="PA-tab3" , options = "ASDEPsldepenses", nlignetitre=1)
 #' @examples readSheetDrees(fich="data-raw/Minima sociaux - donnees departementales par dispositif.xlsx", sheet="Tableau 10", nlignetitre=1)
@@ -132,23 +132,30 @@ readSheetDrees <- function(fich , sheet, nlignetitre = NULL, options = "") {
   } else if ((options %in% c("prestasolmens","msmens","minsocmens")) & (nlignetitre == 3)) {
 
     # onglets avec données par départements dans le fichier de suivi mensuel des prestations de solidarité
-    #tab<-truc[1:10]
     names(tab)[1] <- "date"
     tab <- tab %>%
       mutate(info.date = str_extract(date,"(\\*)*$"),
              date0 = gsub("(\\*)*$","",date),
+             date0 = ifelse(
+               str_extract(date0,"^[[:alpha:]]+") %in% c("janv","févr","avr","juil","sept","oct","nov","déc"),
+               gsub("\\-",".-",date0),
+               date0
+             ),
              date = case_when(
-               grepl("^[[:digit:]]+$",date0) ~ as.Date(as.numeric(date0),origin = "1900-01-01"),
-               TRUE ~ rep(NA,nrow(tab))
-             )) %>%
+               grepl("^[[:digit:]]+$",date0) ~ format.Date(as.Date(as.numeric(date0),origin = "1899-12-30"),"%b %Y"),
+               grepl("^[[:alpha:]]+\\-[[:digit:]]+$",date0) ~ format.Date(as.Date(paste0("01-",date0),"%d-%b-%y"),"%b %Y"),
+               TRUE ~ date0
+               )
+             ) %>%
+      select(-date0) %>%
       pivot_longer(cols=-c("date","info.date"),names_to="noms",values_to="val")
     noms <- as.data.frame(t(as.data.frame(str_split( tab$noms,"\\.",n=3))))
-    tab$code.departement <- noms[,1]
-    tab$territoire <- noms[,2]
+    tab$Code.departement <- noms[,1]
+    tab$Territoire <- noms[,2]
     tab$variable <- noms[,3]
     tab <- tab %>%
       select(-noms) %>%
-      pivot_wider(id_cols=c("date","info.date","code.departement","territoire"),
+      pivot_wider(id_cols=c("date","info.date","Code.departement","Territoire"),
                   names_from="variable",
                   values_from="val")
 
@@ -157,16 +164,29 @@ readSheetDrees <- function(fich , sheet, nlignetitre = NULL, options = "") {
     # onglets avec données nationales dans le fichier de suivi mensuel des prestations de solidarité
     names(tab)[1] <- "date"
     tab <- tab %>%
-      mutate(date = as.Date(as.numeric(date),origin = "1900-01-01")) %>%
-      pivot_longer(cols=-c("date"),names_to="noms",values_to="val")
+      mutate(info.date = str_extract(date,"(\\*)*$"),
+             date0 = gsub("(\\*)*$","",date),
+             date0 = ifelse(
+               str_extract(date0,"^[[:alpha:]]+") %in% c("janv","févr","avr","juil","sept","oct","nov","déc"),
+               gsub("\\-",".-",date0),
+               date0
+             ),
+             date = case_when(
+               grepl("^[[:digit:]]+$",date0) ~ format.Date(as.Date(as.numeric(date0),origin = "1899-12-30"),"%b %Y"),
+               grepl("^[[:alpha:]]+\\-[[:digit:]]+$",date0) ~ format.Date(as.Date(paste0("01-",date0),"%d-%b-%y"),"%b %Y"),
+               TRUE ~ date0
+             )
+      ) %>%
+      select(-date0) %>%
+      pivot_longer(cols=-c("date","info.date"),names_to="noms",values_to="val")
     noms <- as.data.frame(t(as.data.frame(str_split( tab$noms,"\\.",n=2))))
     tab$prestation <- noms[,1]
     tab$variable <- noms[,2]
     tab <- tab %>%
       select(-noms) %>%
-      mutate(val = as.numeric(gsub("\\*|[[:space:]]","",val)),
+      mutate(val = as.numeric(gsub("\\*|[[:space:]]|\\-","",val)),
              prestation = trimws(prestation,"both")) %>%
-      pivot_wider(id_cols=c("date","prestation"),
+      pivot_wider(id_cols=c("date","info.date","prestation"),
                   names_from="variable",
                   values_from="val")
   }
