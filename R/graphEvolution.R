@@ -28,7 +28,7 @@ graphEvolution <- function(nomvariable, denom = "", options = c(), poidsobs = c(
 
   # === Récupération des données pour l'indicateur
   #if (NROW(gpecomp)>=1) {comp <- "Groupe de comparaison"}
-  if (nchar(denom)>0) {poidsobs <- c(poidsobs,denom)}
+  if (nchar(denom)>0) {poidsobs <- unique( c(poidsobs,denom) ) }
   tabs <- selectIndic(nomvariable = nomvariable, denom = denom, keepvar=c(poidsobs),
                      options = options, gpeDpt = gpecomp,
                      donnees = donnees, variables = variables)
@@ -87,18 +87,21 @@ graphEvolution <- function(nomvariable, denom = "", options = c(), poidsobs = c(
     t <- tab
   }
   tabq3 <- data.frame()
-  for (i in 1:nrow(zonesloc)){
-    tabq3 <- rbind(tabq3,
-                   data.frame(
-                     Annee = tabq$Annee,
-                     intitules = rep(zonesloc$intitules[i] , nrow(tabq)),
-                     noms = rep(zonesloc$noms[i] , nrow(tabq)),
-                     ymin = tabq[,zonesloc$ymin[i]],
-                     ymax = tabq[,zonesloc$ymax[i]],
-                     alpha = rep(zonesloc$alpha[i] , nrow(tabq))
-                   ))
+  if (nrow(zonesloc)>=1) {
+    for (i in 1:nrow(zonesloc)){
+      tabq3 <- rbind(tabq3,
+                     data.frame(
+                       Annee = tabq$Annee,
+                       intitules = rep(zonesloc$intitules[i] , nrow(tabq)),
+                       noms = rep(zonesloc$noms[i] , nrow(tabq)),
+                       ymin = tabq[,zonesloc$ymin[i]],
+                       ymax = tabq[,zonesloc$ymax[i]],
+                       alpha = rep(zonesloc$alpha[i] , nrow(tabq))
+                     ))
+    }
+    tabq3 <- tabq3 %>% arrange(intitules,Annee)
   }
-  tabq3 <- tabq3 %>% arrange(intitules,Annee)
+
 
   #couleursloc <- c("Zone interdécile" = "blue",
   #                 "Zone interquartile" = "blue",
@@ -124,10 +127,16 @@ graphEvolution <- function(nomvariable, denom = "", options = c(), poidsobs = c(
   gstat <- ggplotAsdep() +
     geom_line(
       data=tabg2,
-      aes(x=Annee,y=indicateur,colour=Territoire,label=paste(Territoire,", ",Annee,"<br>",indicateur," ",tabs$unitevar,sep="")),size=1) + #
-    geom_ribbon(
-      data=tabq3,
-      aes(ymin=ymin, ymax=ymax, x=Annee, fill=intitules, alpha=intitules, label=paste(intitules," : entre ",ymin," et ",ymax," ",tabs$unitevar,sep=""))) +  #
+      aes(x=Annee,y=indicateur,colour=Territoire,label=paste(Territoire,", ",Annee,"<br>",indicateur," ",tabs$unitevar,sep="")),size=1)
+  if (NROW(optionszones)>=1) {
+    gstat <- gstat + #
+      geom_ribbon(
+        data=tabq3,
+        aes(ymin=ymin, ymax=ymax, x=Annee,
+            fill=intitules, alpha=intitules,
+            label=paste(intitules," : entre ",ymin," et ",ymax," ",tabs$unitevar,sep="")))
+  }
+  gstat <- gstat +  #
     guides(size = FALSE , alpha = FALSE) +
     scale_fill_manual(values = couleursloc) +
     scale_color_manual(values = couleursloc) +
