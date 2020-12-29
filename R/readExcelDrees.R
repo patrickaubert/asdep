@@ -31,6 +31,7 @@ readExcelDrees <- function(fich , sheetinclude = NULL, sheetexclude = NULL, nlig
 
   # ========================================
   # valeurs par défaut pour certains fichiers particuliers
+  titreslignes <- NULL
   options <- tolower(options)
   if (options %in% c("asdepslbenef")) {
 
@@ -59,7 +60,9 @@ readExcelDrees <- function(fich , sheetinclude = NULL, sheetexclude = NULL, nlig
 
   } else if (options %in% c("oarsasl")) {
 
-  } else if (options %in% c("mssl","minsocsl")) {
+  } else if (options %in% c("mssl","minsocsl","minsoc")) {
+    sheetexcludespec <- c("Sommaire")
+    if (is.null(nlignetitre)) { nlignetitre <- 2 }
 
   } else if (options %in% c("prestasolmens","msmens","minsocmens")) {
 
@@ -87,7 +90,7 @@ readExcelDrees <- function(fich , sheetinclude = NULL, sheetexclude = NULL, nlig
 
   # ========================================
   # extraction de tous les onglets
-  titreslignes <- rep(nlignetitre, NROW(sheets))
+  if (is.null(titreslignes)) {titreslignes <- rep(nlignetitre, NROW(sheets))}
   onglets <- lapply(
     1:NROW(sheets),
     function(i){readSheetDrees(fich = fich ,

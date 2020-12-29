@@ -50,4 +50,5 @@ Les options permettent d'ajouter sur le graphique une représentation des divers
 graphEvolution(nomvariable="NbBenefAPA",dept="Vosges",comp="Grand Est",typesortie="tab")
 graphEvolution(nomvariable="NbBenefAPA",denom="pop.60.99",dept="Vosges",comp="Grand Est",options=c("interquartiles","interdeciles","medianePM10"))
 graphEvolution(nomvariable="NbBenefAPA",denom="pop.60.99",dept="Vosges",gpecomp=c("Meuse","Moselle"),options=c("medianePM10","medianePM20"),typesortie="graphdyn")
+graphEvolution(nomvariable="effpersassfam",denom="popTOT",dept="Vosges",gpecomp=c(),options=c("medianePM10","medianePM20"),typesortie="tab")
 }

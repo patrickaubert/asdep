@@ -258,4 +258,35 @@ server <- function(input, output, session) {
   # -- part des personnes ayant un CER parmi les personnes orientées hors Pôle Emploi
   output$partBRSACEREvol <- renderPlotly({graphEvolutionAppli(nomvariable="OarsaTabB9")  })
   output$partBRSACER <- renderPlotly({graphComparaisonAppli(nomvariable="OarsaTabB9")  })
+
+  # === 5) personnels départementaux de l'aide sociale (ETP)
+
+  # -- personnel médical
+  output$persmedicalEvol <- renderPlotly({graphEvolutionAppli(nomvariable="etppersmedical",denom="popTOT")  })
+  output$persmedical <- renderPlotly({graphComparaisonAppli(nomvariable="etppersmedical",denom="popTOT")  })
+  # -- psychologues
+  output$psychologuesEvol <- renderPlotly({graphEvolutionAppli(nomvariable="etppsychologues",denom="popTOT")  })
+  output$psychologues <- renderPlotly({graphComparaisonAppli(nomvariable="etppsychologues",denom="popTOT")  })
+  # -- personnel paramédical
+  output$persparamedEvol <- renderPlotly({graphEvolutionAppli(nomvariable="etppersparamed",denom="popTOT")  })
+  output$persparamed <- renderPlotly({graphComparaisonAppli(nomvariable="etppersparamed",denom="popTOT")  })
+  # -- personnel social et éducatif
+  output$perssocialeteducatifEvol <- renderPlotly({graphEvolutionAppli(nomvariable="etpperssocialeteducatif",denom="popTOT")  })
+  output$perssocialeteducatif <- renderPlotly({graphComparaisonAppli(nomvariable="etpperssocialeteducatif",denom="popTOT")  })
+  # -- personnel médicotechnique
+  output$persmedicotechEvol <- renderPlotly({graphEvolutionAppli(nomvariable="etppersmedicotech",denom="popTOT")  })
+  output$persmedicotech <- renderPlotly({graphComparaisonAppli(nomvariable="etppersmedicotech",denom="popTOT")  })
+  # -- personnel adminsitratif et technique
+  output$persadminettechEvol <- renderPlotly({graphEvolutionAppli(nomvariable="etppersadminettech",denom="popTOT")  })
+  output$persadminettech <- renderPlotly({graphComparaisonAppli(nomvariable="etppersadminettech",denom="popTOT")  })
+  # -- personnel total général hors assistants familiaux
+  output$totalgeneralhorsAFEvol <- renderPlotly({graphEvolutionAppli(nomvariable="etptotalgeneralhorsAF",denom="popTOT")  })
+  output$totalgeneralhorsAF <- renderPlotly({graphComparaisonAppli(nomvariable="etptotalgeneralhorsAF",denom="popTOT")  })
+  # -- assistants familiaux
+  output$persassfamEvol <- renderPlotly({graphEvolutionAppli(nomvariable="effpersassfam",denom="popTOT")  })
+  output$persassfam <- renderPlotly({graphComparaisonAppli(nomvariable="effpersassfam",denom="popTOT")  })
+  # -- personnel total général yc assistants familiaux
+  output$totalgeneralycAFEvol <- renderPlotly({graphEvolutionAppli(nomvariable="efftotalgeneralycAF",denom="popTOT")  })
+  output$totalgeneralycAF <- renderPlotly({graphComparaisonAppli(nomvariable="efftotalgeneralycAF",denom="popTOT")  })
+
 }

@@ -34,7 +34,8 @@ readSheetDrees(fich="data-raw/DonnÃ©es mensuelles des prestations de solidarit
 readSheetDrees(fich="data-raw/DonnÃ©es mensuelles des prestations de solidaritÃ©.xlsx", sheet="Tableau 2" , nlignetitre=3, options="PrestaSolMens")
 readSheetDrees(fich="data-raw/Les bÃ©nÃ©ficiaires de l aide sociale dÃ©partementale - sÃ©ries longues (1996-2018).xlsx", sheet="Tab6-pa" , options = "ASDEPslbenef", nlignetitre=1)
 readSheetDrees(fich="data-raw/Les dÃ©penses d aide sociale dÃ©partementale - sÃ©ries longues (1999 -2018).xlsx", sheet="PA-tab3" , options = "ASDEPsldepenses", nlignetitre=1)
-readSheetDrees(fich="data-raw/Minima sociaux - donnees departementales par dispositif.xlsx", sheet="Tableau 10", nlignetitre=1)
+readSheetDrees(fich="data-raw/Minima sociaux - donnees departementales par dispositif.xlsx", sheet="Tableau 10", nlignetitre=1, options="minsocsl")
+readSheetDrees(fich="data-raw/Minima sociaux - donnees departementales par dispositif.xlsx", sheet="Tableau 11", nlignetitre=2, options="minsocsl")
 readSheetDrees(fich="data-raw/OARSA â€“ Principaux indicateurs de 2015 Ã  2018.xlsx", sheet="Tableau B10" , nlignetitre=1)
 readSheetDrees(fich="data-raw/Le personnel dÃ©partemental de l'action sociale et mÃ©dico-sociale de 2014 Ã  2018.xlsx", sheet="eff - pers medical" , options = "ASDEPslperso", nlignetitre=1)
 }

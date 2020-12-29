@@ -22,6 +22,7 @@ ASDEPslperso_description <- tabspers$metadonnees %>%
   select(ongletsource,info,champ,source,note) %>%
   mutate(ongletsource = gsub("[[:space:]]*\\-[[:space:]]*","_",ongletsource),
          ongletsource = gsub("[[:space:][:punct:]]","",ongletsource),
+         Intitulecourt.var = gsub("^[^\\-]*[[:space:]]*\\-[[:space:]]*","",info),
          info = paste(gsub("^[^\\-]*[[:space:]]*\\-[[:space:]]*","",info),str_extract(info,"^[^\\-]*(?=[[:space:]]*\\-)"),sep=" - ")#,
          #note = paste(str_extract(info,"^[^\\-]*(?=[[:space:]]*\\-)"),note,sep="\n"),
          #info = gsub("^[^\\-]*[[:space:]]*\\-[[:space:]]*","",info)
@@ -33,8 +34,10 @@ ASDEPslperso_description <- tabspers$metadonnees %>%
          Source.var = source) %>%
   mutate(Thematique.var = "Personnels",
          TexteDenom = "personnes",
-         Type.var = "Nombres de personnes",
+         Unite.var = "personnes",
+         Type.var = "Nombres de personnels",
          Popref.var = "popTOT")
+rownames(ASDEPslperso_description) <- ASDEPslperso_description$Nom.var
 
 ASDEPslperso <- tabspers$tablong %>%
   rename(Annee = annee) %>%

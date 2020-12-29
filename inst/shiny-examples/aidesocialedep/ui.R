@@ -111,6 +111,8 @@ ui <- dashboardPage(
       menuItem("Handicap", tabName = "handicap", icon = icon("wheelchair")),
       menuItem("ASE", tabName = "ase", icon = icon("child")),
       menuItem("Insertion", tabName = "insertion", icon = icon("hands-helping")),
+      menuItem("Minima sociaux", tabName = "minsoc", icon = icon("money-bill-wave")),
+      menuItem("Personnels", tabName = "perso", icon = icon("users")),
       menuItem("Paramétrer", tabName = "param", icon = icon("cog")),
       menuItem("Documentation", tabName = "doc", icon = icon("book")),
       menuItem("A propos", tabName = "info", icon = icon("th"))
@@ -366,6 +368,7 @@ ui <- dashboardPage(
           )
         ) # fin fluidRow dep alloc ASE
       ),
+
       tabItem(
         tabName = "insertion",
 
@@ -395,6 +398,56 @@ ui <- dashboardPage(
               var = "OarsaTabB9",
               graph = "partBRSACER")
       ),
+
+      tabItem(
+        tabName = "perso",
+
+        boite(titre = "Personnel médical (en ETP)",
+              var = "etppersmedical",
+              graph = "persmedical",
+              collapsed = FALSE),
+        boite(titre = "Psychologues(en ETP)",
+              var = "etppsychologues",
+              graph = "psychologues",
+              collapsed = FALSE),
+        boite(titre = "Personnel paramédical (en ETP)",
+              var = "etppersparamed",
+              graph = "persparamed",
+              collapsed = FALSE),
+        boite(titre = "Personnel social et éducatif (en ETP)",
+              var = "etpperssocialeteducatif",
+              graph = "perssocialeteducatif",
+              collapsed = FALSE),
+        boite(titre = "Personnel médico-technique (en ETP)",
+              var = "etppersmedicotech",
+              graph = "persmedicotech",
+              collapsed = FALSE),
+        boite(titre = "Personnel administratif et technique (en ETP)",
+              var = "etppersadminettech",
+              graph = "persadminettech",
+              collapsed = FALSE),
+        boite(titre = "Total des personnels du département (en ETP), hors assistants familiaux",
+              var = "etptotalgeneralhorsAF",
+              graph = "totalgeneralhorsAF",
+              collapsed = FALSE),
+        boite(titre = "Assistants familiaux (effectifs physiques)",
+              var = "effpersassfam",
+              graph = "persassfam",
+              collapsed = FALSE),
+        boite(titre = "Total des personnels du département y compris assistants familiaux (effectifs physiques)",
+              var = "efftotalgeneralycAF",
+              graph = "totalgeneralycAF",
+              collapsed = FALSE)
+      ), # fin partie personnels
+
+      tabItem(
+        tabName = "minsoc",
+
+        #boite(titre = "Personnel médical (en ETP)",
+        #      var = "etppersmedical",
+        #      graph = "persmedical",
+        #      collapsed = FALSE)
+      ), # fin partie minima sociaux
 
       # === paramétrage des graphiques affichés
       tabItem(

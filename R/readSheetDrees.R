@@ -21,7 +21,8 @@
 #' @examples readSheetDrees(fich="data-raw/Données mensuelles des prestations de solidarité.xlsx", sheet="Tableau 2" , nlignetitre=3, options="PrestaSolMens")
 #' @examples readSheetDrees(fich="data-raw/Les bénéficiaires de l aide sociale départementale - séries longues (1996-2018).xlsx", sheet="Tab6-pa" , options = "ASDEPslbenef", nlignetitre=1)
 #' @examples readSheetDrees(fich="data-raw/Les dépenses d aide sociale départementale - séries longues (1999 -2018).xlsx", sheet="PA-tab3" , options = "ASDEPsldepenses", nlignetitre=1)
-#' @examples readSheetDrees(fich="data-raw/Minima sociaux - donnees departementales par dispositif.xlsx", sheet="Tableau 10", nlignetitre=1)
+#' @examples readSheetDrees(fich="data-raw/Minima sociaux - donnees departementales par dispositif.xlsx", sheet="Tableau 10", nlignetitre=1, options="minsocsl")
+#' @examples readSheetDrees(fich="data-raw/Minima sociaux - donnees departementales par dispositif.xlsx", sheet="Tableau 11", nlignetitre=2, options="minsocsl")
 #' @examples readSheetDrees(fich="data-raw/OARSA – Principaux indicateurs de 2015 à 2018.xlsx", sheet="Tableau B10" , nlignetitre=1)
 #' @examples readSheetDrees(fich="data-raw/Le personnel départemental de l'action sociale et médico-sociale de 2014 à 2018.xlsx", sheet="eff - pers medical" , options = "ASDEPslperso", nlignetitre=1)
 readSheetDrees <- function(fich , sheet, nlignetitre = NULL, options = "") {
@@ -134,7 +135,33 @@ readSheetDrees <- function(fich , sheet, nlignetitre = NULL, options = "") {
 
   } else if (options %in% c("oarsasl")) {
 
-  } else if (options %in% c("mssl","minsocsl")) {
+  } else if (options %in% c("mssl","minsocsl","minsoc")) {
+
+    # fichier Excel "Minima sociaux par département"
+    names(tab)[grepl("^N° Dep",names(tab))] <- "Code.departement"
+    names(tab)[grepl("^Libelle Dep",names(tab))] <- "Territoire"
+    # noms de colonnes pour le RSA
+    nomsrsa <- names(tab)[grepl("^[^\\.]*RSA[^\\.]*\\.[[:digit:]]{4}",names(tab))]
+    names(tab)[names(tab) %in% nomsrsa] <- paste(gsub("^[^\\.]*RSA[^\\.]*\\.","",nomsrsa),
+                                                 str_extract(nomsrsa,"^[^\\.]*RSA[^\\.]*(?=\\.)"),
+                                                 sep=".")
+    oknoms <- c("Code.departement","Territoire",names(tab)[grepl("^[[:digit:]]{4}",names(tab))])
+    tab <- tab[ ,c(oknoms)]
+
+    tab <- tab %>%
+      mutate_at(vars(-c("Code.departement","Territoire")),function(x){ifelse(x %in% c("-","ns","nd","n"),0,x)}) %>%
+      mutate_at(vars(-c("Code.departement","Territoire")),as.numeric)
+
+    departements <- tab %>%
+      filter(grepl("^[[:digit:]]+[AB[:digit:]]($|[[:digit:]]$|[MDmd]$)",Code.departement)) %>%
+      mutate(TypeTerritoire = "Département")
+    nation <- tab  %>%
+      filter(!grepl("^[[:digit:]]+[AB[:digit:]]($|[[:digit:]]$|[MDmd]$)",Code.departement)) %>%
+      select(-c(Code.departement)) %>%
+      mutate(TypeTerritoire = "France",
+             Code.departement = NA)
+
+    tab <- bind_rows(departements, nation)
 
   } else if ((options %in% c("prestasolmens","msmens","minsocmens")) & (nlignetitre == 3)) {
 

@@ -3,6 +3,7 @@
 export(Intitulepop)
 export(LitOngletOarsa)
 export(champFrance)
+export(corrigeNom)
 export(departementsProches)
 export(ggplotAsdep)
 export(ggplotlyAsdep)

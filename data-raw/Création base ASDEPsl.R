@@ -15,13 +15,17 @@ mergecom <- function(tab1,tab2) {full_join(tab1,tab2,by = intersect( names(tab1)
 
 ASDEPsl <- ASDEPslbenef %>%
   mergecom(ASDEPsldepenses) %>%
+  mergecom(ASDEPslperso) %>%
   mergecom(OARSAsl) %>%
+  mergecom(MINSOCsl) %>%
   mergecom(PopDepartementales)
 
-ASDEPsl_description <- rbind(
+ASDEPsl_description <- bind_rows(
   ASDEPslbenef_description,
   ASDEPsldepenses_description,
+  ASDEPslperso_description,
   OARSAsl_description,
+  MINSOCsl_description,
   PopDepartementales_description
 )
 

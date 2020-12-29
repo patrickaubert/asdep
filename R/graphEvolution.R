@@ -21,6 +21,7 @@
 #' @examples graphEvolution(nomvariable="NbBenefAPA",dept="Vosges",comp="Grand Est",typesortie="tab")
 #' @examples graphEvolution(nomvariable="NbBenefAPA",denom="pop.60.99",dept="Vosges",comp="Grand Est",options=c("interquartiles","interdeciles","medianePM10"))
 #' @examples graphEvolution(nomvariable="NbBenefAPA",denom="pop.60.99",dept="Vosges",gpecomp=c("Meuse","Moselle"),options=c("medianePM10","medianePM20"),typesortie="graphdyn")
+#' @examples graphEvolution(nomvariable="effpersassfam",denom="popTOT",dept="Vosges",gpecomp=c(),options=c("medianePM10","medianePM20"),typesortie="tab")
 graphEvolution <- function(nomvariable, denom = "", options = c(), poidsobs = c(),
                            dept, comp = "TOTAL estimé France entière (hors Mayotte)", gpecomp = c(),
                            typesortie = "graph",

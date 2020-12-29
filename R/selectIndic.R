@@ -15,6 +15,7 @@
 #' @examples selectIndic(nomvariable="NbBenefAPA",denom="pop.60.99", keepvar = c("pop.60.99"))
 #' @examples selectIndic(nomvariable="DepBruteAPA",denom="NbBenefAPA",options="mensuel")
 #' @examples selectIndic(nomvariable="NbBenefAPA",denom="pop.60.99", gpeDpt=c("Meuse","Moselle"))
+#' @examples selectIndic(nomvariable="etppersmedical",denom="popTOT")
 selectIndic <- function(nomvariable, denom = "", keepvar=c(),
                         options = "", gpeDpt = c(),
                         donnees = ASDEPsl, variables = ASDEPsl_description) {
@@ -103,6 +104,7 @@ selectIndic <- function(nomvariable, denom = "", keepvar=c(),
     unitevar <- "millions d'\u20AC"
   }  else if ("denom" %in% names(donneesloc)) {
 
+    # cas où le numérateur est un nombre de bénéficaires => on exprime en % de la population
     if (listetypevariables[[nomvariable]] %in% c("Nombres de bénéficiaires")) {
       donneesloc[,c(nomvariable)] <- 100* as.numeric(donneesloc[,c(nomvariable)])/donneesloc$denom
       if (nomdenom %in% PopDepartementales_description$Nom.var )  {
@@ -110,7 +112,18 @@ selectIndic <- function(nomvariable, denom = "", keepvar=c(),
       }      else if (listetypevariables[[nomdenom]] == "Nombres de bénéficiaires")  {
         unitevar <- paste("% des ",variables[nomdenom,"TexteDenom"],sep="")
       }      else { unitevar <- "??" }
-    }    else if (listetypevariables[[nomvariable]] %in% c("Montants")) {
+
+    # cas où le numérateur est un nombre de personnels => on exprime en pour 100 000 habitants
+    } else if (listetypevariables[[nomvariable]] %in% c("Nombres de personnels")) {
+      donneesloc[,c(nomvariable)] <- 100000* as.numeric(donneesloc[,c(nomvariable)])/donneesloc$denom
+      if (nomdenom %in% PopDepartementales_description$Nom.var )  {
+        unitevar <- paste("pour 100 000 habitants",Intitulepop(nomdenom),sep="")
+      }      else if (listetypevariables[[nomdenom]] == "Nombres de bénéficiaires")  {
+        unitevar <- paste("pour 100 000 ",variables[nomdenom,"TexteDenom"],sep="")
+      }      else { unitevar <- "??" }
+
+      # cas où le numérateur est un montant => on exprime en "par tête"
+    } else if (listetypevariables[[nomvariable]] %in% c("Montants")) {
       if (nomdenom %in% PopDepartementales_description$Nom.var )  {
         donneesloc[,c(nomvariable)] <- donneesloc[,c(nomvariable)] / donneesloc$denom
         unitevar <- paste(infovariable$Unite.var," par habitant",Intitulepop(nomdenom),sep="")
@@ -122,6 +135,7 @@ selectIndic <- function(nomvariable, denom = "", keepvar=c(),
         unitevar <- paste("% des ",variables[nomdenom,"TexteDenom"],sep="")
       }      else { unitevar <- paste(infovariable$Unite.var," ",infovariable$Texte.parbenef,sep="") }
     }
+
   }  else {
     unitevar <- infovariable$Unite.var
   }

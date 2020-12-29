@@ -40,4 +40,5 @@ selectIndic(nomvariable="NbBenefAPA",denom="pop.60.99")
 selectIndic(nomvariable="NbBenefAPA",denom="pop.60.99", keepvar = c("pop.60.99"))
 selectIndic(nomvariable="DepBruteAPA",denom="NbBenefAPA",options="mensuel")
 selectIndic(nomvariable="NbBenefAPA",denom="pop.60.99", gpeDpt=c("Meuse","Moselle"))
+selectIndic(nomvariable="etppersmedical",denom="popTOT")
 }
