@@ -21,7 +21,8 @@ tabspers <- readExcelDrees(fich="Le personnel départemental de l'action sociale
 ASDEPslperso_description <- tabspers$metadonnees %>%
   select(ongletsource,info,champ,source,note) %>%
   mutate(ongletsource = gsub("[[:space:]]*\\-[[:space:]]*","_",ongletsource),
-         ongletsource = gsub("[[:space:][:punct:]]","",ongletsource)#,
+         ongletsource = gsub("[[:space:][:punct:]]","",ongletsource),
+         info = paste(gsub("^[^\\-]*[[:space:]]*\\-[[:space:]]*","",info),str_extract(info,"^[^\\-]*(?=[[:space:]]*\\-)"),sep=" - ")#,
          #note = paste(str_extract(info,"^[^\\-]*(?=[[:space:]]*\\-)"),note,sep="\n"),
          #info = gsub("^[^\\-]*[[:space:]]*\\-[[:space:]]*","",info)
          ) %>%
@@ -42,11 +43,13 @@ ASDEPslperso <- tabspers$tablong %>%
          sheet = gsub("[[:space:][:punct:]]","",sheet)) %>%
   pivot_wider(id_cols=c("Code.departement","Territoire","TypeTerritoire","Annee"),
               names_from="sheet",
-              values_from="valeur")
+              values_from="valeur") %>%
+  mutate(Territoire = asdep::corrigeNom(Territoire))
 
-# correction des noms de territoire et ajouts des codes régions
+# vérification
+verif <- unique(ASDEPslperso$Territoire)
+verif[!(verif %in% asdep::nomscorrectsterritoires$TerritoireCorrect)]
 
-# A FAIRE !!
 
 
 # ===================================================================================
