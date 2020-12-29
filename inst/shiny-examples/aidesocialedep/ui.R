@@ -399,9 +399,22 @@ ui <- dashboardPage(
               graph = "partBRSACER")
       ),
 
+      # === personnels de l'aide sociale départementale
       tabItem(
         tabName = "perso",
 
+        boite(titre = "Total des personnels du département y compris assistants familiaux (effectifs physiques)",
+              var = "efftotalgeneralycAF",
+              graph = "totalgeneralycAF",
+              collapsed = FALSE),
+        boite(titre = "Assistants familiaux (effectifs physiques)",
+              var = "effpersassfam",
+              graph = "persassfam",
+              collapsed = FALSE),
+        boite(titre = "Total des personnels du département (en ETP), hors assistants familiaux",
+              var = "etptotalgeneralhorsAF",
+              graph = "totalgeneralhorsAF",
+              collapsed = FALSE),
         boite(titre = "Personnel médical (en ETP)",
               var = "etppersmedical",
               graph = "persmedical",
@@ -425,21 +438,10 @@ ui <- dashboardPage(
         boite(titre = "Personnel administratif et technique (en ETP)",
               var = "etppersadminettech",
               graph = "persadminettech",
-              collapsed = FALSE),
-        boite(titre = "Total des personnels du département (en ETP), hors assistants familiaux",
-              var = "etptotalgeneralhorsAF",
-              graph = "totalgeneralhorsAF",
-              collapsed = FALSE),
-        boite(titre = "Assistants familiaux (effectifs physiques)",
-              var = "effpersassfam",
-              graph = "persassfam",
-              collapsed = FALSE),
-        boite(titre = "Total des personnels du département y compris assistants familiaux (effectifs physiques)",
-              var = "efftotalgeneralycAF",
-              graph = "totalgeneralycAF",
               collapsed = FALSE)
       ), # fin partie personnels
 
+      # === minima sociaux (à compléter)
       tabItem(
         tabName = "minsoc",
 

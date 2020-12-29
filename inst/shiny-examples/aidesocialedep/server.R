@@ -58,10 +58,14 @@ server <- function(input, output, session) {
   }
 
   graphComparaisonAppli <- function(nomvariable, ...) {
+    # si l'année de référence paramétrée par l'utilisateur est absente, on prend la plus proche
+    anneesdispo <- unique(ASDEPsl[!is.na(ASDEPsl[,nomvariable]),"Annee"])
+    anneeref <- anneesdispo[which.min(abs(anneesdispo - input$anneeref))]
+    # sortie du graphique
     graphComparaison(
       nomvariable = nomvariable,
       ...,
-      annee=input$anneeref,
+      annee=anneeref,
       dept=input$dep, # département choisi par l'utilisateur
       comp= territoireComparaison(input$terrcomp, nomvariable, input$dep),
       gpecomp = gptDeptComparaison(input$terrcomp, input$listedepcomp, input$dep),

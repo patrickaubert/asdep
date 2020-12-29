@@ -10,7 +10,7 @@ graphComparaison2dim(
   denom = "",
   denom1 = denom,
   denom2 = denom,
-  annee = max(ASDEPsl[is.na(ASDEPsl[, c(nomvariable1, nomvariable2)]), "Annee"], na.rm
+  annee = max(ASDEPsl[!is.na(ASDEPsl[, c(nomvariable1, nomvariable2)]), "Annee"], na.rm
     = TRUE),
   options = c(),
   poidsobs = c(),
