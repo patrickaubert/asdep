@@ -7,7 +7,7 @@
 graphComparaison(
   nomvariable,
   denom = "",
-  annee = max(ASDEPsl[is.na(ASDEPsl[, nomvariable]), "Annee"], na.rm = TRUE),
+  annee = max(ASDEPsl[!is.na(ASDEPsl[, nomvariable]), "Annee"], na.rm = TRUE),
   options = c(),
   poidsobs = c(),
   dept,

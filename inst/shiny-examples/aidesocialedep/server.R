@@ -289,4 +289,17 @@ server <- function(input, output, session) {
   output$totalgeneralycAFEvol <- renderPlotly({graphEvolutionAppli(nomvariable="efftotalgeneralycAF",denom="popTOT")  })
   output$totalgeneralycAF <- renderPlotly({graphComparaisonAppli(nomvariable="efftotalgeneralycAF",denom="popTOT")  })
 
+  # === 6) minima sociaux
+
+  # -- RSA et RMI
+  output$rsaEvol <- renderPlotly({graphEvolutionAppli(nomvariable="RSA",denom="popTOT")  })
+  output$rsa <- renderPlotly({graphComparaisonAppli(nomvariable="RSA",denom="popTOT")  })
+
+  # -- AAH
+  output$aahEvol <- renderPlotly({graphEvolutionAppli(nomvariable="AAH",denom="popTOT")  })
+  output$aad <- renderPlotly({graphComparaisonAppli(nomvariable="AAH",denom="popTOT")  })
+
+  # -- ASS
+  output$assEvol <- renderPlotly({graphEvolutionAppli(nomvariable="ASS",denom="popTOT")  })
+  output$asss <- renderPlotly({graphComparaisonAppli(nomvariable="ASS",denom="popTOT")  })
 }

@@ -443,10 +443,14 @@ ui <- dashboardPage(
       tabItem(
         tabName = "minsoc",
 
-        #boite(titre = "Personnel médical (en ETP)",
-        #      var = "etppersmedical",
-        #      graph = "persmedical",
-        #      collapsed = FALSE)
+        boite(titre = "Nombre d'allocataires de l'AAH",
+              var = "AAH",
+              graph = "aah",
+              collapsed = FALSE),
+        boite(titre = "Nombre d'allocataires de l'ASS",
+              var = "ASS",
+              graph = "ass",
+              collapsed = FALSE)
       ), # fin partie minima sociaux
 
       # === paramétrage des graphiques affichés

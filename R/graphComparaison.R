@@ -24,7 +24,7 @@
 #' @examples graphComparaison(nomvariable="NbBenefAPA",denom="pop.60.99",dept="Vosges",gpecomp=c("Meuse","Moselle"),options=c("medianePM10","medianePM20"),typesortie="graphdyn")
 graphComparaison <- function(
   nomvariable, denom = "",
-  annee = max(ASDEPsl[is.na(ASDEPsl[,nomvariable]),"Annee"],na.rm=TRUE),
+  annee = max(ASDEPsl[!is.na(ASDEPsl[,nomvariable]),"Annee"],na.rm=TRUE),
   options = c(), poidsobs = c(),
   dept, comp = "TOTAL estimé France entière (hors Mayotte)", gpecomp = c(),
   typesortie = "graph",
@@ -111,25 +111,31 @@ graphComparaison <- function(
     t <- tab
   }
   tabq3 <- data.frame()
-  for (i in 1:nrow(zonesloc)){
-    tabq3 <- rbind(tabq3,
-                   data.frame(
-                     rang = tabq2$rang,
-                     intitules = rep(zonesloc$intitules[i] , nrow(tabq2)),
-                     noms = rep(zonesloc$noms[i] , nrow(tabq2)),
-                     ymin = tabq2[,zonesloc$ymin[i]],
-                     ymax = tabq2[,zonesloc$ymax[i]],
-                     alpha = rep(zonesloc$alpha[i] , nrow(tabq2))
-                   ))
+  if (nrow(zonesloc)>=1) {
+    for (i in 1:nrow(zonesloc)){
+      tabq3 <- rbind(tabq3,
+                     data.frame(
+                       rang = tabq2$rang,
+                       intitules = rep(zonesloc$intitules[i] , nrow(tabq2)),
+                       noms = rep(zonesloc$noms[i] , nrow(tabq2)),
+                       ymin = tabq2[,zonesloc$ymin[i]],
+                       ymax = tabq2[,zonesloc$ymax[i]],
+                       alpha = rep(zonesloc$alpha[i] , nrow(tabq2))
+                     ))
+    }
   }
 
   # === le graphique, version statique (ggplot)
 
   gstat <- ggplotAsdep() +
     geom_point(data=tabg,
-               aes(x=rang,y=indicateur,size=size,colour=type,alpha=type,text=paste(Territoire," en ",annee," :<br>",indicateur," ",tabs$unitevar,sep=""))) +
-    geom_ribbon(data=tabq3,
-                aes(ymin=ymin, ymax=ymax, x=rang, fill=intitules, alpha=intitules, text=paste(intitules," : entre ",ymin," et ",ymax," ",tabs$unitevar,sep=""))) +
+               aes(x=rang,y=indicateur,size=size,colour=type,alpha=type,text=paste(Territoire," en ",annee," :<br>",indicateur," ",tabs$unitevar,sep="")))
+  if (nrow(tabq3)>=1) {
+    gstat <- gstat +
+      geom_ribbon(data=tabq3,
+                  aes(ymin=ymin, ymax=ymax, x=rang, fill=intitules, alpha=intitules, text=paste(intitules," : entre ",ymin," et ",ymax," ",tabs$unitevar,sep="")))
+  }
+  gstat <- gstat +
     guides(size = FALSE , alpha = FALSE) +
     scale_fill_manual(values = couleursloc) +
     scale_color_manual(values = couleursloc) +

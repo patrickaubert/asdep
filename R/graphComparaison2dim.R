@@ -28,7 +28,7 @@
 graphComparaison2dim <- function(
   nomvariable1, nomvariable2,
   denom = "", denom1 = denom,  denom2 = denom,
-  annee = max(ASDEPsl[is.na(ASDEPsl[,c(nomvariable1,nomvariable2)]),"Annee"],na.rm=TRUE),
+  annee = max(ASDEPsl[!is.na(ASDEPsl[,c(nomvariable1,nomvariable2)]),"Annee"],na.rm=TRUE),
   options = c(), poidsobs = c(),
   dept, comp = "TOTAL estimé France entière (hors Mayotte)", gpecomp = c(),
   typesortie = "graph",
