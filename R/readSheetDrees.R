@@ -23,7 +23,7 @@
 #' @examples readSheetDrees(fich="data-raw/Les dépenses d aide sociale départementale - séries longues (1999 -2018).xlsx", sheet="PA-tab3" , options = "ASDEPsldepenses", nlignetitre=1)
 #' @examples readSheetDrees(fich="data-raw/Minima sociaux - donnees departementales par dispositif.xlsx", sheet="Tableau 10", nlignetitre=1)
 #' @examples readSheetDrees(fich="data-raw/OARSA – Principaux indicateurs de 2015 à 2018.xlsx", sheet="Tableau B10" , nlignetitre=1)
-#' @examples readSheetDrees(fich="data-raw/Le personnel départemental de l'action sociale et médico-sociale de 2014 à 2018.xlsx", sheet="eff - pers medical" , nlignetitre=1)
+#' @examples readSheetDrees(fich="data-raw/Le personnel départemental de l'action sociale et médico-sociale de 2014 à 2018.xlsx", sheet="eff - pers medical" , options = "ASDEPslperso", nlignetitre=1)
 readSheetDrees <- function(fich , sheet, nlignetitre = NULL, options = "") {
 
   # fich <- "data-raw/Données mensuelles des prestations de solidarité.xlsx"
@@ -96,34 +96,41 @@ readSheetDrees <- function(fich , sheet, nlignetitre = NULL, options = "") {
   if (options %in% c("asdepslbenef","asdepsldepenses")) {
 
     # fichier Excel "bénéficiaires de l'aide sociale séries longues"
-    names(tab)[grepl("^[Cc]ode(.*)[Rr][ée]gion$",names(tab))] <- "code.region"
-    names(tab)[grepl("^[Cc]ode(.*)[Dd][ée]partement$",names(tab))] <- "code.departement"
+    names(tab)[grepl("^[Cc]ode(.*)[Rr][ée]gion$",names(tab))] <- "Code.region"
+    names(tab)[grepl("^[Cc]ode(.*)[Dd][ée]partement$",names(tab))] <- "Code.departement"
     names(tab)[grepl("^[Dd][ée]partement($|s$)",names(tab))] <- "Territoire"
 
     tab <- tab %>%
-      mutate_at(vars(-c("code.region","code.departement","Territoire")),as.numeric)
+      mutate_at(vars(-c("Code.region","Code.departement","Territoire")),as.numeric)
 
     departements <- tab %>%
-      filter(grepl("^[[:digit:]][AB[:digit:]]($|[[:digit:]]$|[MDmd]$)",code.departement)) %>%
+      filter(grepl("^[[:digit:]][AB[:digit:]]($|[[:digit:]]$|[MDmd]$)",Code.departement)) %>%
       mutate(TypeTerritoire = "Département")
     regions <- tab  %>%
-      filter(!grepl("^[[:digit:]][AB[:digit:]]($|[[:digit:]]$|[MDmd]$)",code.departement)) %>%
-      filter(grepl("^[[:digit:]]{2,3}$",code.region)) %>%
+      filter(!grepl("^[[:digit:]][AB[:digit:]]($|[[:digit:]]$|[MDmd]$)",Code.departement)) %>%
+      filter(grepl("^[[:digit:]]{2,3}$",Code.region)) %>%
       select(-Territoire) %>%
-      rename(Territoire = code.departement) %>%
+      rename(Territoire = Code.departement) %>%
       mutate(TypeTerritoire = "Région",
-             code.departement = NA)
+             Code.departement = NA)
     nation <- tab  %>%
-      filter(!grepl("^[[:digit:]][AB[:digit:]]($|[[:digit:]]$|[MDmd]$)",code.departement)) %>%
-      filter(!grepl("^[[:digit:]]{2,3}$",code.region)) %>%
-      filter(!grepl("^[Cc]ode(.*)[Rr][ée]gion$",code.region)) %>%
-      select(-c(Territoire,code.departement)) %>%
-      rename(Territoire = code.region) %>%
+      filter(!grepl("^[[:digit:]][AB[:digit:]]($|[[:digit:]]$|[MDmd]$)",Code.departement)) %>%
+      filter(!grepl("^[[:digit:]]{2,3}$",Code.region)) %>%
+      filter(!grepl("^[Cc]ode(.*)[Rr][ée]gion$",Code.region)) %>%
+      select(-c(Territoire,Code.departement)) %>%
+      rename(Territoire = Code.region) %>%
       mutate(TypeTerritoire = "France",
-             code.region = NA,
-             code.departement = NA)
+             Code.region = NA,
+             Code.departement = NA)
 
     tab <- bind_rows(departements, regions, nation)
+
+  } else if (options %in% c("asdepslperso","asdepslpersonnel","asdepslpersonnels")) {
+
+    # Fichier Excel "personnels de l'aide sociale"
+    names(tab)[grepl("^Numero de departement$",names(tab))] <- "Code.departement"
+    names(tab)[grepl("^[Dd][ée]partement($|s$)",names(tab))] <- "Territoire"
+    tab <- tab %>% mutate(TypeTerritoire = "Département")
 
   } else if (options %in% c("oarsasl")) {
 

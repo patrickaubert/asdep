@@ -36,16 +36,17 @@ ASDEPslperso_description <- tabspers$metadonnees %>%
          Popref.var = "popTOT")
 
 ASDEPslperso <- tabspers$tablong %>%
-  rename(Territoire = Departement,
-         Code.departement = "Numero de departement",
-         Annee = annee) %>%
+  rename(Annee = annee) %>%
   select(-info.annee) %>%
-  mutate(TypeTerritoire = "Département",
-         sheet = gsub("[[:space:]]*\\-[[:space:]]*","_",sheet),
+  mutate(sheet = gsub("[[:space:]]*\\-[[:space:]]*","_",sheet),
          sheet = gsub("[[:space:][:punct:]]","",sheet)) %>%
   pivot_wider(id_cols=c("Code.departement","Territoire","TypeTerritoire","Annee"),
               names_from="sheet",
               values_from="valeur")
+
+# correction des noms de territoire et ajouts des codes régions
+
+# A FAIRE !!
 
 
 # ===================================================================================

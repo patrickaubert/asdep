@@ -36,5 +36,5 @@ readSheetDrees(fich="data-raw/Les bÃ©nÃ©ficiaires de l aide sociale dÃ©par
 readSheetDrees(fich="data-raw/Les dÃ©penses d aide sociale dÃ©partementale - sÃ©ries longues (1999 -2018).xlsx", sheet="PA-tab3" , options = "ASDEPsldepenses", nlignetitre=1)
 readSheetDrees(fich="data-raw/Minima sociaux - donnees departementales par dispositif.xlsx", sheet="Tableau 10", nlignetitre=1)
 readSheetDrees(fich="data-raw/OARSA â€“ Principaux indicateurs de 2015 Ã  2018.xlsx", sheet="Tableau B10" , nlignetitre=1)
-readSheetDrees(fich="data-raw/Le personnel dÃ©partemental de l'action sociale et mÃ©dico-sociale de 2014 Ã  2018.xlsx", sheet="eff - pers medical" , nlignetitre=1)
+readSheetDrees(fich="data-raw/Le personnel dÃ©partemental de l'action sociale et mÃ©dico-sociale de 2014 Ã  2018.xlsx", sheet="eff - pers medical" , options = "ASDEPslperso", nlignetitre=1)
 }
