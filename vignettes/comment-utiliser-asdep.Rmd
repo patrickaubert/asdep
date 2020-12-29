@@ -14,7 +14,7 @@ knitr::opts_chunk$set(
 )
 ```
 
-```{r setup}
+```{r setup, include = FALSE, echo = FALSE}
 library(tidyverse)
 library(dplyr)
 library(shiny)
@@ -35,6 +35,12 @@ library(asdep)
 ## Popdepartementales
 
 ## ASDEPsl
+
+# Les fonctions d'extraction des données Excel diffusées sous data.Drees
+
+## readSheetDrees
+
+## readExcelDrees
 
 # Les fonctions créant des graphiques pré-formatés
 

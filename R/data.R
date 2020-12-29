@@ -32,6 +32,23 @@
 #' @source \url{http://www.data.drees.sante.gouv.fr/}
 "ASDEPsldepenses"
 
+#' Personnels départementaux d'aides sociales départementales
+#'
+#' Une base de données issue du volet "personnels" de l'enquête annuelle 'Aide sociale' de la DREES, contenant les effectifs physiques et les ETP de personnels pour l'aide sociale ds départements.
+#' Les noms des variables, correspondant aux différents types d'aide, sont décrits dans la table 'ASDEPslperso_description'.
+#'
+#' @format Un data frame avec 448 lignes et 20 variables:
+#' \describe{
+#'   \item{Annee}{année (format character)}
+#'   \item{Code.region}{code numérique de la région}
+#'   \item{Code.departement}{code numérique du département (ou du territoire gérant l'aide sociale)}
+#'   \item{TypeTerritoire}{type de territoire ("département","région",...)}
+#'   \item{Territoire}{nom complet du territoire}
+#'   \item{nom.variable}{voir la table ASDEPslperso_description}
+#' }
+#' @source \url{http://www.data.drees.sante.gouv.fr/}
+"ASDEPslperso"
+
 #' Orientation et accompagnement des bénéficiaires du RSA
 #'
 #' Une base de données issues de l'enquête annuelle 'Orientation et accompagnement des bénéficiaires du RSA' de la DREES,

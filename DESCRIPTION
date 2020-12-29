@@ -1,6 +1,6 @@
 Package: asdep
 Title: Package R pour l'analyse de l'aide sociale départementales, à partir des données statistiques de la DREES et de l'Insee
-Version: 0.9.0.0002
+Version: 0.9.0.0003
 Authors@R: 
     person(given = "Patrick",
            family = "Aubert",
