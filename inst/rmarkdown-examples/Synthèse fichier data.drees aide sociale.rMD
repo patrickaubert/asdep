@@ -1,0 +1,182 @@
+---
+title: "Synthèse fichier data.drees Aide sociale"
+author: "Patrick Aubert"
+date: "30/12/2020"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+
+library(tidyverse)
+library(plotly)
+library(openxlsx)
+library(asdep)
+
+fichier <- "C:/Users/PA/Documents/R/Projets/asdep/data-raw/Les bénéficiaires de laide sociale départementale - séries longues (1996-2019).xlsx"
+
+sheets <- getSheetNames(fichier)
+ongletdonneesnat <- sheets[grepl("nation",sheets)][1]
+
+```
+
+
+Ce fichier présente une synthèse des résultats d'un fichier Excel data.drees sur l'aide sociale départementale. Les données sont extraites et traitées en utilisant notamment le package *adsep*.
+
+# Données nationales
+
+Les données présentées dans les graphiques ci-après correspondent aux totaux nationaux. Elles sont lues dans l'onglet *"`r ongletdonneesnat`"* du fichier téléchargés sur data.drees *"`r fichier`"*.
+
+```{r extrdonneesnat,  echo=FALSE, message=FALSE, warning=FALSE}
+
+tabsnat <- asdep::readSheetDrees(fich=fichier, 
+                                 sheet=ongletdonneesnat , 
+                                 options = "", 
+                                 nlignetitre=1)
+
+# extraction du tableau de données nationales
+tabnat <- tabsnat$tab %>%
+  mutate(position=case_when(!is.na(X1) ~ 1,
+                            !is.na(X2) ~ 2,
+                            !is.na(X3) ~ 3,
+                            !is.na(X4) ~ 4,
+                            TRUE ~ 999),
+         intitule = case_when(!is.na(X1) ~ X1,
+                            !is.na(X2) ~ X2,
+                            !is.na(X3) ~ X3,
+                            !is.na(X4) ~ X4,
+                            TRUE ~ "")) %>%
+  filter(position != 999) %>%
+  select(-c(X1,X2,X3,X4)) %>%
+  mutate_at(vars(-c("position","intitule")),as.numeric)
+
+```
+
+## Métadonnées lues dans le fichier pour le tableau des données nationales
+
+
+```{r affichemetadonneesnat, results='asis', echo=FALSE, message=FALSE, warning=FALSE}
+
+# extraction et affichage des métadonnées
+meta <- names(tabsnat)
+meta <- meta[!(meta %in% c("fichiersource","ongletsource","containstablong","tablong","tabnum","containstab","tab" ))]
+
+for (j in 1:NROW(meta)) {
+  cat(meta[j]," :\n")
+  cat(tabsnat[[meta[j]]])
+  cat("\n\n")
+}
+
+```
+
+```{r affichedonneesnat, results='asis', echo=FALSE, message=FALSE, warning=FALSE}
+
+htmltools::tagList(plot_ly())
+# RQ : cette instruction est nécessaire pour permettre d'afficher des ggplotly dans la boucle for ensuite
+# cf. commentaire du 13 sep 2019 sur https://github.com/ropensci/plotly/issues/273
+
+# on lit l'une après l'autre toutes les lignes du tableau, et on affiche un graphique par ligne
+
+for (i in 1:nrow(tabnat)) {
+cat("\n")
+cat(paste(paste(rep("#",tabnat$position[i]+1),collapse=""),tabnat$intitule[i]))
+cat("\n")
+print(
+  htmltools::tagList(ggplotly(
+    ggplotAsdep(tabnat[i,] %>% 
+                  pivot_longer(cols=-c("position","intitule"),
+                               names_to="annee",values_to="valeur") ) +
+      geom_line( aes(y=valeur,x=annee,group=intitule,colour=intitule))
+  ))
+)
+cat("\n")
+}
+
+
+
+```
+
+# Données par département
+
+On extrait maintenant les données départementales dans chacun des onglets. On présente dans les graphiques ci-après la distribution des taux d'évolution annuels, afin de détecter d'éventuelles variations aberrantes.
+
+Les onglets de données contiennents également des valeurs agrégées par région, mais on utilise ici uniquement les valeurs départementales.
+
+```{r extrdonneesdep,  echo=FALSE, message=FALSE, warning=FALSE}
+
+# lecture de l'ensemble des onglets (contenant des données départementales) dans le fichier Excel
+tabsdep <- asdep::readExcelDrees(fich=fichier, 
+                                 options = "ASDEPslbenef")
+
+# métadonnées 
+metadonneesdep <- tabsdep$metadonnees
+
+# données (forme "longue" : une ligne par année*variable)
+tabdep <- tabsdep$tablong %>%
+  filter(TypeTerritoire == "Département") %>%
+  select(annee,Territoire,valeur,sheet)
+tabdepevol <- tabdep %>%
+  left_join(tabdep %>%
+              rename(lagvaleur = valeur) %>%
+              mutate(annee = annee+1),
+            by = c("annee","Territoire","sheet")) %>%
+  filter(valeur>0 & lagvaleur>0) %>%
+  mutate(txEvolutionPct = round(100*(valeur/lagvaleur-1),1))
+
+categ <- unique(str_extract(unique(tabdep$sheet),"[^\\-]+$"))
+
+```
+
+```{r affichedonneesdep, results='asis', echo=FALSE, message=FALSE, warning=FALSE}
+
+tabfichier <- unique(tabdepevol$sheet)
+
+#quantilesaffich <- c(0,5,10,25,50,75,90,95,100)
+quantilesaffich <- c(5,10,25,50,75,90,95)
+anneesaffichmin <- 2005
+
+
+htmltools::tagList(plot_ly())
+# RQ : cette instruction est nécessaire pour permettre d'afficher des ggplotly dans la boucle for ensuite
+# cf. commentaire du 13 sep 2019 sur https://github.com/ropensci/plotly/issues/273
+
+for (i in 1:NROW(categ)) {
+  cat("\n")
+  cat(paste("## Onglets de type '-",categ[i],"'",sep=""))
+  cat("\n")
+  tabcateg <- tabfichier[grepl(paste0(categ[i],"$"),tabfichier)]
+  for (j in 1:NROW(tabcateg)) {
+    cat("\n")
+    cat(paste("### Tableau '",
+              tabcateg[j],
+              "' : ",
+              metadonneesdep[metadonneesdep$ongletsource == tabcateg[j],"intitule"],sep=""))
+    cat("\n")
+    note <- metadonneesdep[metadonneesdep$ongletsource == tabcateg[j],"note"]
+    if (!is.na(note)) {
+      cat(paste("Note :",note))
+      cat("\n")
+    }
+    
+    tabloc <- tabdepevol %>% filter(sheet == tabcateg[j])
+        tabquant <- asdep::quantileIndic(donneesQV = data.frame(tabloc),
+                                     var = "txEvolutionPct",
+                                     groupe = "annee",
+                                     liste.quantiles = quantilesaffich/100) %>%
+      mutate_all(as.numeric) %>%
+      select(annee,paste0("p",quantilesaffich)) %>%
+      pivot_longer(cols=-c("annee"),
+                   names_to="quantile.evolution.pct",
+                   values_to="txEvolutionpct")
+    print(
+      htmltools::tagList(ggplotly(
+       ggplotAsdep(tabquant %>% filter(annee>=min(max(annee)-5,anneesaffichmin))) +
+         geom_line( aes(y=txEvolutionpct,x=annee,
+                        group=quantile.evolution.pct,colour=quantile.evolution.pct))
+   
+    ))
+    )
+    cat("\n")
+  }
+}
+

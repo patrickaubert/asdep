@@ -20,6 +20,7 @@
 #' @examples readSheetDrees(fich="data-raw/Données mensuelles des prestations de solidarité.xlsx", sheet="Tableau 1" , nlignetitre=2, options="PrestaSolMens")
 #' @examples readSheetDrees(fich="data-raw/Données mensuelles des prestations de solidarité.xlsx", sheet="Tableau 2" , nlignetitre=3, options="PrestaSolMens")
 #' @examples readSheetDrees(fich="data-raw/Les bénéficiaires de l aide sociale départementale - séries longues (1996-2018).xlsx", sheet="Tab6-pa" , options = "ASDEPslbenef", nlignetitre=1)
+#' @examples readSheetDrees(fich="data-raw/Les bénéficiaires de l aide sociale départementale - séries longues (1996-2018).xlsx", sheet="Données nationales" , options = "", nlignetitre=1)
 #' @examples readSheetDrees(fich="data-raw/Les dépenses d aide sociale départementale - séries longues (1999 -2018).xlsx", sheet="PA-tab3" , options = "ASDEPsldepenses", nlignetitre=1)
 #' @examples readSheetDrees(fich="data-raw/Minima sociaux - donnees departementales par dispositif.xlsx", sheet="Tableau 10", nlignetitre=1, options="minsocsl")
 #' @examples readSheetDrees(fich="data-raw/Minima sociaux - donnees departementales par dispositif.xlsx", sheet="Tableau 11", nlignetitre=2, options="minsocsl")
@@ -70,6 +71,7 @@ readSheetDrees <- function(fich , sheet, nlignetitre = NULL, options = "") {
   tab <- tab[,(colSums(is.na(tab))<nrow(tab))]
   if (!is.null(nlignetitre)) {
     # ligne des titres de colonnes : extraction et traitement
+    namesinit <- names(tab)
     titres <- tab[1:nlignetitre,]
     if (nlignetitre>1) {
       for (i in 1:(nlignetitre-1)) {
@@ -82,6 +84,7 @@ readSheetDrees <- function(fich , sheet, nlignetitre = NULL, options = "") {
       titres <- t(titres %>% summarise_all(function(x){paste(x,collapse=".")}))
     }
     titres <- as.character(titres) %>% stringi::stri_trans_general("Latin-ASCII")
+    titres <- ifelse(!is.na(titres),titres,namesinit)
     # assigne les titres comme noms de colonnes
     tab <- tab[(nlignetitre+1):nrow(tab),]
     names(tab) <- titres

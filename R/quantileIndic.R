@@ -14,7 +14,7 @@ quantileIndic <- function(
   donneesQV,
   var,
   groupe,
-  poids,
+  poids = NULL,
   liste.quantiles = c(0.05,0.10,0.25,0.5,0.75,0.9,0.95)) {
 
   #donnees <- selectIndic(nomvariable="NbBenefAPA",denom="pop.60.99", keepvar = c("pop.60.99"))$var
