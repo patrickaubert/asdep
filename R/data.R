@@ -154,7 +154,5 @@
 #'   \item{Departement}{Nom du département}
 #'   \item{Region}{Nom de la région}
 #' }
-#'
-#' @source \url{}
 "departementsFR"
 

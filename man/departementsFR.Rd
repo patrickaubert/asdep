@@ -13,9 +13,6 @@ Un data frame avec 104 lignes et 4 variables
 \item{Region}{Nom de la région}
 }
 }
-\source{
-\url{}
-}
 \usage{
 departementsFR
 }
