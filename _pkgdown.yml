@@ -1,22 +1,36 @@
 reference:
 - title: Tables de données
-  desc:  Tables extraites des fichiers publiés par la DREES ou l'Insee
+  desc:  Le package contient plusieurs tables R extraites des fichiers publiés par la DREES ou l'Insee
 - contents:
   - ends_with("_description")
   - ends_with("sl")
   - ends_with("slbenef")
   - ends_with("sldepenses")
-- title: Graphiques et illustrations
-  desc:  Fonctions générant des graphiques ou tableaux préformatés
-- contents:
-  - graphEvolution
-  - graphComparaison
-  - graphComparaison2dim
+  - departementsFR
+  - ASDEPslperso
+  - PopDepartementales
 - title: Extraction de données
   desc:  Fonctions pour l'extraction de données à partir des fichiers Excel publiés par la DREES ou l Insee
 - contents:
   - readExcelDrees
   - readSheetDrees
   - LitOngletOarsa
+- title: Graphiques et illustrations
+  desc:  Fonctions générant des graphiques ou tableaux préformatés
+- contents:
+  - graphEvolution
+  - graphComparaison
+  - graphComparaison2dim
+- title: Mise en forme de tables et calcul d'indicateurs
+- contents:
+  - selectIndic
+  - quantileIndic
 - title: Fonctions auxiliaires
 - contents:
+  - ggplotAsdep
+  - ggplotlyAsdep
+  - champFrance
+  - corrigeNom
+  - departementsProches
+  - Intitulepop
+  - listeDenominateurs

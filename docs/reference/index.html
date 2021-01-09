@@ -129,7 +129,7 @@
       <tr>
         <th colspan="2">
           <h2 id="section-tables-de-donn-es" class="hasAnchor"><a href="#section-tables-de-donn-es" class="anchor"></a>Tables de données</h2>
-          <p class="section-desc"><p>Tables extraites des fichiers publiés par la DREES ou l’Insee</p></p>
+          <p class="section-desc"><p>Le package contient plusieurs tables R extraites des fichiers publiés par la DREES ou l’Insee</p></p>
         </th>
       </tr>
       
@@ -173,37 +173,24 @@
           <p><code><a href="ASDEPsldepenses.html">ASDEPsldepenses</a></code> </p>
         </td>
         <td><p>Dépenses annuelles d'aides sociales départementales</p></td>
-      </tr>
-    </tbody><tbody>
-      <tr>
-        <th colspan="2">
-          <h2 id="section-graphiques-et-illustrations" class="hasAnchor"><a href="#section-graphiques-et-illustrations" class="anchor"></a>Graphiques et illustrations</h2>
-          <p class="section-desc"><p>Fonctions générant des graphiques ou tableaux préformatés</p></p>
-        </th>
-      </tr>
-      
-      
-    </tbody><tbody>
-      
-      
-      <tr>
-        
-        <td>
-          <p><code><a href="graphEvolution.html">graphEvolution()</a></code> </p>
-        </td>
-        <td><p>Fonction produisant un graphique présentant l'évolution d'un indicateur d'aide sociale au cours du temps</p></td>
       </tr><tr>
         
         <td>
-          <p><code><a href="graphComparaison.html">graphComparaison()</a></code> </p>
+          <p><code><a href="departementsFR.html">departementsFR</a></code> </p>
         </td>
-        <td><p>Fonction produisant un graphique comparant, pour une année donnée, les valeurs par département d'un indicateur d'aide sociale</p></td>
+        <td><p>Liste des départements et territoires</p></td>
       </tr><tr>
         
         <td>
-          <p><code><a href="graphComparaison2dim.html">graphComparaison2dim()</a></code> </p>
+          <p><code><a href="ASDEPslperso.html">ASDEPslperso</a></code> </p>
         </td>
-        <td><p>Fonction produisant un graphique comparant, pour une année donnée et sous la forme d'un nuage de points, les valeurs départementales de deux indicateurs d'aide sociale</p></td>
+        <td><p>Personnels départementaux d'aides sociales départementales</p></td>
+      </tr><tr>
+        
+        <td>
+          <p><code><a href="PopDepartementales.html">PopDepartementales</a></code> </p>
+        </td>
+        <td><p>Populations départementales</p></td>
       </tr>
     </tbody><tbody>
       <tr>
@@ -239,6 +226,62 @@
     </tbody><tbody>
       <tr>
         <th colspan="2">
+          <h2 id="section-graphiques-et-illustrations" class="hasAnchor"><a href="#section-graphiques-et-illustrations" class="anchor"></a>Graphiques et illustrations</h2>
+          <p class="section-desc"><p>Fonctions générant des graphiques ou tableaux préformatés</p></p>
+        </th>
+      </tr>
+      
+      
+    </tbody><tbody>
+      
+      
+      <tr>
+        
+        <td>
+          <p><code><a href="graphEvolution.html">graphEvolution()</a></code> </p>
+        </td>
+        <td><p>Fonction produisant un graphique présentant l'évolution d'un indicateur d'aide sociale au cours du temps</p></td>
+      </tr><tr>
+        
+        <td>
+          <p><code><a href="graphComparaison.html">graphComparaison()</a></code> </p>
+        </td>
+        <td><p>Fonction produisant un graphique comparant, pour une année donnée, les valeurs par département d'un indicateur d'aide sociale</p></td>
+      </tr><tr>
+        
+        <td>
+          <p><code><a href="graphComparaison2dim.html">graphComparaison2dim()</a></code> </p>
+        </td>
+        <td><p>Fonction produisant un graphique comparant, pour une année donnée et sous la forme d'un nuage de points, les valeurs départementales de deux indicateurs d'aide sociale</p></td>
+      </tr>
+    </tbody><tbody>
+      <tr>
+        <th colspan="2">
+          <h2 id="section-mise-en-forme-de-tables-et-calcul-d-indicateurs" class="hasAnchor"><a href="#section-mise-en-forme-de-tables-et-calcul-d-indicateurs" class="anchor"></a>Mise en forme de tables et calcul d'indicateurs</h2>
+          <p class="section-desc"></p>
+        </th>
+      </tr>
+      
+      
+    </tbody><tbody>
+      
+      
+      <tr>
+        
+        <td>
+          <p><code><a href="selectIndic.html">selectIndic()</a></code> </p>
+        </td>
+        <td><p>Une fonction pour extraire et calculer un indicateur sur l'aide sociale</p></td>
+      </tr><tr>
+        
+        <td>
+          <p><code><a href="quantileIndic.html">quantileIndic()</a></code> </p>
+        </td>
+        <td><p>Une fonction auxiliaire calculant les quantiles des distributions par département d'un indicateur</p></td>
+      </tr>
+    </tbody><tbody>
+      <tr>
+        <th colspan="2">
           <h2 id="section-fonctions-auxiliaires" class="hasAnchor"><a href="#section-fonctions-auxiliaires" class="anchor"></a>Fonctions auxiliaires</h2>
           <p class="section-desc"></p>
         </th>
@@ -248,7 +291,49 @@
     </tbody><tbody>
       
       
-      
+      <tr>
+        
+        <td>
+          <p><code><a href="ggplotAsdep.html">ggplotAsdep()</a></code> </p>
+        </td>
+        <td><p>Une fonction auxiliaire permettant de mettre en forme des graphiques ggplot</p></td>
+      </tr><tr>
+        
+        <td>
+          <p><code><a href="ggplotlyAsdep.html">ggplotlyAsdep()</a></code> </p>
+        </td>
+        <td><p>Une fonction auxiliaire permettant de mettre en forme des graphiques dynamique plotly</p></td>
+      </tr><tr>
+        
+        <td>
+          <p><code><a href="champFrance.html">champFrance()</a></code> </p>
+        </td>
+        <td><p>Une fonction auxiliaire qui retourne le champ le plus large possible pour lequel une variable est non nulle</p></td>
+      </tr><tr>
+        
+        <td>
+          <p><code><a href="corrigeNom.html">corrigeNom()</a></code> </p>
+        </td>
+        <td><p>Une fonction auxiliaire qui corrige les noms de territoires mal orthographiés</p></td>
+      </tr><tr>
+        
+        <td>
+          <p><code><a href="departementsProches.html">departementsProches()</a></code> </p>
+        </td>
+        <td><p>Une fonction auxiliaire déterminant les départements les plus proches d'un département de référence au regard d'un indicateur donné</p></td>
+      </tr><tr>
+        
+        <td>
+          <p><code><a href="Intitulepop.html">Intitulepop()</a></code> </p>
+        </td>
+        <td><p>Fonction auxiliaire associant un intitulé en clair à un nom de variable de population</p></td>
+      </tr><tr>
+        
+        <td>
+          <p><code><a href="listeDenominateurs.html">listeDenominateurs()</a></code> </p>
+        </td>
+        <td><p>Une fonction déterminant les dénominateurs possibles d'une variable de la base ASDEPsl</p></td>
+      </tr>
     </tbody>
     </table>
   </div>
