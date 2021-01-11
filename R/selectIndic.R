@@ -22,6 +22,8 @@ selectIndic <- function(nomvariable, denom = "", keepvar=c(),
 
   # ------------------- traitements préliminaires -------------------
 
+  donnees <- data.frame(donnees)
+
   noms.variables.sortie <- c("Territoire","TypeTerritoire",nomvariable,"Annee",keepvar)
 
   infovariable <- variables[variables$Nom.var == nomvariable,]
