@@ -12,8 +12,8 @@
 <!-- jquery -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.4.1/jquery.min.js" integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo=" crossorigin="anonymous"></script>
 <!-- Bootstrap -->
+<link href="https://cdnjs.cloudflare.com/ajax/libs/bootswatch/3.4.0/sandstone/bootstrap.min.css" rel="stylesheet" crossorigin="anonymous" />
 
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.4.1/css/bootstrap.min.css" integrity="sha256-bZLfwXAP04zRMK2BjiO8iu9pf4FbLqX6zitd+tIvLhE=" crossorigin="anonymous" />
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.4.1/js/bootstrap.min.js" integrity="sha256-nuL8/2cJ5NDSSwnKD8VqreErSWHtnEP9E7AySL+1ev4=" crossorigin="anonymous"></script>
 
@@ -100,7 +100,13 @@
 </li>
       </ul>
       <ul class="nav navbar-nav navbar-right">
-        
+        <li>
+  <a href="https://github.com/patrickaubert/asdep/">
+    <span class="fa fa-github fa-lg"></span>
+     
+    github
+  </a>
+</li>
       </ul>
       
     </div><!--/.nav-collapse -->
@@ -195,37 +201,6 @@
     </tbody><tbody>
       <tr>
         <th colspan="2">
-          <h2 id="section-extraction-de-donn-es" class="hasAnchor"><a href="#section-extraction-de-donn-es" class="anchor"></a>Extraction de données</h2>
-          <p class="section-desc"><p>Fonctions pour l’extraction de données à partir des fichiers Excel publiés par la DREES ou l Insee</p></p>
-        </th>
-      </tr>
-      
-      
-    </tbody><tbody>
-      
-      
-      <tr>
-        
-        <td>
-          <p><code><a href="readExcelDrees.html">readExcelDrees()</a></code> </p>
-        </td>
-        <td><p>Fonction extrayant le contenu de tous les onglets d'un fichier Excel diffusé sur data.drees</p></td>
-      </tr><tr>
-        
-        <td>
-          <p><code><a href="readSheetDrees.html">readSheetDrees()</a></code> </p>
-        </td>
-        <td><p>Fonction extrayant le contenu d'un onglet d'un fichier Excel diffusé sur data.drees</p></td>
-      </tr><tr>
-        
-        <td>
-          <p><code><a href="LitOngletOarsa.html">LitOngletOarsa()</a></code> </p>
-        </td>
-        <td><p>Fonction auxiliaire extrayant les données d'un onglet du fichier Excel de résultats de l'enquête OARSA (DREES)</p></td>
-      </tr>
-    </tbody><tbody>
-      <tr>
-        <th colspan="2">
           <h2 id="section-graphiques-et-illustrations" class="hasAnchor"><a href="#section-graphiques-et-illustrations" class="anchor"></a>Graphiques et illustrations</h2>
           <p class="section-desc"><p>Fonctions générant des graphiques ou tableaux préformatés</p></p>
         </th>
@@ -278,6 +253,37 @@
           <p><code><a href="quantileIndic.html">quantileIndic()</a></code> </p>
         </td>
         <td><p>Une fonction auxiliaire calculant les quantiles des distributions par département d'un indicateur</p></td>
+      </tr>
+    </tbody><tbody>
+      <tr>
+        <th colspan="2">
+          <h2 id="section-extraction-de-donn-es" class="hasAnchor"><a href="#section-extraction-de-donn-es" class="anchor"></a>Extraction de données</h2>
+          <p class="section-desc"><p>Fonctions pour l’extraction de données à partir des fichiers Excel publiés par la DREES ou l Insee</p></p>
+        </th>
+      </tr>
+      
+      
+    </tbody><tbody>
+      
+      
+      <tr>
+        
+        <td>
+          <p><code><a href="readExcelDrees.html">readExcelDrees()</a></code> </p>
+        </td>
+        <td><p>Fonction extrayant le contenu de tous les onglets d'un fichier Excel diffusé sur data.drees</p></td>
+      </tr><tr>
+        
+        <td>
+          <p><code><a href="readSheetDrees.html">readSheetDrees()</a></code> </p>
+        </td>
+        <td><p>Fonction extrayant le contenu d'un onglet d'un fichier Excel diffusé sur data.drees</p></td>
+      </tr><tr>
+        
+        <td>
+          <p><code><a href="LitOngletOarsa.html">LitOngletOarsa()</a></code> </p>
+        </td>
+        <td><p>Fonction auxiliaire extrayant les données d'un onglet du fichier Excel de résultats de l'enquête OARSA (DREES)</p></td>
       </tr>
     </tbody><tbody>
       <tr>
@@ -348,7 +354,7 @@
 
       <footer>
       <div class="copyright">
-  <p>Developed by Patrick Aubert.</p>
+  <p>Developed by <a href='https://sites.google.com/site/patrickauber/'>Patrick Aubert</a>.</p>
 </div>
 
 <div class="pkgdown">

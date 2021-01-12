@@ -3,5 +3,8 @@ pkgdown: 1.6.1
 pkgdown_sha: ~
 articles:
   comment-utiliser-asdep: comment-utiliser-asdep.html
-last_built: 2021-01-09T13:43Z
+last_built: 2021-01-12T21:10Z
+urls:
+  reference: https://patrickaubert.github.io/asdep//reference
+  article: https://patrickaubert.github.io/asdep//articles
 

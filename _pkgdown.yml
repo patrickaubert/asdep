@@ -1,3 +1,11 @@
+template:
+  params:
+    bootswatch: sandstone
+title: asdep
+url: https://patrickaubert.github.io/asdep/
+authors:
+  Patrick Aubert:
+    href: https://sites.google.com/site/patrickauber/
 reference:
 - title: Tables de données
   desc:  Le package contient plusieurs tables R extraites des fichiers publiés par la DREES ou l'Insee
@@ -9,12 +17,6 @@ reference:
   - departementsFR
   - ASDEPslperso
   - PopDepartementales
-- title: Extraction de données
-  desc:  Fonctions pour l'extraction de données à partir des fichiers Excel publiés par la DREES ou l Insee
-- contents:
-  - readExcelDrees
-  - readSheetDrees
-  - LitOngletOarsa
 - title: Graphiques et illustrations
   desc:  Fonctions générant des graphiques ou tableaux préformatés
 - contents:
@@ -25,6 +27,12 @@ reference:
 - contents:
   - selectIndic
   - quantileIndic
+- title: Extraction de données
+  desc:  Fonctions pour l'extraction de données à partir des fichiers Excel publiés par la DREES ou l Insee
+- contents:
+  - readExcelDrees
+  - readSheetDrees
+  - LitOngletOarsa
 - title: Fonctions auxiliaires
 - contents:
   - ggplotAsdep
@@ -34,3 +42,8 @@ reference:
   - departementsProches
   - Intitulepop
   - listeDenominateurs
+navbar:
+ right:
+    - icon: fa-github fa-lg
+      text: "github"
+      href: https://github.com/patrickaubert/asdep/
