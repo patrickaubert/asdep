@@ -6,50 +6,42 @@
 library(openxlsx)
 library(reshape2)
 
-options(encoding = "utf8")
-setwd(paste(getwd(),"/data-raw/",sep=""))
+#options(encoding = "utf8")
+#setwd(paste(getwd(),"/data-raw/",sep=""))
 
 # extraction des populations departementales du fichier Excel telecharge sur le site de l'Insee
 
-nomfich <- "estim-pop-dep-sexe-aq-1975-2019.xlsx"
-nomsheet <- "2019"
+nomfich <- "data-raw/estim-pop-dep-sexe-aq-1975-2020.xlsx"
+nomsheet <- "2020"
 
-# dernière annee  = année N (pop au 01/01/N+1)
-val <- read.xlsx(nomfich, sheet = nomsheet,
-                 cols= c(1:23), rows = c(c(6:101),c(103:107)),
-                 colNames = FALSE, rowNames = FALSE, na.strings = "NA"   )
-names(val) <- c("Code.departement","Territoire",as.character(seq(0,95,5)),"popTOT")
-val$popASE <- rowSums(val[,c(as.character(seq(0,15,5)))])
-val$popPH <- rowSums(val[,c(as.character(seq(20,95,5)))])
-val$popPA <- rowSums(val[,c(as.character(seq(60,95,5)))])
-val$Annee <- rep((as.numeric(nomsheet)-1),nrow(val))
-popdepartementales <- val
-# annees precedentes
-for (an in c(1999:2018)){
-  nomsheet <- as.character(an)
-  val <- read.xlsx(nomfich, sheet = nomsheet,
+# fonction d'extraction onglet pour une annee
+extronglet <- function(nomfich = nomfich, sheet) {
+  val <- read.xlsx(nomfich, sheet = sheet,
                    cols= c(1:23), rows = c(c(6:101),c(103:107)),
                    colNames = FALSE, rowNames = FALSE, na.strings = "NA"   )
   names(val) <- c("Code.departement","Territoire",as.character(seq(0,95,5)),"popTOT")
-  val$popASE <- rowSums(val[,c(as.character(seq(0,15,5)))])
-  val$popPH <- rowSums(val[,c(as.character(seq(20,95,5)))])
-  val$popPA <- rowSums(val[,c(as.character(seq(60,95,5)))])
-  val$Annee <- rep((an-1),nrow(val))
-  popdepartementales <- rbind( popdepartementales, val)
+  val <- val %>%
+    filter(!is.na(Code.departement),grepl("^[[:digit:]]",Code.departement)) %>%
+    mutate_at(vars(-c("Code.departement","Territoire")),as.numeric)
+  val$popASE <- rowSums(val[,c(as.character(seq(0,15,5)))],na.rm=TRUE)
+  val$popPH <- rowSums(val[,c(as.character(seq(20,95,5)))],na.rm=TRUE)
+  val$popPA <- rowSums(val[,c(as.character(seq(60,95,5)))],na.rm=TRUE)
+  val$Annee <- rep((as.numeric(sheet)-1),nrow(val))
+  return(val)
 }
 
-popdepartementales$TypeTerritoire <- rep("Département", nrow(popdepartementales))
+popdepartementales <- do.call("bind_rows", lapply(1990:2020,function(an){extronglet(nomfich,as.character(an))}))
 
-popdepartementales <- popdepartementales[,c("Code.departement","TypeTerritoire","Territoire","popTOT","popASE","popPH","popPA",as.character(seq(0,95,5)),"Annee")]
+popdepartementales <- popdepartementales %>%
+  mutate(TypeTerritoire = "Département") %>%
+  rename_at(vars(c(as.character(seq(0,95,5)))) , function(x){paste("pop",x,as.character(as.numeric(x)+4),sep=".")})
 
-noms.var.pop <- c( "popTOT","popASE","popPH","popPA",paste("pop",as.character(seq(0,95,5)),as.character(seq(4,99,5)),sep=".") )
-names(popdepartementales) <- c("Code.departement","TypeTerritoire","Territoire",noms.var.pop,"Annee")
-#names(popdepartementales) <- c("Code.departement","TypeTerritoire","Territoire","popTOT","popASE","popPH","popPA",paste("pop",as.character(seq(0,95,5)),as.character(seq(4,99,5)),sep="."),"Annee")
+# mise en forme de la base
 
 # pour Mayotte avant qu'elle ne devienne un département => mise de la population à 0 (dans le but du calcul France entière yc Mayotte)
 mayotte <- popdepartementales[(popdepartementales$Territoire == "Mayotte" & popdepartementales$Annee == 2018),c("Code.departement","TypeTerritoire","Territoire")]
 popzero <- cbind(as.data.frame(matrix(0, ncol = NROW(noms.var.pop), nrow = NROW(unique(popdepartementales[(popdepartementales$Annee<2013),c("Annee")])))),
-                 c(1998:2012))
+                 c(1990:2012))
 colnames(popzero) <- c(noms.var.pop,"Annee")
 popmayotte <- do.call("rbind", replicate(NROW(unique(popdepartementales[(popdepartementales$Annee<2013),c("Annee")])), mayotte, simplify = FALSE))
 popmayotte <- cbind(popmayotte,popzero)
@@ -178,6 +170,8 @@ PopDepartementales_description <- data.frame(
   Unite.var=rep("personnes",NROW(noms.varpop)),
   Popref.var=rep("popTOT",NROW(noms.varpop)) )
 
+
+popdepartementales$Territoire <- trimws(popdepartementales$Territoire, "both")
 
 #  --- encodage en UTF-8 des noms de territoire
 

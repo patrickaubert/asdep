@@ -57,7 +57,7 @@ ASDEPslbenef_description <- ASDEPslbenef_description %>%
          ) %>%
   select(-ongletsource)
 
-# quelques derniers traitements des métadonnées sont réalisées à la fin du programme
+# RQ : quelques derniers traitements des métadonnées sont réalisées à la fin du programme
 
 # ===================================
 # traitement des bases : 2) indicateurs

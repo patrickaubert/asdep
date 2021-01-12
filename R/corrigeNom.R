@@ -17,7 +17,7 @@ corrigeNom <- function(nomdep,
                        nomcorrec = asdep::nomscorrectsterritoires$TerritoireCorrect,
                        nommalortho = asdep::nomscorrectsterritoires$TerritoireMalortho){
   (data.frame(
-    orig = nomdep,
+    orig = trimws(nomdep),
     stringsAsFactors = FALSE
   ) %>%
     left_join(

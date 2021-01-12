@@ -1,407 +1,166 @@
 # --------------------------------------------------------------------------------------------------------------
 # Création de la base des dépenses annuelles d'aide sociale, à partir du fichier Excel téléchargé sur data.drees
 # --------------------------------------------------------------------------------------------------------------
-
+# (nouvelle version : on utilise maintenant les fonctions du package)
 
 library(openxlsx)
 library(reshape2)
 library(plyr)
+library(dplyr)
+library(tidyr)
+library(stringr)
 
-options(encoding = "utf8")
+# ===================================
+# Extraction des données Excel
 
-setwd(paste(getwd(),"/data-raw/",sep=""))
+tabsdepenses <- readExcelDrees(fich="data-raw/Les dépenses d'aide sociale départementale - séries longues (1999 - 2019).xlsx",
+                           options = "ASDEPsldepenses")
 
-fichierloc <- "Les dépenses d aide sociale départementale - séries longues (1999 -2018).xlsx"
-ongletdep <- "SL_depenses_2018"
+# ===================================
+# Extraction des métadonnées enregistrées par ailleurs
 
-# --------------------------------------------------------------------------------------------------------------
-# Paramètres généraux et fonctions générales
-
-departements <- read.csv2("Liste des departements.csv",header=TRUE,sep=",",stringsAsFactors = FALSE,fileEncoding="utf8")
-syndep <- read.csv2("Synonymes noms départements.csv",header=TRUE,sep=",",stringsAsFactors = FALSE,fileEncoding="utf8")
-
-listesyn <- as.list(setNames(syndep$Nom.departement, syndep$Synonyme.nom))
-
-CorrigeNom <- function(nomdep){
-  if (nomdep %in% names(listesyn)) { return( listesyn[[nomdep]]  )  }
-  else { return( nomdep )}
-}
-
-CorrigeNumReg <- function(numreg){
-  if (numreg<10) { return(100+numreg) } else { return(numreg) }
-}
-
-CorrigeNomTerritoire <- function(nom){
-  return( trimws(CorrigeNom(nom), which=c("both")) )
-}
-
-# --------------------------------------------------------------------------------------------------------------
-
-
-
-# --------------------------------------------------------------------------------------------------------------
-# Fonction LitOnglet : lit un onglet du fichier Excel et restitue les données lues sous la forme de tables
-
-LitOnglet <- function(Nom.var,
-                      nomfich = FichierSource,
-                      nomsheet) {
-
-  # valeur par défaut du nom du fichier source
-  #if (identical(nomfich,"")) { nomfich <- FichierSource }
-  #if (identical(nomfich,"")) { return() }
-
-  # pré-identifie la thématique d'après le nom de l'onglet
-
-  if (grepl("PA",nomsheet)) { thematique <- "Perte d'autonomie"}
-  else if (grepl("PH",nomsheet)) { thematique <- "Handicap"}
-  else if (grepl("ASE",nomsheet)) { thematique <- "Aide sociale à l'enfance"}
-  else if (grepl("RSA",nomsheet)) { thematique <- "insertion"}
-  else if (grepl("[aA]utre",nomsheet)) { thematique <- "Aide sociale générale"}
-  else if (grepl("[tT]ot",nomsheet)) { thematique <- "Aide sociale générale"}
-  else { thematique <- ""}
-
-  # identifie les lignes correspondant à des départements, des régions, ou la France entiÃ¨re, à partir d'une lecture de la premiÃ¨re colonne
-
-  col1 <- read.xlsx(nomfich, sheet = nomsheet, cols= c(1),  colNames = FALSE, skipEmptyRows = FALSE, skipEmptyCols = TRUE)
-  col1$numligne <- seq(1,nrow(col1),1)
-  col1 <- col1[!is.na(col1$X1),]
-
-  Source.var <- ""
-  Intitule.var <- ""
-  Champ.var <- ""
-  Note.var <- ""
-
-  i <- 1
-  col1[i,c("X1")] <- sub("\n","",col1[i,c("X1")])
-  col1[i,c("X1")] <- sub("\r","",col1[i,c("X1")])
-  col1[i,c("X1")] <- sub("&#10; "," ",col1[i,c("X1")])
-  col1[i,c("X1")] <- trimws(col1[i,c("X1")],which="left")
-  while ((col1[i,c("X1")] != "Code r\u00E9gion") & (i<nrow(col1))) {
-    if (substr(col1[i,1],1,7) == "Tableau") {
-      Intitule.var <- sub("Tableau [0-9a-z]+ .","",col1[i,1])
-      Intitule.var <- sub("Tableau [0-9a-z]+.","",Intitule.var)
-      Intitule.var <- sub(" de [0-9]+ à 2[0-9]+","",Intitule.var)
-      Intitule.var <- sub("\\(\\*\\)","",Intitule.var)
-      Intitule.var <- sub("\\*","",Intitule.var)
-      Intitule.var <- sub(", par d\u00E9partement","",Intitule.var)
-      Intitule.var <- sub(" par d\u00E9partement","",Intitule.var)
-      Intitule.var <- sub(",","",Intitule.var)
-      Intitule.var <- sub("Donn\u00E9es au 31 d\u00E9cembre","",Intitule.var)
-      Intitule.var <- sub("Donn\u00E9es en d\u00E9cembre","",Intitule.var)
-      Intitule.var <- trimws(Intitule.var,which="left")
-    }
-    if (substr(col1[i,1],1,6) == "Source") {   Source.var <- sub("[sS]ources? [:-] ","",col1[i,1]) }
-    if (substr(col1[i,1],1,5) == "Champ") {   Champ.var <- sub("[cC]hamp [:-] ","",col1[i,1]) }
-    if (substr(col1[i,1],1,4) == "Note") {   Note.var <- sub("[nN]otes? [:-]","",col1[i,1]) }
-    if (substr(col1[max(1,i-1),1],1,4) == "Note") {   Note.var <- paste(Note.var,col1[i,1],sep=" ") } # ligne suivante, car les notes sont souvent sur deux lignes
-    Note.var <- sub("\\(\\*\\) ","",Note.var)
-    i <- i+1
-    col1[i,c("X1")] <- sub("\n","",col1[i,c("X1")])
-    col1[i,c("X1")] <- sub("\r","",col1[i,c("X1")])
-    col1[i,c("X1")] <- sub("&#10; "," ",col1[i,c("X1")])
-    col1[i,c("X1")] <- trimws(col1[i,c("X1")],which="left")
-  }
-  rowdep <- c(  )
-  while ((tolower(substr(col1[i,1],1,5)) != "total") & (i<nrow(col1))) {
-    rowdep <- c( rowdep, c( col1[i,c("numligne")] ) )
-    i <- i+1
-    col1[i,c("X1")] <- sub("\n","",col1[i,c("X1")])
-    col1[i,c("X1")] <- sub("\r","",col1[i,c("X1")])
-    col1[i,c("X1")] <- sub("&#10; "," ",col1[i,c("X1")])
-  }
-
-  rowfrance <- c( )
-  while ((col1[i,c("X1")] != "Code r\u00E9gion") & (i<nrow(col1))) {
-    if (tolower(substr(col1[i,1],1,5)) == "total") {   rowfrance <- c( rowfrance, c( col1[i,c("numligne")] ) ) }
-    i <- i+1
-    col1[i,c("X1")] <- sub("\n","",col1[i,c("X1")])
-    col1[i,c("X1")] <- sub("\r","",col1[i,c("X1")])
-    col1[i,c("X1")] <- sub("&#10; "," ",col1[i,c("X1")])
-  }
-
-  rowregion <- c( )
-  while (i<nrow(col1)) {
-    if ((tolower(substr(col1[i,1],1,1)) %in% c("c", as.character(0:9)))) {   rowregion <- c( rowregion, c( col1[i,c("numligne")] ) ) }
-    i <- i+1
-    col1[i,c("X1")] <- sub("\n","",col1[i,c("X1")])
-    col1[i,c("X1")] <- sub("\r","",col1[i,c("X1")])
-    col1[i,c("X1")] <- sub("&#10; "," ",col1[i,c("X1")])
-  }
-
-
-  # extrait les données de l'onglet du fichier Excel
-
-  tab.deb. <- read.xlsx(nomfich, sheet = nomsheet,
-                        rows = rowdep, colNames = TRUE, rowNames = FALSE, na.strings = "NA"                 )
-  if ("Départements" %in% names(tab.deb.)) { tab.deb. <- rename(tab.deb., c("D\u00E9partements"="D\u00E9partement") ) }
-  listenomsinit <- colnames(tab.deb.)
-  listenomschoix <- c()
-  for (i in c(1:length(listenomsinit))) {
-    listenomsinit[[i]] <- sub("&#10;","",listenomsinit[[i]])
-    if (listenomsinit[[i]] == "Codedépartement") { listenomsinit[[i]] <- "Code.département" }
-    if (listenomsinit[[i]] %in% c("Code.r\u00E9gion" , "Code.d\u00E9partement","D\u00E9partement",as.character(1995:2020))) { listenomschoix <- c(listenomschoix, listenomsinit[[i]]) }
-  }
-  colnames(tab.deb.) <- listenomsinit
-  tab.deb <- melt(tab.deb.[,c(listenomschoix)],id=c("Code.r\u00E9gion" , "Code.d\u00E9partement","D\u00E9partement"))
-  tab.deb <- tab.deb[!is.na(tab.deb$value),]
-  tab.deb <- tab.deb[(tab.deb$value != "-"),]
-  tab.deb$TypeTerritoire <- rep("D\u00E9partement",nrow(tab.deb))
-  tab.deb$Territoire <- tab.deb$Département
-  tab.deb$Annee <- tab.deb$variable
-  tab.deb[,c(Nom.var)] <- tab.deb$value
-
-  tab <- tab.deb[,c("Annee","Code.r\u00E9gion","Code.d\u00E9partement","TypeTerritoire","Territoire", Nom.var)]
-
-  if (length(rowregion)>=1) {
-
-    tab.reg. <- read.xlsx(nomfich, sheet = nomsheet,
-                          rows = rowregion, colNames = TRUE, rowNames = FALSE, na.strings = "NA" )
-    if ("R\u00E9gions" %in% names(tab.reg.)) { tab.reg. <- rename(tab.reg., c("R\u00E9gions"="R\u00E9gion") ) }
-    listenomsinit <- colnames(tab.reg.)
-    listenomschoix <- c()
-    for (i in c(1:length(listenomsinit))) {
-      listenomsinit[[i]] <- sub("&#10;","",listenomsinit[[i]])
-      if (listenomsinit[[i]] %in% c("Code.r\u00E9gion" , "R\u00E9gion",as.character(1995:2020))) { listenomschoix <- c(listenomschoix, listenomsinit[[i]]) }
-    }
-    colnames(tab.reg.) <- listenomsinit
-    tab.reg <- melt(tab.reg.,id=c("Code.r\u00E9gion","R\u00E9gion" ))
-    tab.reg$TypeTerritoire <- rep("R\u00E9gion",nrow(tab.reg))
-    tab.reg$Code.département <- rep("",nrow(tab.reg))
-    tab.reg$Territoire <- tab.reg$Région
-    tab.reg$Annee <- tab.reg$variable
-    tab.reg[,c(Nom.var)] <- tab.reg$value
-
-    tab <- rbind( tab,
-                  tab.reg[,c("Annee","Code.r\u00E9gion","Code.d\u00E9partement","TypeTerritoire","Territoire", Nom.var)] )
-
-  }
-
-  if (length(rowfrance)>=1) {
-
-    tab.france. <- read.xlsx(nomfich, sheet = nomsheet,
-                             rows = rowfrance, colNames = FALSE, rowNames = FALSE, na.strings = "NA"   )
-    names(tab.france.) <- c("Territoire", c(  as.character(unique(tab.deb$Annee))  ) )
-    tab.france <- melt(tab.france.,id=c("Territoire"))
-    tab.france <- tab.france[!is.na(tab.france$value),]
-    tab.france$variable <- as.character(tab.france$variable)
-    tab.france <- tab.france[!is.na(tab.france$variable),]
-    tab.france$TypeTerritoire <- rep("France",nrow(tab.france))
-    tab.france$Code.département <- rep("",nrow(tab.france))
-    tab.france$Code.région <- rep("",nrow(tab.france))
-    tab.france$Annee <- as.numeric(tab.france$variable)
-    tab.france[,c(Nom.var)] <- tab.france$value
-
-    tab <- rbind( tab,
-                  tab.france[,c("Annee","Code.r\u00E9gion","Code.d\u00E9partement","TypeTerritoire","Territoire", Nom.var)] )
-
-  }
-
-
-
-  # concatene et restitue les outputs
-
-  #tab <- rbind( tab.deb[,c("Annee","Code.r\u00E9gion","Code.d\u00E9partement","TypeTerritoire","Territoire", Nom.var)],
-  #              tab.reg[,c("Annee","Code.r\u00E9gion","Code.d\u00E9partement","TypeTerritoire","Territoire", Nom.var)],
-  #              tab.france[,c("Annee","Code.r\u00E9gion","Code.d\u00E9partement","TypeTerritoire","Territoire", Nom.var)]            )
-
-  # on remet en euros (le fichier Excel est en milliers d'euros)
-  tab[,c(Nom.var)] <- 1000 * as.numeric(tab[,c(Nom.var)])
-
-  tab$Annee <- as.numeric(as.character(tab$Annee))
-
-  tab$Territoire <- sapply( tab$Territoire, CorrigeNomTerritoire)
-
-  infovar <- data.frame(Nom.var = c(Nom.var),
-                        Intitule.var = c(Intitule.var),
-                        Intitulecourt.var = c(""),
-                        Source.var = c(Source.var),
-                        Champ.var = c(Champ.var),
-                        Note.var = c(Note.var),
-                        Unite.var = c("€"),
-                        Thematique.var = thematique,
-                        TexteDenom = c(""),
-                        ListeDenom.var = c(""),
-                        ListeComposante.var = c(""),
-                        Type.var = c("Montants")
-  )
-  infovar[] <- lapply(infovar, as.character)
-
-  return( list(tab = tab, infovar = infovar))
-
-}
-
-# fin de la fonction LitOnglet
-# --------------------------------------------------------------------------------------------------------------
-
-# --------------------------------------------------------------------------------------------------------------
-# Fonction CompleteInfo : Ajoute des informations sur les variables
-
-CompleteInfo <- function(lit,
-                         Intitulecourt.var = "",
-                         ListeDenom.var = "",
-                         TexteDenom = "",
-                         ListeComposante.var = "",
-                         Thematique.var = GlobalThematique,
-                         Type.var = GlobalType ,
-                         Unite.var = GlobalUnite) {
-
-  tab <- lit$tab
-  infovar <- lit$infovar
-
-  if (!identical(Intitulecourt.var,""))   { infovar$Intitulecourt.var <- Intitulecourt.var }
-  if (!identical(ListeDenom.var,""))      { infovar$ListeDenom.var <- ListeDenom.var }
-  if (!identical(TexteDenom,""))          { infovar$TexteDenom <- TexteDenom }
-  if (!identical(ListeComposante.var,"")) { infovar$ListeComposante.var <- ListeComposante.var }
-  if (!identical(Thematique.var,""))      { infovar$Thematique.var <- Thematique.var }
-  if (!identical(Type.var,""))            { infovar$Type.var <- Type.var }
-  if (!identical(Unite.var,""))           { infovar$Unite.var <- Unite.var }
-
-  return( list(tab = tab, infovar = infovar))
-
-}
-
-# fin de la fonction CompleteInfo
-# --------------------------------------------------------------------------------------------------------------
-
-
-infos.onglets <- read.xlsx("Contenu fichiers excel.xlsx",
-                           sheet = ongletdep,
+infos.onglets <- read.xlsx("data-raw/Contenu fichiers excel.xlsx",
+                           sheet = "SL_depenses_2019",
                            colNames = TRUE, skipEmptyRows = FALSE, skipEmptyCols = TRUE)
 
-#  --- lecture des onglets un par un
+# ===================================
+# traitement des bases : 1) métadonnées
 
-for (i in (1:nrow(infos.onglets))) {
-  lit <- LitOnglet(Nom.var = infos.onglets[i,"Nom.var"],
-                   nomfich = fichierloc,
-                   nomsheet = infos.onglets[i,"NoOngletExcel"])
-  if (i == 1) {
-    DepensesAidessociales <- lit$tab
-  } else {
-    DepensesAidessociales <- merge(DepensesAidessociales, lit$tab, by=c("Annee","Code.région","Code.département","TypeTerritoire","Territoire"), all.x=TRUE, all.y=TRUE)
+# on récupère d'abord les source, champ, note, intitulé dans les informations lues dans le fichier Excel récupéré sous data.drees
 
-  }
-  infovar <- lit$infovar
-  if (!is.na(infos.onglets[i,"Intitulecourt.var"])) { infovar$Intitulecourt.var <- infos.onglets[i,"Intitulecourt.var"] }
-  if (!is.na(infos.onglets[i,"ListeDenom.var"])) { infovar$ListeDenom.var <- infos.onglets[i,"ListeDenom.var"] }
-  if (!is.na(infos.onglets[i,"TexteDenom"])) { infovar$TexteDenom <- infos.onglets[i,"TexteDenom"] }
-  if (!is.na(infos.onglets[i,"ListeComposante.var"])) { infovar$ListeComposante.var <- infos.onglets[i,"ListeComposante.var"] }
-  if (i == 1) {
-    vardepenses <- infovar
-  } else {
-    vardepenses <- rbind( vardepenses, infovar)
-  }
-}
+ASDEPsldepenses_description <- tabsdepenses$metadonnees %>%
+  select(ongletsource, intitule, source, champ,note) %>%
+  mutate(intitule = gsub("^[[:punct:][:space:]–]+|[[:punct:][:space:]–]+$","",intitule)) %>%
+  rename(Intitule.var = intitule,
+         Source.var = source,
+         Champ.var = champ,
+         Note.var = note)
 
-#  --- ajout de variables
+# d'autres métadonnées ont été enregistrées (à la main) dans un fichier Excel auxiliaire
 
-# aide à l'accueil par des particuliers, par différence à partir du total des aides à l'accueil
-DepensesAidessociales$DepBruteAccueilPAparticuliers <- DepensesAidessociales$DepBruteTotPA-rowSums(DepensesAidessociales[,c("DepBruteAPAdom","DepBruteAPAetab","DepBruteASH")], na.rm=TRUE)
+ASDEPsldepenses_description <- ASDEPsldepenses_description %>%
+  left_join(infos.onglets, by= c("ongletsource" = "NoOngletExcel")) %>%
+  mutate(Type.var = "Montants",
+         Unite.var = "€",
+         Thematique.var = tolower(gsub("[[:punct:][:space:]]+|tab[[:digit:]]+$","",ongletsource)),
+         Popref.var = recode(Thematique.var,
+                             "pa" = "60-99",
+                             "ph" = "20-64",
+                             "ase" = "00-20",
+                             "rsarmi" = "20-64",
+                             "tot" = "popTOT",
+                             "autres" = "Aide sociale générale"),
+         Thematique.var = recode(Thematique.var,
+                                 "pa" = "Perte d'autonomie",
+                                 "ph" = "Handicap",
+                                 "ase" = "Aide sociale à l'enfance",
+                                 "rsarmi" = "insertion",
+                                 "tot" = "Aide sociale générale",
+                                 "autres" = "Aide sociale générale")
+         ) %>%
+  select(-ongletsource)
 
-intituleAideAccueilPA <- data.frame(Nom.var= "DepBruteAccueilPAparticuliers",
-                                    Intitule.var = "Dépenses brutes d'accueil de personnes âgées par des particuliers et autres dépenses d'aide à l'accueil",
-                                    Intitulecourt.var = "aides à l'accueil",
-                                    Source.var="DREES, Enquêtes Aide sociale",
-                                    Champ.var="France métropolitaine et DROM (Hors Mayotte)",
-                                    Note.var="",
-                                    Thematique.var="Perte d'autonomie",
-                                    Type.var="Montants",
-                                    Unite.var="€",
-                                    TexteDenom = "aides à l'accueil",
-                                    ListeDenom.var = c("NbBenefAccueilParticulier"),
-                                    ListeComposante.var = c(""))
+# RQ : quelques derniers traitements des métadonnées sont réalisées à la fin du programme
 
-vardepenses <- rbind( vardepenses,
-                      intituleAideAccueilPA[,colnames(vardepenses)])
+# ===================================
+# traitement des bases : 2) indicateurs
 
-# aides ménagères PA à domicile
-DepensesAidessociales$DepBruteAidesMenageresPA <- DepensesAidessociales$DepBruteAidesPAdom-DepensesAidessociales$DepBruteAPAdom
+ASDEPsldepenses <- tabsdepenses$tablong %>%
+  rename(Annee = annee) %>%
+  left_join(infos.onglets %>%
+              select(NoOngletExcel,Nom.var),
+            by = c("sheet" = "NoOngletExcel")) %>%
+  select(-c(info.annee,sheet)) %>%
+  # RQ : la manip suivante est réalisée car, pour certaines variables, le total France est en double avec un petit écart d'arrondi (ne disparaît pas avec distinct ())
+  group_by(Code.region,Code.departement,Territoire,TypeTerritoire,Annee,Nom.var) %>%
+  summarise_all(mean) %>%
+  ungroup()
 
-intituleAidemenagerePA <- data.frame(Nom.var= "DepBruteAidesMenageresPA",
-                                     Intitule.var = "Dépenses d'aides ménagères à domicile pour personnes âgées",
-                                     Intitulecourt.var = "aides ménagère",
-                                     Source.var="DREES, Enquêtes Aide sociale",
-                                     Champ.var="France métropolitaine et DROM (Hors Mayotte)",
-                                     Note.var="Cette série est calculée comme le solde entre le total des dépenses brutes d'aides aux personnes âgées à domicile et les dépenses d'APA à domicile.",
-                                     Thematique.var="Perte d'autonomie",
-                                     Type.var="Montants",
-                                     Unite.var="€",
-                                     TexteDenom = "aides ménagères",
-                                     ListeDenom.var = c("NbBenefAideMenagerePA"),
-                                     ListeComposante.var = c(""))
+# on ajoute certaines variables d'agrégat
 
-vardepenses <- rbind( vardepenses,
-                      intituleAidemenagerePA[,colnames(vardepenses)])
+#ASDEPsldepenses <- bind_rows(
+#  ASDEPsldepenses,
+#  ASDEPsldepenses %>%
+#    filter(Nom.var %in% c("NbBenefAPA","NbBenefPSD")) %>%
+#    select(-Nom.var) %>%
+#    group_by(Code.region,Code.departement,Territoire,TypeTerritoire,Annee) %>%
+#    summarise_all(sum) %>%
+#    ungroup() %>%
+#    mutate(Nom.var = "NbBenefAPAPSD"),
+#  ASDEPsldepenses %>%
+#    filter(Nom.var %in% c("NbBenefACTP","NbBenefPCH")) %>%
+#    select(-Nom.var) %>%
+#    group_by(Code.region,Code.departement,Territoire,TypeTerritoire,Annee) %>%
+#    summarise_all(sum) %>%
+#    ungroup() %>%
+#    mutate(Nom.var = "TotBenefACTPPCH"),
+#)
 
-vardepenses <- vardepenses[!is.na(vardepenses$Nom.var),]
+# on remet les variables en colonnes
 
-#  --- corrections sur certaines variables
-
-# pour les prestations qui n'existent pas certaines années, on remplace les valeurs manquantes par des 0 :
-
-# APA avant 2002
-DepensesAidessociales[(DepensesAidessociales$Annee<2002),c("DepBruteAPA","DepBruteAPAdom","DepBruteAPAetab")][is.na(DepensesAidessociales[(DepensesAidessociales$Annee<2002),c("DepBruteAPA","DepBruteAPAdom","DepBruteAPAetab")])] <- 0
-# PCH avant 2007
-DepensesAidessociales[(DepensesAidessociales$Annee<2007),c("DepBrutePCH")][is.na(DepensesAidessociales[(DepensesAidessociales$Annee<2007),c("DepBrutePCH")])] <- 0
-
+ASDEPsldepenses <- ASDEPsldepenses %>%
+  pivot_wider(id_cols=c("Code.region","Code.departement","Territoire","TypeTerritoire","Annee"),
+              names_from="Nom.var",
+              values_from="valeur") %>%
+  mutate(Territoire = asdep::corrigeNom(Territoire)) %>%
+  data.frame()
 
 
-#  --- complétude des variables ListeDenom.var à partir des variables ListeComposante.var
-rownames(vardepenses) <- vardepenses$Nom.var
-for (i in (1:nrow(vardepenses))) {
-  if (!(vardepenses[i,"ListeComposante.var"]) %in% c("", NA)) {
-    composantes <- as.vector(unlist(strsplit(vardepenses[i,"ListeComposante.var"],split="_|\\s")))
-    nomdenom <- as.character(vardepenses[i,"Nom.var"])
+# vérification
+verif <- unique(ASDEPsldepenses$Territoire)
+verif[!(verif %in% asdep::nomscorrectsterritoires$TerritoireCorrect)]
+
+# ===================================
+# derniers traitements sur les métadonnées
+
+# ajout des métadonnées sur les agrégats ajoutés
+
+#ASDEPsldepenses_description <- bind_rows(
+#  ASDEPsldepenses_description,
+#  data.frame(Nom.var= "NbBenefAPAPSD",
+#             Intitule.var = "Nombre de bénéficiaires de l'APA ou de la PSD",
+#             Intitulecourt.var = "APA ou PSD",
+#             Source.var="DREES, Enquêtes Aide sociale",
+#             Champ.var="France métropolitaine et DROM (Hors Mayotte)",
+#             Note.var="",
+#             Thematique.var="Perte d'autonomie",
+#             Type.var="Nombres de bénéficiaires",
+#             Unite.var="personnes",
+#             TexteDenom = "prestations d'APA ou de PSD",
+#             ListeDenom.var = c(""),
+#             ListeComposante.var = c("NbBenefAPA_NbBenefPSD")),
+#  data.frame(Nom.var= "TotBenefACTPPCH",
+#             Intitule.var = "Nombre de bénéficiaires de la PCH ou de l'ACTP",
+#             Intitulecourt.var = "PCH ou ACTP",
+#             Source.var="DREES, Enquêtes Aide sociale",
+#             Champ.var="France métropolitaine et DROM (Hors Mayotte)",
+#             Note.var="",
+#             Thematique.var="Handicap",
+#             Type.var="Nombres de bénéficiaires",
+#             Unite.var="personnes",
+#             TexteDenom = "droits ouverts d'ACTP ou de PCH",
+#             ListeDenom.var = c(""),
+#             ListeComposante.var = c("NbBenefACTP_NbBenefPCH"))
+#)
+
+#  complétude des variables ListeDenom.var à partir des variables ListeComposante.var
+rownames(ASDEPsldepenses_description) <- ASDEPsldepenses_description$Nom.var
+for (i in (1:nrow(ASDEPsldepenses_description))) {
+  if (!(ASDEPsldepenses_description[i,"ListeComposante.var"]) %in% c("", NA)) {
+    composantes <- as.vector(unlist(strsplit(ASDEPsldepenses_description[i,"ListeComposante.var"],split="_|\\s")))
+    nomdenom <- as.character(ASDEPsldepenses_description[i,"Nom.var"])
     for (j in (1:NROW(composantes))) {
-      if (!(grepl(nomdenom,vardepenses[composantes[j],"ListeDenom.var"]))) {
-        if (vardepenses[composantes[j],"ListeDenom.var"] %in% c(NA,"")) { vardepenses[composantes[j],"ListeDenom.var"] <- nomdenom }
-        else { vardepenses[composantes[j],"ListeDenom.var"] <- paste(vardepenses[composantes[j],"ListeDenom.var"],nomdenom,sep="_") }
+      if (!(grepl(nomdenom,ASDEPsldepenses_description[composantes[j],"ListeDenom.var"]))) {
+        if (ASDEPsldepenses_description[composantes[j],"ListeDenom.var"] %in% c(NA,"")) { ASDEPsldepenses_description[composantes[j],"ListeDenom.var"] <- nomdenom }
+        else { ASDEPsldepenses_description[composantes[j],"ListeDenom.var"] <- paste(ASDEPsldepenses_description[composantes[j],"ListeDenom.var"],nomdenom,sep="_") }
       }
     }
   }
 }
 
-# --- ajout des populations de référence (pour la ratio par habitant) pour chaque variable, quand elles ne sont pas dans les données)
-
-fPopref <- function(them){
-  if (them == "Perte d'autonomie") {return("60-99")}
-  else if (them == "Handicap") {return("20-64")}
-  else if (them == "Aide sociale à l'enfance") {return("00-20")}
-  else if (them == "Insertion") {return("20-64")}
-  else(return("popTOT"))
-}
-vardepenses$Popref.var <- sapply(vardepenses$Thematique.var, fPopref)
-
-# --- verif
-# dep <- unique(DepensesAidessociales$Territoire)
-# dep <- dep[order(dep)]
-
-#  --- reste à faire
-
-# ajouter automatiquement les dénominateurs de niveau 2, en lisant les dénominateurs des dénominateurs
-
-
-#  --- suppression des caractÃ¨res qui posent problÃ¨mes
-
-DepensesAidessociales <- plyr::rename(DepensesAidessociales, c("Code.région"="Code.region", "Code.département"="Code.departement"))
-
-#DepensesAidessociales$Annee <- as.character(DepensesAidessociales$Annee)
-#DepensesAidessociales <- DepensesAidessociales[order(-DepensesAidessociales$Annee),]
-
-#  --- encodage en UTF-8 des noms de territoire
-
-#Encoding(DepensesAidessociales$Territoire)
-#Encoding(DepensesAidessociales$TypeTerritoire)
-DepensesAidessociales$Territoire <- enc2utf8(DepensesAidessociales$Territoire)
-DepensesAidessociales$TypeTerritoire <- enc2utf8(DepensesAidessociales$TypeTerritoire)
-
-# -------------------------------------------------------------------------------------------------
-# sauvegarde les tables constituées
-
-ASDEPsldepenses <- DepensesAidessociales
-ASDEPsldepenses_description <- vardepenses
+rownames(ASDEPsldepenses_description) <- ASDEPsldepenses_description$Nom.var
 
 # ===================================================================================
 usethis::use_data(ASDEPsldepenses,
                   ASDEPsldepenses_description,
                   overwrite = T)
-
