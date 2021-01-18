@@ -32,6 +32,8 @@ pasteNA <- function(a,b) ifelse(is.na(a),b,ifelse(is.na(b),a,paste(a,b)))
 
 ASDEPslbenef_description <- tabsbenef$metadonnees %>%
   select(ongletsource, intitule, source, champ,note,info) %>%
+  mutate(info = ifelse(is.na(info),"",info),
+         note = ifelse(is.na(note),"",note) ) %>%
   mutate(note = pasteNA(note,info)) %>%
   select(-info) %>%
   rename(Intitule.var = intitule,
