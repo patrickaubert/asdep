@@ -48,24 +48,12 @@ graphComparaison <- function(
   tab <- tabs$var %>% filter(Annee == annee)
   tab <- tab[!is.na(tab[,popref]),] %>%
     mutate(size = sqrt(tab[,popref]/40) )
+
   tabd <- tab[,c("TypeTerritoire","Territoire","size",nomvariable)] %>%
     filter(TypeTerritoire == "Département") %>%
     arrange(Territoire)
 
-  # === Récupération des données sur les distributions (quantiles, etc.)
-  tabq <- quantileIndic(donneesQV = tab %>% filter(TypeTerritoire == "Département"),
-                        var=nomvariable,  groupe="Annee",  poids=poidsobs) %>%
-    mutate(Annee = as.numeric(as.character(Annee)))
-
-  zoneaffiche <- c()
-  if ("interdeciles" %in% options) zoneaffiche <- c(zoneaffiche,"p10","p90")
-  if ("interquartiles" %in% options) zoneaffiche <- c(zoneaffiche,"p25","p75")
-  if ("interdecilespond" %in% options) zoneaffiche <- c(zoneaffiche,"p10pond","p90pond")
-  if ("interquartilespond" %in% options) zoneaffiche <- c(zoneaffiche,"p25pond","p75pond")
-  if ("medianePM10" %in% options) zoneaffiche <- c(zoneaffiche,"p50.m10","p50.p10")
-  if ("medianePM20" %in% options) zoneaffiche <- c(zoneaffiche,"p50.m20","p50.p20")
-
-  # === les tables pour le graphique
+  # les tables pour le graphique
   tabg <- tabd[,c("Territoire","size",nomvariable)]
   names(tabg) <- c("Territoire","size","indicateur")
   tabg <- tabg  %>%
@@ -76,70 +64,39 @@ graphComparaison <- function(
              Territoire %in% gpecomp ~ comp,
              TRUE ~ "Autres départements"))
 
-  tabq2 <- tabq %>%
-    slice(rep(1:n(), each = nrow(tabg))) %>%
-    mutate(rang = 1:n())
+  # === Récupération des paramètres graphiques
+  optloc <- optionsgraphiques(dept = dept, comp = comp, options = options)
+
+  # === Récupération des données sur les distributions (quantiles, etc.)
+  tabzones <- selectZones(nomvariable = nomvariable,
+                          options = options,
+                          nbrang = nrow(tabd),
+                          tab = tab %>% filter(TypeTerritoire == "Département"),
+                          poidsobs = poidsobs)
 
   # === production des graphiques en output
-
-  # récupération des paramètres graphiques
-
-  optionszones <- intersect(options,ParamGraphiquesAsdep$noms)
-
-  ParamGraphiques <- ParamGraphiquesAsdep %>%
-    filter(noms %in% c("dept","comp","autres",optionszones)) %>%
-    mutate(intitules = recode(intitules,
-                         "Territoire de référence" = dept,
-                         "Groupe de comparaison" = comp,
-                         "Autres territoires" = "Autres départements"))
-  rownames(ParamGraphiques) <- ParamGraphiques$noms
-
-  couleursloc <- ParamGraphiques[c("dept","comp","autres",optionszones),"couleur"]
-  names(couleursloc) <- ParamGraphiques[c("dept","comp","autres",optionszones),"intitules"]
-  couleursloc <- couleursloc[names(couleursloc) != ""]
-  #names(couleursloc) <- c(dept, comp, "Autres départements",ParamGraphiquesAsdep[c(optionszones),"intitules"])
-
-  alphasloc <- ParamGraphiques[c("dept","comp","autres",optionszones),"alpha"]
-  names(alphasloc) <- ParamGraphiques[c("dept","comp","autres",optionszones),"intitules"]
-  alphasloc <- alphasloc[names(alphasloc) != ""]
-  #names(alphasloc) <- c(dept, comp, "Autres départements",ParamGraphiquesAsdep[c(optionszones),"intitules"])
-
- # table avec les zones représentées sur le graphique
-
-  zonesloc <- ParamGraphiquesAsdep %>% filter(noms %in% options)
-  typezone <- function(tab,defzone) {
-    t <- tab
-  }
-  tabq3 <- data.frame()
-  if (nrow(zonesloc)>=1) {
-    for (i in 1:nrow(zonesloc)){
-      tabq3 <- rbind(tabq3,
-                     data.frame(
-                       rang = tabq2$rang,
-                       intitules = rep(zonesloc$intitules[i] , nrow(tabq2)),
-                       noms = rep(zonesloc$noms[i] , nrow(tabq2)),
-                       ymin = tabq2[,zonesloc$ymin[i]],
-                       ymax = tabq2[,zonesloc$ymax[i]],
-                       alpha = rep(zonesloc$alpha[i] , nrow(tabq2))
-                     ))
-    }
-  }
 
   # === le graphique, version statique (ggplot)
 
   gstat <- ggplotAsdep() +
     geom_point(data=tabg,
-               aes(x=rang,y=indicateur,size=size,colour=type,alpha=type,text=paste(Territoire," en ",annee," :<br>",indicateur," ",tabs$unitevar,sep="")))
-  if (nrow(tabq3)>=1) {
+               aes(x=rang,y=indicateur,
+                   size=size,colour=type,alpha=type,
+                   text=paste(Territoire," en ",annee," :<br>",indicateur," ",tabs$unitevar,sep="")))
+
+  if (nrow(tabzones$zones)>=1) {
     gstat <- gstat +
-      geom_ribbon(data=tabq3,
-                  aes(ymin=ymin, ymax=ymax, x=rang, fill=intitules, alpha=intitules, text=paste(intitules," : entre ",ymin," et ",ymax," ",tabs$unitevar,sep="")))
+      geom_ribbon(data=tabzones$zones,
+                  aes(ymin=ymin, ymax=ymax, x=rang,
+                      fill=intitules, alpha=intitules,
+                      text=paste(intitules," : entre ",ymin," et ",ymax," ",tabs$unitevar,sep="")))
   }
+
   gstat <- gstat +
     guides(size = FALSE , alpha = FALSE) +
-    scale_fill_manual(values = couleursloc) +
-    scale_color_manual(values = couleursloc) +
-    scale_alpha_manual(values = alphasloc) +
+    scale_fill_manual(values = optloc$couleurs) +
+    scale_color_manual(values = optloc$couleurs) +
+    scale_alpha_manual(values = optloc$alphas) +
     labs(x = paste("rang (par ordre croissant) en",annee,sep=" "),
          y = paste("En",tabs$unitevar,sep=" "))
 
@@ -155,7 +112,7 @@ graphComparaison <- function(
     } else if (typesortie == "tab") {
       tabg
     } else if (typesortie == "tabcomplet") {
-      list("tabgraph" = tabg, "tabquantile" = tabq)
+      list("tabgraph" = tabg, "tabquantile" = tabzones$quantiles)
     } else if (typesortie == "graphdyn") {
       gdyn
     }

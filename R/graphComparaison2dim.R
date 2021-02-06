@@ -22,7 +22,6 @@
 #' @return un graphique (format ggplot ou plotly), ou éventuellement un tableau (selon les options retenues)
 #' @export graphComparaison2dim
 #'
-#' @examples graphComparaison2dim(nomvariable="NbBenefAPA",dept="Vosges",comp="Grand Est",typesortie="tab")
 #' @examples graphComparaison2dim(nomvariable1="NbBenefAPADomicile",denom="pop.60.99",nomvariable2="NbBenefAPAEtab",dept="Vosges",comp="Grand Est")
 #' @examples graphComparaison2dim(nomvariable="TotBenefPA",denom1="pop.60.99",nomvariable2="TotBenefPH",denom2="pop.20.64",dept="Vosges",gpecomp=c("Meuse","Moselle"),typesortie="graphdyn")
 graphComparaison2dim <- function(
@@ -103,43 +102,10 @@ graphComparaison2dim <- function(
   # === production des graphiques en output
 
   # récupération des paramètres graphiques
-
-  optionszones <- intersect(options,ParamGraphiquesAsdep$noms)
-
-  ParamGraphiques <- ParamGraphiquesAsdep %>%
-    filter(noms %in% c("dept","comp","autres",optionszones)) %>%
-    mutate(intitules = recode(intitules,
-                              "Territoire de référence" = dept,
-                              "Groupe de comparaison" = comp,
-                              "Autres territoires" = "Autres départements"))
-  rownames(ParamGraphiques) <- ParamGraphiques$noms
-
-  couleursloc <- ParamGraphiques[c("dept","comp","autres",optionszones),"couleur"]
-  names(couleursloc) <- ParamGraphiques[c("dept","comp","autres",optionszones),"intitules"]
-  couleursloc <- couleursloc[names(couleursloc) != ""]
-
-  alphasloc <- ParamGraphiques[c("dept","comp","autres",optionszones),"alpha"]
-  names(alphasloc) <- ParamGraphiques[c("dept","comp","autres",optionszones),"intitules"]
-  alphasloc <- alphasloc[names(alphasloc) != ""]
+  optloc <- optionsgraphiques(dept = dept, comp = comp, options = options)
 
   # table avec les zones représentées sur le graphique
 
-  zonesloc <- ParamGraphiquesAsdep %>% filter(noms %in% options)
-  typezone <- function(tab,defzone) {
-    t <- tab
-  }
-  tabq3 <- data.frame()
-  #for (i in 1:nrow(zonesloc)){
-  #  tabq3 <- rbind(tabq3,
-  #                 data.frame(
-  #                   rang = tabq2$rang,
-  #                   intitules = rep(zonesloc$intitules[i] , nrow(tabq2)),
-  #                   noms = rep(zonesloc$noms[i] , nrow(tabq2)),
-  #                   ymin = tabq2[,zonesloc$ymin[i]],
-  #                   ymax = tabq2[,zonesloc$ymax[i]],
-  #                   alpha = rep(zonesloc$alpha[i] , nrow(tabq2))
-  #                 ))
-  #}
 
   # === le graphique, version statique (ggplot)
 
@@ -150,9 +116,9 @@ graphComparaison2dim <- function(
     #geom_ribbon(data=tabq3,
     #            aes(ymin=ymin, ymax=ymax, x=rang, fill=intitules, alpha=intitules, text=paste(intitules," : entre ",ymin," et ",ymax," ",tabs$unitevar,sep=""))) +
     guides(size = FALSE , alpha = FALSE) +
-    scale_fill_manual(values = couleursloc) +
-    scale_color_manual(values = couleursloc) +
-    scale_alpha_manual(values = alphasloc) +
+    scale_fill_manual(values = optloc$couleurs) +
+    scale_color_manual(values = optloc$couleurs) +
+    scale_alpha_manual(values = optloc$alphas) +
     labs(x = paste("En",tabs1$unitevar,sep=" "),
          y = paste("En",tabs2$unitevar,sep=" "))
 

@@ -27,6 +27,7 @@ graphEvolution <- function(nomvariable, denom = "", options = c(), poidsobs = c(
                            typesortie = "graph",
                            donnees = ASDEPsl, variables = ASDEPsl_description) {
 
+
   # === Récupération des données pour l'indicateur
   #if (NROW(gpecomp)>=1) {comp <- "Groupe de comparaison"}
   if (nchar(denom)>0) {poidsobs <- unique( c(poidsobs,denom) ) }
@@ -37,138 +38,54 @@ graphEvolution <- function(nomvariable, denom = "", options = c(), poidsobs = c(
   tabd <- tab[,c("Annee","Territoire",nomvariable)] %>%
     filter(Territoire %in% c(dept,comp))
 
-  # === Récupération des données sur les distributions (quantiles, etc.)
-  tabq <- quantileIndic(donneesQV = tab %>% filter(TypeTerritoire == "Département"),
-                        var=nomvariable,  groupe="Annee",  poids=poidsobs) %>%
-    mutate(Annee = as.numeric(as.character(Annee)))
 
-  zoneaffiche <- c()
-  if ("interdeciles" %in% options) zoneaffiche <- c(zoneaffiche,"p10","p90")
-  if ("interquartiles" %in% options) zoneaffiche <- c(zoneaffiche,"p25","p75")
-  if ("interdecilespond" %in% options) zoneaffiche <- c(zoneaffiche,"p10pond","p90pond")
-  if ("interquartilespond" %in% options) zoneaffiche <- c(zoneaffiche,"p25pond","p75pond")
-  if ("medianePM10" %in% options) zoneaffiche <- c(zoneaffiche,"p50.m10","p50.p10")
-  if ("medianePM20" %in% options) zoneaffiche <- c(zoneaffiche,"p50.m20","p50.p20")
+  # === Récupération des paramètres graphiques
+  optloc <- optionsgraphiques(dept = dept, comp = comp, options = options)
+
+
+  # === Récupération des données sur les distributions (quantiles, etc.)
+  tabzones <- selectZones(nomvariable = nomvariable,
+                          options = options,
+                          nbrang = 1,
+                          tab = tab %>% filter(TypeTerritoire == "Département"),
+                          poidsobs = poidsobs)
+
 
   # === la table pour le graphique
   tabd2 <- tabd %>% pivot_wider(id_cols=c("Annee"),names_from="Territoire",values_from=nomvariable)
 
-  tabg1 <- tabd2 %>% left_join(tabq, by="Annee")
-  tabg1 <- tabg1[, c(names(tabd2), zoneaffiche)]
+  tabg1 <- tabd2 %>% left_join(tabzones$quantiles, by="Annee")
+  tabg1 <- tabg1[, c(names(tabd2), optloc$zoneaffiche)]
 
   tabg2 <- tabd[,c("Annee","Territoire",nomvariable)]
   names(tabg2) <- c("Annee","Territoire","indicateur")
 
   # === production des graphiques en output
 
-  # récupération des paramètres graphiques
-
-  optionszones <- intersect(options,ParamGraphiquesAsdep$noms)
-
-  ParamGraphiques <- ParamGraphiquesAsdep %>%
-    filter(noms %in% c("dept","comp","autres",optionszones)) %>%
-    mutate(intitules = recode(intitules,
-                              "Territoire de référence" = dept,
-                              "Groupe de comparaison" = comp,
-                              "Autres territoires" = "Autres départements"))
-  rownames(ParamGraphiques) <- ParamGraphiques$noms
-
-  couleursloc <- ParamGraphiques[c("dept","comp","autres",optionszones),"couleur"]
-  names(couleursloc) <- ParamGraphiques[c("dept","comp","autres",optionszones),"intitules"]
-  couleursloc <- couleursloc[names(couleursloc) != ""]
-
-  alphasloc <- ParamGraphiques[c("dept","comp","autres",optionszones),"alpha"]
-  names(alphasloc) <- ParamGraphiques[c("dept","comp","autres",optionszones),"intitules"]
-  alphasloc <- alphasloc[names(alphasloc) != ""]
-
-  # table avec les zones représentées sur le graphique
-
-  zonesloc <- ParamGraphiquesAsdep %>% filter(noms %in% options)
-  typezone <- function(tab,defzone) {
-    t <- tab
-  }
-  tabq3 <- data.frame()
-  if (nrow(zonesloc)>=1) {
-    for (i in 1:nrow(zonesloc)){
-      tabq3 <- rbind(tabq3,
-                     data.frame(
-                       Annee = tabq$Annee,
-                       intitules = rep(zonesloc$intitules[i] , nrow(tabq)),
-                       noms = rep(zonesloc$noms[i] , nrow(tabq)),
-                       ymin = tabq[,zonesloc$ymin[i]],
-                       ymax = tabq[,zonesloc$ymax[i]],
-                       alpha = rep(zonesloc$alpha[i] , nrow(tabq))
-                     ))
-    }
-    tabq3 <- tabq3 %>% arrange(intitules,Annee)
-  }
-
-
-  #couleursloc <- c("Zone interdécile" = "blue",
-  #                 "Zone interquartile" = "blue",
-  #                 "Zone interdécile (pondérée)" = "green",
-  #                 "Zone interquartile (pondérée)" = "green",
-  #                 "Médiane +/- 20 %" = "red",
-  #                 "Médiane +/- 10 %" = "red"
-  #                 )
-  #zones <- data.frame(
-  #  intitules = c("Zone interdécile","Zone interquartile","Zone interdécile (pondérée)","Zone interquartile (pondérée)","Médiane +/- 20 %","Médiane +/- 10 %"),
-  #  noms = c("interdeciles","interquartiles","interdecilespond","interquartilespond","medianePM20","medianePM10"),
-  #  ymin = c("p10","p25","p10pond","p25pond","p50.m20","p50.m10"),
-  #  ymax = c("p90","p75","p90pond","p75pond","p50.p20","p50.p10"),
-  #  alpha = c(0.1, 0.2, 0.1, 0.2, 0.1, 0.2),
-  #  couleur = c("blue","blue","green","green","red","red"),
-  #  stringsAsFactors = FALSE
-  #)
-  #zonesloc <- zones %>% filter(noms %in% options)
-#
-
-  # === le graphique, version statique (ggplot)
+   # === le graphique, version statique (ggplot)
 
   gstat <- ggplotAsdep() +
     geom_line(
       data=tabg2,
       aes(x=Annee,y=indicateur,colour=Territoire,label=paste(Territoire,", ",Annee,"<br>",indicateur," ",tabs$unitevar,sep="")),size=1)
-  if (NROW(optionszones)>=1) {
+  if (NROW(optloc$optionszones)>=1) {
     gstat <- gstat + #
       geom_ribbon(
-        data=tabq3,
+        data=tabzones$zones,
         aes(ymin=ymin, ymax=ymax, x=Annee,
             fill=intitules, alpha=intitules,
             label=paste(intitules," : entre ",ymin," et ",ymax," ",tabs$unitevar,sep="")))
   }
   gstat <- gstat +  #
     guides(size = FALSE , alpha = FALSE) +
-    scale_fill_manual(values = couleursloc) +
-    scale_color_manual(values = couleursloc) +
-    scale_alpha_manual(values = alphasloc) +
+    scale_fill_manual(values = optloc$couleurs) +
+    scale_color_manual(values = optloc$couleurs) +
+    scale_alpha_manual(values = optloc$alphas) +
     labs(x = "année",
          y = paste("En",tabs$unitevar,sep=" "))
 
-  #if ("interdeciles" %in% options) {gstat <- gstat + geom_ribbon(data=tabq,aes(ymin=p10, ymax=p90, x=Annee, fill="Zone interdécile"), alpha = 0.1)}
-  #if ("interquartiles" %in% options) {gstat <- gstat + geom_ribbon(data=tabq,aes(ymin=p25, ymax=p75, x=Annee, fill="Zone interquartile"), alpha = 0.2)}
-  #if ("interdecilespond" %in% options) {gstat <- gstat + geom_ribbon(data=tabq,aes(ymin=p10pond, ymax=p90pond, x=Annee, fill="Zone interdécile (pondérée)"), alpha = 0.1)}
-  #if ("interquartilespond" %in% options) {gstat <- gstat + geom_ribbon(data=tabq,aes(ymin=p25pond, ymax=p75pond, x=Annee, fill="Zone interquartile (pondérée)"), alpha = 0.2)}
-  #if ("medianePM20" %in% options) {gstat <- gstat + geom_ribbon(data=tabq,aes(ymin=p50.m20, ymax=p50.p20, x=Annee, fill="Médiane +/- 20 %"), alpha = 0.1)}
-  #if ("medianePM10" %in% options) {gstat <- gstat + geom_ribbon(data=tabq,aes(ymin=p50.m10, ymax=p50.p10, x=Annee, fill="Médiane +/- 10 %"), alpha = 0.2)}
-  #for (z in 1:nrow(zonesloc)) {
-  #  gstat <- gstat +
-  #    geom_ribbon(
-  #      #data=tabq,
-  #      aes(ymin= tabq[,zonesloc[z,"ymin"]],
-  #          ymax= tabq[,zonesloc[z,"ymax"]],
-  #          x=tabq$Annee,
-  #          fill=zonesloc[z,"intitules"]),
-  #      alpha = zonesloc[z,"alpha"])
-  #}
 
   # === le graphique, version dynamique (plotly)
-
-  #gdyn <- ggplotly(g)
-  #if ("interdeciles" %in% options){
-  #  gdyn <- gdyn  %>% add_ribbons(data=tabq, x = ~Annee, ymin = ~p10, ymax = ~p90, line = list(color = 'rgba(7, 164, 181, 0.05)'),  fillcolor = 'rgba(7, 164, 181, 0.2)',
-  #                                  name = "zone interdécile", text = ~paste("80 % des départements (",round(100*pond.interdec,0)," % de la population) entre ",round(p10,1)," et ",round(p90,1),", en ",Annee,sep=""), hoverinfo ="text" )
-  #}
 
   gdyn <- ggplotlyAsdep(gstat)
 
@@ -180,7 +97,7 @@ graphEvolution <- function(nomvariable, denom = "", options = c(), poidsobs = c(
     } else if (typesortie == "tab") {
       tabg1
     } else if (typesortie == "tabcomplet") {
-      list("tabgraph" = tabg2, "tablarge" = tabg1, "tabquantile" = tabq)
+      list("tabgraph" = tabg2, "tablarge" = tabg1, "tabquantile" = tabzones$quantiles)
     } else if (typesortie == "graphdyn") {
       gdyn
     }

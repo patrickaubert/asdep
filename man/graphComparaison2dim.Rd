@@ -60,7 +60,6 @@ Le tableau sous-jacent peut également être récupéré avec l'option typesorti
 Les options permettent d'ajouter sur le graphique une représentation des diverses zones : zone interquartile ("interquartiles"), zone interdécile ("interdeciles"), zone correspondant à la médiane +/- 10 ou 20 \% ("medianePM10" et "medianePM20") ...
 }
 \examples{
-graphComparaison2dim(nomvariable="NbBenefAPA",dept="Vosges",comp="Grand Est",typesortie="tab")
 graphComparaison2dim(nomvariable1="NbBenefAPADomicile",denom="pop.60.99",nomvariable2="NbBenefAPAEtab",dept="Vosges",comp="Grand Est")
 graphComparaison2dim(nomvariable="TotBenefPA",denom1="pop.60.99",nomvariable2="TotBenefPH",denom2="pop.20.64",dept="Vosges",gpecomp=c("Meuse","Moselle"),typesortie="graphdyn")
 }

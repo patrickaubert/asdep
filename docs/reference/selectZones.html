@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Une fonction auxiliaire qui corrige les noms de territoires mal orthographiés — corrigeNom • asdep</title>
+<title>Une fonction auxiliaire qui crée les tables nécessaires pour afficher des zones (interquartiles, etc) sur un graphique — selectZones • asdep</title>
 
 
 <!-- jquery -->
@@ -39,11 +39,8 @@
 
 
 
-<meta property="og:title" content="Une fonction auxiliaire qui corrige les noms de territoires mal orthographiés — corrigeNom" />
-<meta property="og:description" content="La fonction s'appuie sur la base 'nomscorrecterritoires' contenue dans le package.
-Si un nom est reconnu comme faisant partie des noms mal-orthographiés dans cette base
-(par exemple &quot;La-Réunion&quot; au lieu de &quot;La Réunion&quot;), il est remplacés par la forme correcte
-d'après la base" />
+<meta property="og:title" content="Une fonction auxiliaire qui crée les tables nécessaires pour afficher des zones (interquartiles, etc) sur un graphique — selectZones" />
+<meta property="og:description" content="Cette fonction est notamment utilisée dans les fonctions graphEvolution, graphComparaison, etc." />
 
 
 
@@ -124,48 +121,44 @@ d'après la base" />
 <div class="row">
   <div class="col-md-9 contents">
     <div class="page-header">
-    <h1>Une fonction auxiliaire qui corrige les noms de territoires mal orthographiés</h1>
+    <h1>Une fonction auxiliaire qui crée les tables nécessaires pour afficher des zones (interquartiles, etc) sur un graphique</h1>
     
-    <div class="hidden name"><code>corrigeNom.Rd</code></div>
+    <div class="hidden name"><code>selectZones.Rd</code></div>
     </div>
 
     <div class="ref-description">
-    <p>La fonction s'appuie sur la base 'nomscorrecterritoires' contenue dans le package.
-Si un nom est reconnu comme faisant partie des noms mal-orthographiés dans cette base
-(par exemple "La-Réunion" au lieu de "La Réunion"), il est remplacés par la forme correcte
-d'après la base</p>
+    <p>Cette fonction est notamment utilisée dans les fonctions graphEvolution, graphComparaison, etc.</p>
     </div>
 
-    <pre class="usage"><span class='fu'>corrigeNom</span><span class='op'>(</span>
-  <span class='va'>nomdep</span>,
-  nomcorrec <span class='op'>=</span> <span class='fu'>asdep</span><span class='fu'>::</span><span class='va'>nomscorrectsterritoires</span><span class='op'>$</span><span class='va'>TerritoireCorrect</span>,
-  nommalortho <span class='op'>=</span> <span class='fu'>asdep</span><span class='fu'>::</span><span class='va'>nomscorrectsterritoires</span><span class='op'>$</span><span class='va'>TerritoireMalortho</span>
-<span class='op'>)</span></pre>
+    <pre class="usage"><span class='fu'>selectZones</span><span class='op'>(</span><span class='va'>nomvariable</span>, <span class='va'>options</span>, nbrang <span class='op'>=</span> <span class='fl'>1</span>, <span class='va'>tab</span>, <span class='va'>poidsobs</span><span class='op'>)</span></pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
     <colgroup><col class="name" /><col class="desc" /></colgroup>
     <tr>
-      <th>nomdep</th>
-      <td><p>un vecteur de noms de territoires</p></td>
+      <th>nomvariable</th>
+      <td><p>le nom de la variable, parmi celles de la table ASDEPsl</p></td>
     </tr>
     <tr>
-      <th>nomcorrec</th>
-      <td><p>un vecteur contenant les formes correctes des noms de territoires (par défaut, la variable 'TerritoireCorrect' de la base 'nomscorrecterritoires')</p></td>
+      <th>options</th>
+      <td><p>un vecteur d'options issu de la fonction d'origine</p></td>
     </tr>
     <tr>
-      <th>nommalortho</th>
-      <td><p>un vecteur (de même taille que 'nomcorrec') contenant les formes mal-orthographiées des noms de territoires (par défaut, la variable 'TerritoireMalortho' de la base 'nomscorrecterritoires')</p></td>
+      <th>tab</th>
+      <td><p>une table avec les valeurs de l'indicateur</p></td>
+    </tr>
+    <tr>
+      <th>poidsobs</th>
+      <td><p>une variable de pondération (par exemple si on souhaite calculer des quantiles pondérés par la population des départements). Par défaut, si denom est renseigné, cette variable denom est utilisée comme poidsobs</p></td>
     </tr>
     </table>
 
     <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
 
-    <p>un vecteur de la même taille que nomdep, avec les formes corrigées si un mauvaise orthographe a été détectée</p>
+    
 
-    <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
-    <pre class="examples"><div class='input'><span class='fu'>corrigeNom</span><span class='op'>(</span>nomdep<span class='op'>=</span><span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='st'>"Alpes de Haute-Provence"</span>,<span class='st'>"Territoire-de-Belfort"</span>,<span class='st'>"Nouveau-RhÃ´ne"</span><span class='op'>)</span><span class='op'>)</span>
-</div><div class='output co'>#&gt; <span class='error'>Error in data.frame(orig = nomdep, stringsAsFactors = FALSE) %&gt;% left_join(data.frame(nomcorrec = nomcorrec,     nommalortho = nommalortho, stringsAsFactors = FALSE), by = c(orig = "nommalortho")) %&gt;%     mutate(correc = ifelse(!is.na(nomcorrec), nomcorrec, orig)): impossible de trouver la fonction "%&gt;%"</span></div></pre>
+
+
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
     <nav id="toc" data-toggle="toc" class="sticky-top">

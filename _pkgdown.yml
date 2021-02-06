@@ -27,6 +27,7 @@ reference:
 - contents:
   - selectIndic
   - quantileIndic
+  - selectZones
 - title: Extraction de données
   desc:  Fonctions pour l'extraction de données à partir des fichiers Excel publiés par la DREES ou l Insee
 - contents:
@@ -42,6 +43,7 @@ reference:
   - departementsProches
   - Intitulepop
   - listeDenominateurs
+  - optionsgraphiques
 navbar:
  right:
     - icon: fa-github fa-lg
