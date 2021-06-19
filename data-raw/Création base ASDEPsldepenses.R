@@ -9,6 +9,9 @@ library(plyr)
 library(dplyr)
 library(tidyr)
 library(stringr)
+library(devtools)
+
+devtools::load_all()
 
 # ===================================
 # Extraction des données Excel
@@ -158,9 +161,11 @@ for (i in (1:nrow(ASDEPsldepenses_description))) {
   }
 }
 
-rownames(ASDEPsldepenses_description) <- ASDEPsldepenses_description$Nom.var
+#rownames(ASDEPsldepenses_description) <- ASDEPsldepenses_description$Nom.var
 
 # ===================================================================================
+# Dernière actualisation de la base réalisée le : 19/06/2021
+
 usethis::use_data(ASDEPsldepenses,
                   ASDEPsldepenses_description,
                   overwrite = T)

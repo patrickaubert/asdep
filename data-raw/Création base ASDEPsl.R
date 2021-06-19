@@ -31,6 +31,8 @@ ASDEPsl_description <- bind_rows(
 
 
 # ===================================================================================
+# Dernière actualisation de la base réalisée le : 19/06/2021
+
 usethis::use_data(ASDEPsl,
                   ASDEPsl_description,
                   overwrite = T)

@@ -9,12 +9,20 @@ library(plyr)
 library(dplyr)
 library(tidyr)
 library(stringr)
+library(devtools)
+
+devtools::load_all()
+
 
 # ===================================
 # Extraction des données Excel
 
-tabsbenef <- readExcelDrees(fich="data-raw/Les bénéficiaires de laide sociale départementale - séries longues (1996-2019).xlsx",
+nomfich <- "data-raw/Les bénéficiaires de laide sociale départementale - séries longues (1996-2019).xlsx"
+#nomfich <- "https://data.drees.solidarites-sante.gouv.fr/api/datasets/1.0/375_les-beneficiaires-de-l-aide-sociale-departementale/attachments/les_beneficiaires_de_l_aide_sociale_departementale_series_longues_1996_2019_xlsx/"
+
+tabsbenef <- readExcelDrees(fich=nomfich,
                            options = "ASDEPslbenef")
+
 
 # ===================================
 # Extraction des métadonnées enregistrées par ailleurs
@@ -160,6 +168,8 @@ for (i in (1:nrow(ASDEPslbenef_description))) {
 rownames(ASDEPslbenef_description) <- ASDEPslbenef_description$Nom.var
 
 # ===================================================================================
+# Dernière actualisation de la base réalisée le :
+
 usethis::use_data(ASDEPslbenef,
                   ASDEPslbenef_description,
                   overwrite = T)
