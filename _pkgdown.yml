@@ -10,13 +10,14 @@ reference:
 - title: Tables de données
   desc:  Le package contient plusieurs tables R extraites des fichiers publiés par la DREES ou l'Insee
 - contents:
-  - ends_with("_description")
   - ends_with("sl")
   - ends_with("slbenef")
   - ends_with("sldepenses")
   - departementsFR
   - ASDEPslperso
+  - ASDEPprevalaidessoc
   - PopDepartementales
+  - ends_with("_description")
 - title: Graphiques et illustrations
   desc:  Fonctions générant des graphiques ou tableaux préformatés
 - contents:

@@ -32,6 +32,30 @@
 #' @source \url{http://www.data.drees.sante.gouv.fr/}
 "ASDEPsldepenses"
 
+#' Prévalences par tranches d'âge des aides sociales départementales
+#'
+#' Une base de données issues de l'enquête annuelle 'Aide sociale' de la DREES, contenant les nombres de bénéficiaires et les prévalences
+#' (c'est-à-dire les parts dans la population) des aides sociales départementales (APA, ASH, etc.) La base contient pour l'instant les aides
+#' sociales aux personnes âgées
+#'
+#' @format Un data frame avec 2187 lignes et 12 variables:
+#' \describe{
+#'   \item{annee}{année}
+#'   \item{prestation}{nom ou type d'aide sociale}
+#'   \item{gir}{catégorie de GIR ("GIR1","GIR2", etc. ou "Ensemble")}
+#'   \item{lieu}{lieu de résidence au sens de la prestation ("ensemble", "domicile" ou "établissement")}
+#'   \item{age}{tranche d'âge (exemple : "[70,75)" = 70 à 74 ans)}
+#'   \item{nb}{nombre de bénéficiaires de la prestation dans la tranche d'âge}
+#'   \item{pop}{population totale dans la tranche d'âge}
+#'   \item{prevalence}{prévalence de la prestation dans la tranche d'âge}
+#'   \item{part}{part des bénéficiaires de la prestation de la tranche d'âge parmi l'ensemble des bénéficiaires de cette prestation}
+#'   \item{recale_gir}{indicatrice valant TRUE si les totaux tous GIR confondus ont été recalculés comme somme des effectifs par GIR}
+#'   \item{decomp6age}{indicatrice valant TRUE si la tranche d'âge appartient à un découpage des âges au-delà de 60 ans en 6 tranches (quinquennal jusqu'à 85 ans, puis regroupant tous les 85 ans et plus)}
+#'   \item{decomp8age}{indicatrice valant TRUE si la tranche d'âge appartient à un découpage des âges au-delà de 60 ans en 8 tranches (quinquennal jusqu'à 95 ans, puis regroupant tous les 95 ans et plus)}
+#' }
+#' @source \url{http://www.data.drees.sante.gouv.fr/}
+"ASDEPprevalaidessoc"
+
 #' Personnels départementaux d'aides sociales départementales
 #'
 #' Une base de données issue du volet "personnels" de l'enquête annuelle 'Aide sociale' de la DREES, contenant les effectifs physiques et les ETP de personnels pour l'aide sociale ds départements.
