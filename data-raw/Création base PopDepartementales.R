@@ -11,9 +11,12 @@ library(tidyverse)
 #setwd(paste(getwd(),"/data-raw/",sep=""))
 
 # extraction des populations departementales du fichier Excel telecharge sur le site de l'Insee
+# paru le 18/01/2022
+# téléchargé le 24/06/2022
+# source : https://www.insee.fr/fr/statistiques/1893198
 
-nomfich <- "data-raw/estim-pop-dep-sexe-aq-1975-2020.xlsx"
-nomsheet <- "2020"
+nomfich <- "data-raw/estim-pop-dep-sexe-aq-1975-2022.xlsx"
+#nomsheet <- "2022"
 
 # fonction d'extraction onglet pour une annee
 extronglet <- function(nomfich = nomfich, sheet) {
@@ -31,7 +34,7 @@ extronglet <- function(nomfich = nomfich, sheet) {
   return(val)
 }
 
-popdepartementales <- do.call("bind_rows", lapply(1990:2020,function(an){extronglet(nomfich,as.character(an))}))
+popdepartementales <- do.call("bind_rows", lapply(1990:2022,function(an){extronglet(nomfich,as.character(an))}))
 
 popdepartementales <- popdepartementales %>%
   mutate(TypeTerritoire = "Département") %>%
@@ -44,6 +47,11 @@ popdepartementales <- popdepartementales %>%
 
 verif <- unique(popdepartementales$Territoire)
 verif[!(verif %in% asdep::nomscorrectsterritoires$TerritoireCorrect)]
+
+# correction des pop de 95 ans et + manquantes pour les DROM dans les années 1990 (elles ont été agrégées avec les 90-94)
+
+popdepartementales <- popdepartementales %>%
+  mutate(pop.95.99 = ifelse(is.na(pop.95.99),0,pop.95.99))
 
 # ajout des régions
 
@@ -191,6 +199,8 @@ popdepartementales$Territoire <- trimws(popdepartementales$Territoire, "both")
 PopDepartementales <- popdepartementales
 
 # ===================================================================================
+# Dernière actualisation de la base réalisée le : 24/06/2022
+
 usethis::use_data(PopDepartementales,
                   PopDepartementales_description,
                   overwrite = T)

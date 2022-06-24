@@ -5,7 +5,7 @@
 \alias{ASDEPslbenef}
 \title{Bénéficiaires d'aides sociales départementales}
 \format{
-Un data frame avec 3131 lignes et 51 variables:
+Un data frame avec 3125 lignes et 51 variables:
 \describe{
 \item{Annee}{année (format character)}
 \item{Code.region}{code numérique de la région}

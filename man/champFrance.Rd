@@ -4,7 +4,7 @@
 \alias{champFrance}
 \title{Une fonction auxiliaire qui retourne le champ le plus large possible pour lequel une variable est non nulle}
 \usage{
-champFrance(var, annee = max(ASDEPsl$Annee), tab = ASDEPsl)
+champFrance(var, annee = NULL, tab = ASDEPsl)
 }
 \arguments{
 \item{var}{un nom de variable de la table ASDEPsl}

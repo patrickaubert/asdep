@@ -65,6 +65,8 @@ verif[!(verif %in% asdep::nomscorrectsterritoires$TerritoireCorrect)]
 
 
 # ===================================================================================
+# dernière actualisation : 24/06/2022
+
 usethis::use_data(ASDEPslperso,
                   ASDEPslperso_description,
                   overwrite = T)

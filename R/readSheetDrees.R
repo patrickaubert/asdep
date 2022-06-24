@@ -134,7 +134,20 @@ readSheetDrees <- function(fich , sheet, nlignetitre = NULL, options = "") {
     # Fichier Excel "personnels de l'aide sociale"
     names(tab)[grepl("^Numero de departement$",names(tab))] <- "Code.departement"
     names(tab)[grepl("^[Dd][ée]partement($|s$)",names(tab))] <- "Territoire"
-    tab <- tab %>% mutate(TypeTerritoire = "Département")
+    #tab <- tab %>% mutate(TypeTerritoire = "Département")
+
+    # distinction des types de territoire : départements au totaux nationaux
+    departements <- tab %>%
+      filter(grepl("^[[:digit:]][AB[:digit:]]($|[[:digit:]]$|[MDmd]$)",Code.departement)) %>%
+      mutate(TypeTerritoire = "Département")
+    nation <- tab  %>%
+      filter(!grepl("^[[:digit:]][AB[:digit:]]($|[[:digit:]]$|[MDmd]$)",Code.departement)) %>%
+      select(-c(Territoire)) %>%
+      dplyr::rename(Territoire = Code.departement) %>%
+      mutate(TypeTerritoire = "France",
+             Code.departement = NA)
+
+    tab <- bind_rows(departements, nation)
 
   } else if (options %in% c("oarsasl")) {
 

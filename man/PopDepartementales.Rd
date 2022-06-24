@@ -5,7 +5,7 @@
 \alias{PopDepartementales}
 \title{Populations départementales}
 \format{
-Un data frame avec 2646 lignes et 12 variables
+Un data frame avec 4074 lignes et 12 variables
 }
 \source{
 \url{https://www.insee.fr/fr/statistiques/1893198}

@@ -136,7 +136,8 @@ ASDEPslbenef_description <- bind_rows(
              Unite.var="personnes",
              TexteDenom = "prestations d'APA ou de PSD",
              ListeDenom.var = c(""),
-             ListeComposante.var = c("NbBenefAPA_NbBenefPSD")),
+             ListeComposante.var = c("NbBenefAPA_NbBenefPSD"),
+             Popref.var = "60-99"),
   data.frame(Nom.var= "TotBenefACTPPCH",
              Intitule.var = "Nombre de bénéficiaires de la PCH ou de l'ACTP",
              Intitulecourt.var = "PCH ou ACTP",
@@ -148,7 +149,8 @@ ASDEPslbenef_description <- bind_rows(
              Unite.var="personnes",
              TexteDenom = "droits ouverts d'ACTP ou de PCH",
              ListeDenom.var = c(""),
-             ListeComposante.var = c("NbBenefACTP_NbBenefPCH"))
+             ListeComposante.var = c("NbBenefACTP_NbBenefPCH"),
+             Popref.var = "20-64")
 )
 
 #  complétude des variables ListeDenom.var à partir des variables ListeComposante.var
@@ -169,7 +171,7 @@ for (i in (1:nrow(ASDEPslbenef_description))) {
 rownames(ASDEPslbenef_description) <- ASDEPslbenef_description$Nom.var
 
 # ===================================================================================
-# Dernière actualisation de la base réalisée le :
+# Dernière actualisation de la base réalisée le : 24/06/2022
 
 usethis::use_data(ASDEPslbenef,
                   ASDEPslbenef_description,

@@ -52,7 +52,7 @@ ASDEPsldepenses_description <- ASDEPsldepenses_description %>%
                              "ase" = "00-20",
                              "rsarmi" = "20-64",
                              "tot" = "popTOT",
-                             "autres" = "Aide sociale générale"),
+                             "autres" = "popTOT"),
          Thematique.var = recode(Thematique.var,
                                  "pa" = "Perte d'autonomie",
                                  "ph" = "Handicap",
@@ -161,10 +161,14 @@ for (i in (1:nrow(ASDEPsldepenses_description))) {
   }
 }
 
+# on supprime les anomalies
+ASDEPsldepenses_description <- ASDEPsldepenses_description %>%
+  filter(!is.na(Intitule.var))
+
 #rownames(ASDEPsldepenses_description) <- ASDEPsldepenses_description$Nom.var
 
 # ===================================================================================
-# Dernière actualisation de la base réalisée le : 19/06/2021
+# Dernière actualisation de la base réalisée le : 24/06/2022
 
 usethis::use_data(ASDEPsldepenses,
                   ASDEPsldepenses_description,

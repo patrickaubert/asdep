@@ -5,7 +5,7 @@
 \alias{ASDEPsldepenses_description}
 \title{Intitulés des variables des bases sur les dépenses d'aides sociales départementales}
 \format{
-Un data frame avec 34 lignes et 13 variables:
+Un data frame avec 32 lignes et 13 variables:
 \describe{
 \item{nom.var}{nom de la variable (correspond aux colonnes des bases ASDEPslbenef et ASDEPsldepenses)}
 \item{Intitule.var}{intitulé complet de la variable}

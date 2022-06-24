@@ -2,6 +2,7 @@ server <- function(input, output, session) {
 
   listedepartements <- unique(ASDEPsl[ASDEPsl$TypeTerritoire == "Département", "Territoire"])
   listedepartements <- listedepartements[order(listedepartements)]
+  listedepartements <- listedepartements[!is.na(listedepartements)]
 
   region <- function(dep) {departementsFR[departementsFR$Departement == dep,"Region"]}
   autresdepRegion <- function(dep) {

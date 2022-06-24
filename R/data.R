@@ -3,7 +3,7 @@
 #' Une base de données issues de l'enquête annuelle 'Aide sociale' de la DREES, contenant les effectifs de bénéficiaires de diverses aides sociales versées par les départements.
 #' Les noms des variables, correspondant aux différents types d'aide, sont décrits dans la table 'ASDEPslbenef_description'.
 #'
-#' @format Un data frame avec 3131 lignes et 51 variables:
+#' @format Un data frame avec 3125 lignes et 51 variables:
 #' \describe{
 #'   \item{Annee}{année (format character)}
 #'   \item{Code.region}{code numérique de la région}
@@ -116,7 +116,7 @@
 #'
 #' Une base de métadonnées sur les variables de la base ASDEPsldepenses
 #'
-#' @format Un data frame avec 34 lignes et 13 variables:
+#' @format Un data frame avec 32 lignes et 13 variables:
 #' \describe{
 #'   \item{nom.var}{nom de la variable (correspond aux colonnes des bases ASDEPslbenef et ASDEPsldepenses)}
 #'   \item{Intitule.var}{intitulé complet de la variable}
@@ -162,7 +162,7 @@
 #'
 #' Une base de données contenant les populations départementales par tranche d'âge, téléchargéex sur le site de l'Insee.
 #'
-#' @format Un data frame avec 2646 lignes et 12 variables
+#' @format Un data frame avec 4074 lignes et 12 variables
 #'
 #' @source \url{https://www.insee.fr/fr/statistiques/1893198}
 "PopDepartementales"
