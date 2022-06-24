@@ -17,18 +17,19 @@ devtools::load_all()
 # ===================================
 # Extraction des données Excel
 
-nomfich <- "data-raw/Les bénéficiaires de laide sociale départementale - séries longues (1996-2019).xlsx"
+nomfich <- "data-raw/Les bénéficiaires de l'aide sociale départementale - séries longues (1996-2020).xlsx"
 #nomfich <- "https://data.drees.solidarites-sante.gouv.fr/api/datasets/1.0/375_les-beneficiaires-de-l-aide-sociale-departementale/attachments/les_beneficiaires_de_l_aide_sociale_departementale_series_longues_1996_2019_xlsx/"
 
 tabsbenef <- readExcelDrees(fich=nomfich,
-                           options = "ASDEPslbenef")
+                            sheetexclude = c("Corrections Déc 21"),
+                            options = "ASDEPslbenef")
 
 
 # ===================================
 # Extraction des métadonnées enregistrées par ailleurs
 
 infos.onglets <- read.xlsx("data-raw/Contenu fichiers excel.xlsx",
-                           sheet = "SL_benef_2019",
+                           sheet = "SL_benef_2020",
                            colNames = TRUE, skipEmptyRows = FALSE, skipEmptyCols = TRUE)
 
 # ===================================
@@ -44,7 +45,7 @@ ASDEPslbenef_description <- tabsbenef$metadonnees %>%
          note = ifelse(is.na(note),"",note) ) %>%
   mutate(note = pasteNA(note,info)) %>%
   select(-info) %>%
-  rename(Intitule.var = intitule,
+  dplyr::rename(Intitule.var = intitule,
          Source.var = source,
          Champ.var = champ,
          Note.var = note)
@@ -73,7 +74,7 @@ ASDEPslbenef_description <- ASDEPslbenef_description %>%
 # traitement des bases : 2) indicateurs
 
 ASDEPslbenef <- tabsbenef$tablong %>%
-  rename(Annee = annee) %>%
+  dplyr::rename(Annee = annee) %>%
   left_join(infos.onglets %>%
               select(NoOngletExcel,Nom.var),
             by = c("sheet" = "NoOngletExcel")) %>%

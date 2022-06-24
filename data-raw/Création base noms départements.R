@@ -12,19 +12,19 @@ syndep <- read.csv2("Synonymes noms départements.csv",header=TRUE,sep=",",strin
 # Table des codes
 codeterritoires <- bind_rows(
   departements %>%
-    rename(Territoire = Departement,
+    dplyr::rename(Territoire = Departement,
            Code.departement = NumDept,
            Code.region = NumReg) %>%
     mutate(TypeTerritoire = "Département"),
   regions %>%
-    rename(Territoire = Region,
+    dplyr::rename(Territoire = Region,
            Code.region = NumReg) %>%
     mutate(TypeTerritoire = "Région")
 )
 
 # Table des "synonymes" de noms de territoire (ie noms mal orthographies)
 nomscorrectsterritoires <- syndep %>%
-  rename(TerritoireCorrect = Nom.departement,
+  dplyr::rename(TerritoireCorrect = Nom.departement,
          TerritoireMalortho = Synonyme.nom)
 
 # NROW(unique(nomscorrectsterritoires$TerritoireMalortho)) == NROW(nomscorrectsterritoires$TerritoireMalortho)

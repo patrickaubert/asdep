@@ -16,14 +16,14 @@ devtools::load_all()
 # ===================================
 # Extraction des données Excel
 
-tabsdepenses <- readExcelDrees(fich="data-raw/Les dépenses d'aide sociale départementale - séries longues (1999 - 2019).xlsx",
+tabsdepenses <- readExcelDrees(fich="data-raw/Les dépenses d'aide sociale départementale - séries longues (1999 - 2020).xlsx",
                            options = "ASDEPsldepenses")
 
 # ===================================
 # Extraction des métadonnées enregistrées par ailleurs
 
 infos.onglets <- read.xlsx("data-raw/Contenu fichiers excel.xlsx",
-                           sheet = "SL_depenses_2019",
+                           sheet = "SL_depenses_2020",
                            colNames = TRUE, skipEmptyRows = FALSE, skipEmptyCols = TRUE)
 
 # ===================================
@@ -34,7 +34,7 @@ infos.onglets <- read.xlsx("data-raw/Contenu fichiers excel.xlsx",
 ASDEPsldepenses_description <- tabsdepenses$metadonnees %>%
   select(ongletsource, intitule, source, champ,note) %>%
   mutate(intitule = gsub("^[[:punct:][:space:]–]+|[[:punct:][:space:]–]+$","",intitule)) %>%
-  rename(Intitule.var = intitule,
+  dplyr::rename(Intitule.var = intitule,
          Source.var = source,
          Champ.var = champ,
          Note.var = note)
@@ -69,7 +69,7 @@ ASDEPsldepenses_description <- ASDEPsldepenses_description %>%
 # traitement des bases : 2) indicateurs
 
 ASDEPsldepenses <- tabsdepenses$tablong %>%
-  rename(Annee = annee) %>%
+  dplyr::rename(Annee = annee) %>%
   left_join(infos.onglets %>%
               select(NoOngletExcel,Nom.var),
             by = c("sheet" = "NoOngletExcel")) %>%

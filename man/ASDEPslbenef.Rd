@@ -5,7 +5,7 @@
 \alias{ASDEPslbenef}
 \title{Bénéficiaires d'aides sociales départementales}
 \format{
-Un data frame avec 2701 lignes et 49 variables:
+Un data frame avec 3131 lignes et 51 variables:
 \describe{
 \item{Annee}{année (format character)}
 \item{Code.region}{code numérique de la région}
@@ -16,7 +16,7 @@ Un data frame avec 2701 lignes et 49 variables:
 }
 }
 \source{
-\url{http://www.data.drees.sante.gouv.fr/}
+\url{https://data.drees.solidarites-sante.gouv.fr/explore/dataset/375_les-beneficiaires-de-l-aide-sociale-departementale/information/}
 }
 \usage{
 ASDEPslbenef

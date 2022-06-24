@@ -114,7 +114,7 @@ readSheetDrees <- function(fich , sheet, nlignetitre = NULL, options = "") {
       filter(!grepl("^[[:digit:]][AB[:digit:]]($|[[:digit:]]$|[MDmd]$)",Code.departement)) %>%
       filter(grepl("^[[:digit:]]{2,3}$",Code.region)) %>%
       select(-Territoire) %>%
-      rename(Territoire = Code.departement) %>%
+      dplyr::rename(Territoire = Code.departement) %>%
       mutate(TypeTerritoire = "Région",
              Code.departement = NA)
     nation <- tab  %>%
@@ -122,7 +122,7 @@ readSheetDrees <- function(fich , sheet, nlignetitre = NULL, options = "") {
       filter(!grepl("^[[:digit:]]{2,3}$",Code.region)) %>%
       filter(!grepl("^[Cc]ode(.*)[Rr][ée]gion$",Code.region)) %>%
       select(-c(Territoire,Code.departement)) %>%
-      rename(Territoire = Code.region) %>%
+      dplyr::rename(Territoire = Code.region) %>%
       mutate(TypeTerritoire = "France",
              Code.region = NA,
              Code.departement = NA)

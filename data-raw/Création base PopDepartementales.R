@@ -5,6 +5,7 @@
 
 library(openxlsx)
 library(reshape2)
+library(tidyverse)
 
 #options(encoding = "utf8")
 #setwd(paste(getwd(),"/data-raw/",sep=""))
@@ -36,50 +37,47 @@ popdepartementales <- popdepartementales %>%
   mutate(TypeTerritoire = "Département") %>%
   rename_at(vars(c(as.character(seq(0,95,5)))) , function(x){paste("pop",x,as.character(as.numeric(x)+4),sep=".")})
 
-# mise en forme de la base
+# verification et correction des noms de département
 
-# pour Mayotte avant qu'elle ne devienne un département => mise de la population à 0 (dans le but du calcul France entière yc Mayotte)
-mayotte <- popdepartementales[(popdepartementales$Territoire == "Mayotte" & popdepartementales$Annee == 2018),c("Code.departement","TypeTerritoire","Territoire")]
-popzero <- cbind(as.data.frame(matrix(0, ncol = NROW(noms.var.pop), nrow = NROW(unique(popdepartementales[(popdepartementales$Annee<2013),c("Annee")])))),
-                 c(1990:2012))
-colnames(popzero) <- c(noms.var.pop,"Annee")
-popmayotte <- do.call("rbind", replicate(NROW(unique(popdepartementales[(popdepartementales$Annee<2013),c("Annee")])), mayotte, simplify = FALSE))
-popmayotte <- cbind(popmayotte,popzero)
+popdepartementales <- popdepartementales %>%
+  mutate(Territoire = corrigeNom(Territoire))
 
-popdepartementales <- rbind(popdepartementales, popmayotte[,colnames(popdepartementales)])
+verif <- unique(popdepartementales$Territoire)
+verif[!(verif %in% asdep::nomscorrectsterritoires$TerritoireCorrect)]
 
-# calcul des populations regionales
+# ajout des régions
 
-departements <- read.csv2("Liste des departements.csv",header=TRUE,sep=",",stringsAsFactors = FALSE)
-regions <- read.csv2("Liste des regions.csv",header=TRUE,sep=",",stringsAsFactors = FALSE)
+departementsFR <- departementsFR %>%
+  mutate(NumReg = as.character(NumReg))
 
-CorrigeNumDept <- function(num) {
-  if ( num %in% as.character(c(1:9)) ) { return(paste("0",num,sep="")) }
-  else {return( num ) }
-}
+popdepartementales <- popdepartementales %>%
+  left_join(departementsFR %>%
+              select(NumDept,NumReg) %>%
+              rename(Code.departement = NumDept,
+                     Code.region = NumReg),
+            by = "Code.departement")
 
-departements$NumDept <- sapply(departements$NumDept, CorrigeNumDept)
-
-popdepartementales <- merge(popdepartementales, departements[,c("NumDept","NumReg")], by.x="Code.departement", by.y="NumDept")
-popdepartementales <- plyr::rename(popdepartementales, c("NumReg" = "Code.region"))
-
-popregion <- aggregate(popdepartementales[,c(noms.var.pop)],by=list(Annee=popdepartementales$Annee,Code.region=popdepartementales$Code.region), FUN=sum)
-popregion$Code.departement <- rep("",nrow(popregion))
-popregion$Departement <- rep("",nrow(popregion))
-popregion$TypeTerritoire <- rep("Région",nrow(popregion))
-popregion <- merge(popregion, regions, by.x="Code.region", by.y="NumReg")
-popregion <- plyr::rename(popregion, c("Region" = "Territoire"))
-
-popdepartementales <- rbind(popdepartementales, popregion[,names(popdepartementales)])
-
+popregionales <- popdepartementales %>%
+  select(-Code.departement,-TypeTerritoire,-Territoire) %>%
+  group_by(Code.region,Annee) %>%
+  summarise_all(sum) %>%
+  ungroup() %>%
+  mutate(TypeTerritoire = "Région",
+         Code.Departement = NA) %>%
+  left_join(departementsFR %>%
+              select(NumReg,Region) %>%
+              distinct() %>%
+              rename(Territoire = Region,
+                     Code.region = NumReg),
+            by = "Code.region")
 
 # calcul des populations nationales
+
 metropole <- c("01", "02",  "03", "04", "05", "06", "07", "08", "09", "10", "11", "12", "13", "14", "15", "16", "17", "18", "19", "2A", "2B",
                "21", "22", "23", "24", "25", "26", "27", "28", "29", "30", "31", "32", "33", "34", "35", "36", "37", "38", "39", "40", "41" ,
                "42", "43", "44", "45", "46", "47", "48", "49", "50", "51", "52", "53", "54", "55", "56", "57", "58", "59", "60", "61", "62" ,
                "63", "64", "65", "66", "67", "68", "69", "70", "71", "72", "73", "74", "75", "76", "77", "78", "79", "80", "81", "82", "83" ,
                "84", "85", "86", "87", "88", "89", "90", "91", "92", "93", "94", "95")
-
 champ.national <- list(
   "TOTAL estim\u00E9 France m\u00E9tropolitaine" = c(metropole),
   "France m\u00E9tropolitaine" = c(metropole),
@@ -89,22 +87,29 @@ champ.national <- list(
   "TOTAL estim\u00E9 France enti\u00E8re" = c(metropole, "971", "972", "973", "974",  "976"),
   "France" = c(metropole, "971", "972", "973", "974",  "976")
 )
-i <- 2
-an <- 2015
-for (i in c(1:7)) {
-  for (an in unique(popdepartementales$Annee)){
-    france <- data.frame(Code.departement ="",
-                         Code.region = "",
-                         TypeTerritoire = "France",
-                         Territoire = names(champ.national[i]),
-                         Annee = an)
-    france <- cbind(france,
-                    as.data.frame(t(colSums(popdepartementales[( (popdepartementales$Annee == an) & (popdepartementales$Code.departement %in% champ.national[[i]]) ), c(noms.var.pop)]))))
-    popdepartementales <- rbind(popdepartementales,
-                                france[,names(popdepartementales)])
-  }
 
+popagr <- function(i) {
+  popdepartementales %>%
+    filter(Code.departement %in% champ.national[[i]]) %>%
+    select(-Code.departement,-Code.region,-TypeTerritoire,-Territoire) %>%
+    group_by(Annee) %>%
+    summarise_all(sum) %>%
+    ungroup() %>%
+    mutate(Territoire = names(champ.national)[i],
+           TypeTerritoire = "France",
+           Code.region = NA,
+           Code.Departement = NA)
 }
+
+popnationales <- do.call("bind_rows", lapply( 1:NROW(champ.national) , popagr))
+
+# agrégation des trois niveaux géographiques
+
+popdepartementales <- bind_rows(
+  popdepartementales,
+  popregionales,
+  popnationales
+)
 
 # calcul des agrégats de population pertinents (d'après les variables contenues dans le fichier de données)
 # (les populations de références de chaque variable sont sous le format, par exemple, "20-64" pour désigner les 20-64 ans => cette section crée la variable "pop.20.64")
@@ -129,6 +134,7 @@ AgrPop <- function(tab,tranche) {
   else { return(tab) }
 }
 tranches.utilisees <- unique( c(ASDEPslbenef_description$Popref.var, ASDEPsldepenses_description$Popref.var ) )
+tranches.utilisees <- tranches.utilisees[!is.na(tranches.utilisees)]
 popdepartementales <- AgrPop(popdepartementales, tranches.utilisees )
 
 NommeVarpop <- function(x){
@@ -175,8 +181,8 @@ popdepartementales$Territoire <- trimws(popdepartementales$Territoire, "both")
 
 #  --- encodage en UTF-8 des noms de territoire
 
-popdepartementales$Territoire <- enc2utf8(popdepartementales$Territoire)
-popdepartementales$TypeTerritoire <- enc2utf8(popdepartementales$TypeTerritoire)
+#popdepartementales$Territoire <- enc2utf8(popdepartementales$Territoire)
+#popdepartementales$TypeTerritoire <- enc2utf8(popdepartementales$TypeTerritoire)
 
 
 # -------------------------------------------------------------------------------------------------

@@ -5,7 +5,7 @@
 \alias{ASDEPsldepenses}
 \title{Dépenses annuelles d'aides sociales départementales}
 \format{
-Un data frame avec 2460 lignes et 38 variables:
+Un data frame avec 2604 lignes et 38 variables:
 \describe{
 \item{Annee}{année (format character)}
 \item{Code.region}{code numérique de la région}
@@ -16,7 +16,7 @@ Un data frame avec 2460 lignes et 38 variables:
 }
 }
 \source{
-\url{http://www.data.drees.sante.gouv.fr/}
+\url{https://data.drees.solidarites-sante.gouv.fr/explore/dataset/376_les-depenses-d-aide-sociale-departementale/information/}
 }
 \usage{
 ASDEPsldepenses

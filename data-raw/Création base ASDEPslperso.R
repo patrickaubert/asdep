@@ -11,23 +11,30 @@ library(stringr)
 
 #options(encoding = "utf8")
 
-setwd(paste(getwd(),"/data-raw/",sep=""))
+#setwd(paste(getwd(),"/data-raw/",sep=""))
 
-# Extraction des données Excel
+# == Extraction des données Excel
 
-tabspers <- readExcelDrees(fich="Le personnel départemental de l'action sociale et médico-sociale de 2014 à 2018.xlsx",
+tabspers <- readExcelDrees(fich="data-raw/Le personnel départemental de l'action sociale et médico-sociale de 2014 à 2020.xlsx",
                            options = "ASDEPslperso")
+
+# == mise en forme des métadonnées
 
 ASDEPslperso_description <- tabspers$metadonnees %>%
   select(ongletsource,info,champ,source,note) %>%
   mutate(ongletsource = gsub("[[:space:]]*\\-[[:space:]]*","_",ongletsource),
          ongletsource = gsub("[[:space:][:punct:]]","",ongletsource),
+         note = paste(str_extract(info,"\\\n.*$"),note,sep="\n"),
+         info = info %>% str_replace("\\\n.*$","") %>% trimws(),
          Intitulecourt.var = gsub("^[^\\-]*[[:space:]]*\\-[[:space:]]*","",info),
-         info = paste(gsub("^[^\\-]*[[:space:]]*\\-[[:space:]]*","",info),str_extract(info,"^[^\\-]*(?=[[:space:]]*\\-)"),sep=" - ")#,
+         # -- deux lignes suivantes désactivées le 24/06/2022
+         #Intitulecourt.var = gsub("^[^\\-]*[[:space:]]*\\-[[:space:]]*","",info),
+         #info = paste(gsub("^[^\\-]*[[:space:]]*\\-[[:space:]]*","",info),str_extract(info,"^[^\\-]*(?=[[:space:]]*\\-)"),sep=" - ")#,
+         # -- deux lignes suivantes étaient déjà désactivées
          #note = paste(str_extract(info,"^[^\\-]*(?=[[:space:]]*\\-)"),note,sep="\n"),
          #info = gsub("^[^\\-]*[[:space:]]*\\-[[:space:]]*","",info)
          ) %>%
-  rename(Nom.var = ongletsource,
+  dplyr::rename(Nom.var = ongletsource,
          Intitule.var = info,
          Note.var = note,
          Champ.var = champ,
@@ -39,8 +46,10 @@ ASDEPslperso_description <- tabspers$metadonnees %>%
          Popref.var = "popTOT")
 rownames(ASDEPslperso_description) <- ASDEPslperso_description$Nom.var
 
+# == mise en forme des données
+
 ASDEPslperso <- tabspers$tablong %>%
-  rename(Annee = annee) %>%
+  dplyr::rename(Annee = annee) %>%
   select(-info.annee) %>%
   mutate(sheet = gsub("[[:space:]]*\\-[[:space:]]*","_",sheet),
          sheet = gsub("[[:space:][:punct:]]","",sheet)) %>%

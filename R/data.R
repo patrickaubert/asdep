@@ -3,7 +3,7 @@
 #' Une base de données issues de l'enquête annuelle 'Aide sociale' de la DREES, contenant les effectifs de bénéficiaires de diverses aides sociales versées par les départements.
 #' Les noms des variables, correspondant aux différents types d'aide, sont décrits dans la table 'ASDEPslbenef_description'.
 #'
-#' @format Un data frame avec 2701 lignes et 49 variables:
+#' @format Un data frame avec 3131 lignes et 51 variables:
 #' \describe{
 #'   \item{Annee}{année (format character)}
 #'   \item{Code.region}{code numérique de la région}
@@ -12,7 +12,7 @@
 #'   \item{Territoire}{nom complet du territoire}
 #'   \item{nom.variable}{voir la table ASDEPslbenef_description}
 #' }
-#' @source \url{http://www.data.drees.sante.gouv.fr/}
+#' @source \url{https://data.drees.solidarites-sante.gouv.fr/explore/dataset/375_les-beneficiaires-de-l-aide-sociale-departementale/information/}
 "ASDEPslbenef"
 
 #' Dépenses annuelles d'aides sociales départementales
@@ -20,7 +20,7 @@
 #' Une base de données issues de l'enquête annuelle 'Aide sociale' de la DREES, contenant les montants annuels de dépenses de diverses aides sociales versées par les départements.
 #' Les noms des variables, correspondant aux différents types d'aide, sont décrits dans la table 'ASDEPsldepenses_description'.
 #'
-#' @format Un data frame avec 2460 lignes et 38 variables:
+#' @format Un data frame avec 2604 lignes et 38 variables:
 #' \describe{
 #'   \item{Annee}{année (format character)}
 #'   \item{Code.region}{code numérique de la région}
@@ -29,7 +29,7 @@
 #'   \item{Territoire}{nom complet du territoire}
 #'   \item{nom.variable}{voir la table ASDEPsldepenses_description}
 #' }
-#' @source \url{http://www.data.drees.sante.gouv.fr/}
+#' @source \url{https://data.drees.solidarites-sante.gouv.fr/explore/dataset/376_les-depenses-d-aide-sociale-departementale/information/}
 "ASDEPsldepenses"
 
 #' Prévalences par tranches d'âge des aides sociales départementales
@@ -61,7 +61,7 @@
 #' Une base de données issue du volet "personnels" de l'enquête annuelle 'Aide sociale' de la DREES, contenant les effectifs physiques et les ETP de personnels pour l'aide sociale ds départements.
 #' Les noms des variables, correspondant aux différents types d'aide, sont décrits dans la table 'ASDEPslperso_description'.
 #'
-#' @format Un data frame avec 448 lignes et 20 variables:
+#' @format Un data frame avec 697 lignes et 20 variables:
 #' \describe{
 #'   \item{Annee}{année (format character)}
 #'   \item{Code.region}{code numérique de la région}
@@ -70,7 +70,7 @@
 #'   \item{Territoire}{nom complet du territoire}
 #'   \item{nom.variable}{voir la table ASDEPslperso_description}
 #' }
-#' @source \url{http://www.data.drees.sante.gouv.fr/}
+#' @source \url{https://data.drees.solidarites-sante.gouv.fr/explore/dataset/3066_le-personnel-de-l-action-sociale-et-medico-sociale/information/}
 "ASDEPslperso"
 
 #' Orientation et accompagnement des bénéficiaires du RSA
@@ -93,7 +93,7 @@
 #'
 #' Une base de métadonnées sur les variables de la base ASDEPslbenef
 #'
-#' @format Un data frame avec 44 lignes et 13 variables:
+#' @format Un data frame avec 46 lignes et 13 variables:
 #' \describe{
 #'   \item{nom.var}{nom de la variable (correspond aux colonnes des bases ASDEPslbenef et ASDEPsldepenses)}
 #'   \item{Intitule.var}{intitulé complet de la variable}
@@ -116,7 +116,7 @@
 #'
 #' Une base de métadonnées sur les variables de la base ASDEPsldepenses
 #'
-#' @format Un data frame avec 35 lignes et 13 variables:
+#' @format Un data frame avec 34 lignes et 13 variables:
 #' \describe{
 #'   \item{nom.var}{nom de la variable (correspond aux colonnes des bases ASDEPslbenef et ASDEPsldepenses)}
 #'   \item{Intitule.var}{intitulé complet de la variable}

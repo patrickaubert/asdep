@@ -5,7 +5,7 @@
 \alias{ASDEPslperso}
 \title{Personnels départementaux d'aides sociales départementales}
 \format{
-Un data frame avec 448 lignes et 20 variables:
+Un data frame avec 697 lignes et 20 variables:
 \describe{
 \item{Annee}{année (format character)}
 \item{Code.region}{code numérique de la région}
@@ -16,7 +16,7 @@ Un data frame avec 448 lignes et 20 variables:
 }
 }
 \source{
-\url{http://www.data.drees.sante.gouv.fr/}
+\url{https://data.drees.solidarites-sante.gouv.fr/explore/dataset/3066_le-personnel-de-l-action-sociale-et-medico-sociale/information/}
 }
 \usage{
 ASDEPslperso
