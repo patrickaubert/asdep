@@ -5,7 +5,7 @@
 \alias{ASDEPprevalaidessoc}
 \title{Prévalences par tranches d'âge des aides sociales départementales}
 \format{
-Un data frame avec 2187 lignes et 12 variables:
+Un data frame avec 2421 lignes et 12 variables:
 \describe{
 \item{annee}{année}
 \item{prestation}{nom ou type d'aide sociale}
@@ -30,6 +30,9 @@ ASDEPprevalaidessoc
 \description{
 Une base de données issues de l'enquête annuelle 'Aide sociale' de la DREES, contenant les nombres de bénéficiaires et les prévalences
 (c'est-à-dire les parts dans la population) des aides sociales départementales (APA, ASH, etc.) La base contient pour l'instant les aides
-sociales aux personnes âgées
+sociales aux personnes âgées.
+}
+\details{
+La version de la base a été compilée en août 2022, et contient les données jusqu'au 31 décembre 2020.
 }
 \keyword{datasets}
