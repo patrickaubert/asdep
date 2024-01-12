@@ -17,13 +17,15 @@ devtools::load_all()
 # ===================================
 # Extraction des données Excel
 
-nomfich <- "data-raw/Les bénéficiaires de l'aide sociale départementale - séries longues (1996-2020).xlsx"
+nomfich <- "https://data.drees.solidarites-sante.gouv.fr/api/datasets/1.0/les-beneficiaires-de-l-aide-sociale-departementale-aux-personnes-agees-ou-handic/attachments/paph_les_beneficiaires_de_l_aide_sociale_departementale_series_longues_1996_2022_xlsx/"
+#nomfich <- "data-raw/Les bénéficiaires de l'aide sociale départementale - séries longues (1996-2020).xlsx"
 #nomfich <- "https://data.drees.solidarites-sante.gouv.fr/api/datasets/1.0/375_les-beneficiaires-de-l-aide-sociale-departementale/attachments/les_beneficiaires_de_l_aide_sociale_departementale_series_longues_1996_2019_xlsx/"
 
-tabsbenef <- readExcelDrees(fich=nomfich,
-                            sheetexclude = c("Corrections Déc 21"),
+GET(nomfich, write_disk(tempfich <- tempfile(fileext = ".xlsx")))
+tabsbenef <- readExcelDrees(fich=tempfich,
+                            #sheetexclude = c("Corrections Déc 21"),
                             options = "ASDEPslbenef")
-
+unlink(tempfich)
 
 # ===================================
 # Extraction des métadonnées enregistrées par ailleurs

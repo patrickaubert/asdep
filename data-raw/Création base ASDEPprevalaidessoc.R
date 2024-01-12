@@ -2,25 +2,64 @@
 # Prévalence dans les prestations d'aide sociale pour personnes âgées : construction des fichiers
 # ==================================================================================================
 
+# A FAIRE AVANT ACTUALISATION 2020 !!
+# rechercher ventila par âge 2019 ? (ASH, AidesMén)
+
 
 
 # ==================================================================================================
 # 0) Initialisation
 
-
+library(devtools)
 library(readxl)
+library(httr)
 library(tidyverse)
+
+devtools::load_all()
 
 # remotes::install_github("patrickaubert/healthexpectancies",ref='main')
 library(healthexpectancies)
 
 reprawdata <- "C:/Users/PA/Documents/R/Projets/divers_stat_privé/Evolution APA/"
 
+ancienneversion <- ASDEPprevalaidessoc
+
 
 # ==================================================================================================
 # 1) extraction des données : parts par âge pour les principales prestations
 
 # fonctions pour l'extraction
+
+extrAPA2020 <- function(an,rangegir="A5:V26",rangeage ="A14:I21",rangegirage="A5:J12") {
+  fich <- paste(#reprawdata,"/data-raw/PA - Bénéficiaires par GIR, sexe et âge - APA-ASH-Aides ménagères - données ",
+                #as.character(an),".xlsx",sep=""
+                "https://data.drees.solidarites-sante.gouv.fr/api/datasets/1.0/les-caracteristiques-des-beneficiaires-de-l-aide-sociale-departementale-aux-pers/attachments/pa_beneficiaires_par_gir_sexe_et_age_apa_ash_aides_menageres_donnees_",
+                as.character(an),"_xlsx/",sep="")
+  GET(fich, write_disk(tempfich <- tempfile(fileext = ".xlsx")))
+  gir <- read_excel(tempfich,sheet = "nat- APA par GIR-%", range = rangegir)
+  names(gir)[1:2] <- c("prestation","gir")
+  gir <- gir %>%
+    filter(!is.na(gir),gir!="Total") %>%
+    fill(prestation,.direction="down") %>%
+    pivot_longer(cols=-c("prestation","gir"),names_to="annee",values_to="part")
+  age <- read_excel(tempfich,sheet = "nat-Aides PA par sexe et âge", range = rangeage) %>% filter(!is.na(...1))
+  names(age) <- c("prestation", names(age)[2:NROW(names(age))])
+  age <- age %>% pivot_longer(cols=-prestation,names_to="trAge",values_to="part")
+  girage <- read_excel(tempfich,sheet = "nat-APA par GIR et âge", col_names=FALSE, range = rangegirage)
+  names(girage) <- c("trAge",paste0("domicile_GIR",1:4),"population_totale",paste0("étab_GIR",1:4))
+  girage <- girage %>%
+    select(-population_totale) %>%
+    pivot_longer(cols=-trAge,names_to="trGirAge",values_to="partGir") %>%
+    mutate(prestation = gsub("_.*$","",trGirAge),
+           gir = gsub("^.*_","",trGirAge)) %>%
+    select(-trGirAge)
+  unlink(tempfich)
+  return(list(
+    gir = gir,
+    age = age %>% mutate(annee = an),
+    girage = girage %>% mutate(annee = an)
+  ))
+}
 
 extrAPA2016 <- function(an,rangegir="A3:E5",rangeage ="A12:I17",rangegirage="A5:I12") {
   fich <- paste(reprawdata,"/data-raw/APA - Données détaillées par GIR, âge et sexe en ",
@@ -126,6 +165,9 @@ extrAPA2010 <- function(an,rangegir="A3:D5",rangeagedom ="B9:G12",
 
 dataApa <- list()
 
+for (an in 2020:2021) {
+  dataApa[[as.character(an)]] <- extrAPA2020(an)
+}
 for (an in 2016:2019) {
   dataApa[[as.character(an)]] <- extrAPA2016(an)
 }
@@ -138,9 +180,11 @@ for (an in 2010:2013) {
 
 # agrégation des tableaux
 
-rangeAn <- c(2010:2019)
+rangeAn <- c(2010:2021)
 
-gir <- do.call("rbind", lapply(rangeAn, function(a){dataApa[[as.character(a)]]$gir}))
+# gir <- do.call("rbind", lapply(rangeAn, function(a){dataApa[[as.character(a)]]$gir}))
+gir <- dataApa[["2021"]]$gir
+# pour la ventilation par GIR, on utilise juste la dernière année, car tout l'historique y est fourni
 
 age <- do.call("rbind", lapply(rangeAn, function(a){dataApa[[as.character(a)]]$age}))
 
@@ -163,19 +207,22 @@ age <- bind_rows(ageavt,
 # homogénéisation des données
 
 presta <- list("APA à domicile" = "APAdom",
-               "Aide sociale à l'hébergement (ASH)" = "ASH",
+               "Domicile" = "APAdom",
+               "domicile" = "APAdom",
                "APA en établissement" = "APAetab",
-               "Aide sociale à l’hébergement (ASH)" = "ASH",
                "APA en établissement (hors dotation globale)" = "APAetab",
+               "Etablissement" = "APAetab",
+               "Établissement" = "APAetab",
+               "APA HDG+EDG" = "APAetab",
+               "APA en établissements"= "APAetab",
+               "étab" = "APAetab",
+               "Aide sociale à l'hébergement (ASH)" = "ASH",
+               "Aide sociale à l’hébergement (ASH)" = "ASH",
+               "ASH en établissement" = "ASH",
                "Aide ménagère" = "AidesMenag",
                "Aide ménagères" = "AidesMenag",
                "aide ménagère" = "AidesMenag",
-               "Domicile" = "APAdom",
-               "Etablissement" = "APAetab",
-               "APA HDG+EDG" = "APAetab",
-               "APA en établissements"= "APAetab",
-               "domicile" = "APAdom",
-               "étab" = "APAetab",
+               "Aides ménagères" = "AidesMenag",
                "aides à domicile" = "EnsAidesDom",
                "aides à l’hébergement" = "EnsAidesEtab",
                "PSD à domicile" = "PSDDom",
@@ -206,7 +253,8 @@ age <- age %>%
   filter(prestation %in% unique(unlist(presta)))
 
 gir <- gir %>%
-  mutate(prestation = recode(prestation, !!!presta)) %>%
+  mutate(prestation = recode(prestation, !!!presta),
+         gir = gir %>% str_replace_all("([[:space:]]|\\*)","")) %>%
   filter(prestation %in% unique(unlist(presta)))
 
 girage <- girage %>%
@@ -222,13 +270,14 @@ girage <- girage %>%
 
 # récupération des nombres de bénéficiaires des prestations à partir de la table ASDEPslbenef du package 'asdep'
 
-eff <- asdep::ASDEPslbenef[
-  ASDEPslbenef$Territoire == "TOTAL estimé France entière (hors Mayotte)",
+eff <- ASDEPslbenef[
+  ASDEPslbenef$Territoire %in% c("TOTAL estimé France entière (hors Mayotte)",
+                                 "TOTAL estimé France entière, hors Mayotte"),
   c("Annee","NbBenefAPADomicile","NbBenefAPAEtab","NbBenefASH","NbBenefAideMenagerePA",
     "NbBenefPSD", "NbBenefPSDDomicile", "NbBenefPSDEtab",
     "TotBenefPADomicile", "TotBenefPAEtab" )] %>%
   filter(Annee %in% c(min(age$annee):max(age$annee))) %>%
-  rename(annee = Annee ,
+  dplyr::rename(annee = Annee ,
          APAdom = NbBenefAPADomicile,
          APAetab = NbBenefAPAEtab ,
          ASH = NbBenefASH,
@@ -246,6 +295,7 @@ eff <- asdep::ASDEPslbenef[
 #       "inconnu" dans l'enquête => on intègre deux modes de calcul, avec et son recalage
 
 gir <- gir %>%
+  mutate(annee = as.numeric(annee)) %>%
   left_join(eff, by=c("annee","prestation")) %>%
   mutate(nb = part*nb)
 
@@ -258,12 +308,13 @@ girage <- girage %>%
   mutate(nb = partGir*nb)
 
 # -- vérification de la cohérence par âge vs. par âge * gir
-#calegir <- girage %>%
-#  select(prestation,annee,age,nb) %>%
-#  group_by(prestation,annee,age) %>% summarise(nbtsgir = sum(nb)) %>% ungroup() %>%
-#  left_join(age %>% select(annee,prestation,age,nb) %>% rename(nbcale=nb),
-#            by=c("annee","age","prestation") ) %>%
-#  mutate(ecart=round(nbtsgir/nbcale-1,3))
+calegir <- girage %>%
+  select(prestation,annee,age,nb) %>%
+  group_by(prestation,annee,age) %>% summarise(nbtsgir = sum(nb)) %>% ungroup() %>%
+  left_join(age %>% select(annee,prestation,age,nb) %>% rename(nbcale=nb),
+            by=c("annee","age","prestation") ) %>%
+  mutate(ecart=round(nbtsgir/nbcale-1,3))
+# -- fin vérification
 
 # ajout des totaux intermédiaires APA tous lieux, GIR12, GIR34
 
@@ -287,12 +338,13 @@ age3 <- rbind(
 )
 
 # -- vérification de la cohérence ensemble vs. par lieu
-#verifage <- age2 %>%
-#  filter(grepl("^APA",prestation)) %>%
-#  pivot_wider(id_cols=c("annee","age"),names_from="prestation",values_from="nb") %>%
-#  mutate(ecart=APA-APAdom-APAetab)
-#min(verifage$ecart)
-#max(verifage$ecart)
+verifage <- age3 %>%
+  filter(grepl("^APA",prestation)) %>%
+  pivot_wider(id_cols=c("annee","recale_gir","age"),names_from="prestation",values_from="nb") %>%
+  mutate(ecart=APA-APAdom-APAetab)
+min(verifage$ecart)
+max(verifage$ecart)
+# --
 
 girage2 <- rbind(
   girage %>% mutate(prestation = paste0(prestation,"_",gir)) %>% select(prestation,annee,age,nb),
@@ -340,13 +392,13 @@ prevalagecompl <- bind_rows(age3, girage3 %>% mutate(recale_gir=FALSE)) %>%
 popnew <- healthexpectancies::FRInseePopulationForecast2021
 
 pop <- popnew %>%
-  filter(sex == "all",type=="observed") %>%
-  rename(agefin = age0101,
+  filter(sex == "all",type.obs=="observed") %>%
+  dplyr::rename(agefin = age0101,
          annee = year,
          sexe = sex,
          pop = popx0101) %>%
   mutate(annee = annee-1) %>% #pour passer de la population au 01/01/N à celle au 31/12/N-1
-  select(-sexe,-geo,-type) %>%
+  select(-sexe,-geo,-type.obs) %>%
   filter(agefin>=60,annee>=2000) %>%
   group_by(annee,agefin) %>% summarise_all(sum) %>% ungroup()
 
@@ -359,16 +411,18 @@ popagr <- pop  %>%
   group_by(annee,age) %>% summarise_all(sum) %>% ungroup() %>%
   select(annee,age,pop)
 
-#ggplot(popagr %>% filter(age %in% c("[85,90)",  "[90,95)",  "[95,Inf]")),
-#ggplot(popagr %>% filter(age %in% c("[95,Inf]")),
-#       aes(x=annee,y=pop,colour=age,group=age)) +
-#  geom_line() +
-#  geom_point()
+# --
+#ggplot(popagr %>% filter(age %in% c("[85,90)",  "[90,95)",  "[95,Inf]"))
+ggplot(popagr %>% filter(age %in% c("[95,Inf]")),
+       aes(x=annee,y=pop,colour=age,group=age)) +
+  geom_line() +
+  geom_point()
 
-#ggplot(age %>% filter(age %in% c("[95,Inf]"),grepl("^APA",prestation)),
-#       aes(x=annee,y=part,colour=prestation,group=prestation)) +
-#  geom_line() +
-#  geom_point()
+ggplot(age %>% filter(age %in% c("[95,Inf]"),grepl("^APA",prestation)),
+       aes(x=annee,y=part,colour=prestation,group=prestation)) +
+  geom_line() +
+  geom_point()
+# --
 
 popagrcompl <- pop %>%
   filter(annee>=2016, agefin>=85) %>%
@@ -391,7 +445,7 @@ efftot <- preval %>%
   select(prestation,annee,recale_gir,nb) %>%
   filter(!is.na(nb)) %>%
   group_by(prestation,recale_gir,annee) %>% summarise_all(sum) %>% ungroup() %>%
-  rename(nbtot = nb)
+  dplyr::rename(nbtot = nb)
 
 # ensemble des données
 
@@ -408,7 +462,7 @@ prevalences <- bind_rows(
   filter(!is.na(nb)) %>%
   left_join(efftot, by = c("annee","prestation","recale_gir")) %>%
   mutate(part = nb / nbtot) %>%
-  rename(catprestation = prestation) %>%
+  dplyr::rename(catprestation = prestation) %>%
   mutate(gir = str_extract(catprestation,"(?<=_)GIR.*$"),
          gir = ifelse(is.na(gir),"Ensemble",gir),
          prestation = gsub("_.*$","",catprestation),
@@ -432,9 +486,11 @@ prevalences <- prevalences[,c("prestation", "gir","lieu",
 ASDEPprevalaidessoc <- prevalences
 
 # ===================================================================================
-# Dernière actualisation de la base réalisée le : 24/06/2022
+# Dernière actualisation de la base réalisée le : 19/08/2022
 
 # == historique des versions :
+# 12/01/2024 : ajout des données au 31/12/2021
+# 19/08/2022 : ajout données au 31/12/2020 (fichier téléchargé sur data.drees le 11/08/2022)
 # 10/10/2021 : ajout PSD et ensemble des aides sociales PA
 # 17/07/2021 : ajout de la variable "recale_gir" et du calcul de l'APA tous GIR comme sommes de l'APA par GIR
 # 20/06/2021 : correction de l'oubli de décalage d'une année de la pop (du 01/01/N+1 au 31/12/N)
