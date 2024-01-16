@@ -10,6 +10,7 @@ library(dplyr)
 library(tidyr)
 library(stringr)
 library(devtools)
+library(httr)
 
 devtools::load_all()
 
@@ -17,21 +18,34 @@ devtools::load_all()
 # ===================================
 # Extraction des données Excel
 
-nomfich <- "https://data.drees.solidarites-sante.gouv.fr/api/datasets/1.0/les-beneficiaires-de-l-aide-sociale-departementale-aux-personnes-agees-ou-handic/attachments/paph_les_beneficiaires_de_l_aide_sociale_departementale_series_longues_1996_2022_xlsx/"
+# partie PA-PH (distinguée de PE depuis 2022)
+
+nomfich_paph <- "https://data.drees.solidarites-sante.gouv.fr/api/datasets/1.0/les-beneficiaires-de-l-aide-sociale-departementale-aux-personnes-agees-ou-handic/attachments/paph_les_beneficiaires_de_l_aide_sociale_departementale_series_longues_1996_2022_xlsx/"
 #nomfich <- "data-raw/Les bénéficiaires de l'aide sociale départementale - séries longues (1996-2020).xlsx"
 #nomfich <- "https://data.drees.solidarites-sante.gouv.fr/api/datasets/1.0/375_les-beneficiaires-de-l-aide-sociale-departementale/attachments/les_beneficiaires_de_l_aide_sociale_departementale_series_longues_1996_2019_xlsx/"
 
-GET(nomfich, write_disk(tempfich <- tempfile(fileext = ".xlsx")))
-tabsbenef <- readExcelDrees(fich=tempfich,
+httr::GET(nomfich_paph, write_disk(tempfich <- tempfile(fileext = ".xlsx")))
+tabsbenef_paph <- readExcelDrees(fich=tempfich,
                             #sheetexclude = c("Corrections Déc 21"),
                             options = "ASDEPslbenef")
 unlink(tempfich)
+
+# partie PE
+
+nomfich_pe <- "https://data.drees.solidarites-sante.gouv.fr/api/datasets/1.0/les-beneficiaires-de-l-aide-sociale-a-l-enfance/attachments/les_beneficiaires_de_l_aide_sociale_a_l_enfance_series_longues_1996_2022_xlsx/"
+
+httr::GET(nomfich_pe, write_disk(tempfich <- tempfile(fileext = ".xlsx")))
+tabsbenef_pe <- readExcelDrees(fich=tempfich,
+                                 #sheetexclude = c("Corrections Déc 21"),
+                                 options = "ASDEPslbenef")
+unlink(tempfich)
+
 
 # ===================================
 # Extraction des métadonnées enregistrées par ailleurs
 
 infos.onglets <- read.xlsx("data-raw/Contenu fichiers excel.xlsx",
-                           sheet = "SL_benef_2020",
+                           sheet = "SL_benef_2022",
                            colNames = TRUE, skipEmptyRows = FALSE, skipEmptyCols = TRUE)
 
 # ===================================
@@ -41,7 +55,7 @@ pasteNA <- function(a,b) ifelse(is.na(a),b,ifelse(is.na(b),a,paste(a,b)))
 
 # on récupère d'abord les source, champ, note, intitulé dans les informations lues dans le fichier Excel récupéré sous data.drees
 
-ASDEPslbenef_description <- tabsbenef$metadonnees %>%
+ASDEPslbenef_description <- bind_rows(tabsbenef_paph$metadonnees, tabsbenef_pe$metadonnees) %>%
   select(ongletsource, intitule, source, champ,note,info) %>%
   mutate(info = ifelse(is.na(info),"",info),
          note = ifelse(is.na(note),"",note) ) %>%
@@ -51,6 +65,18 @@ ASDEPslbenef_description <- tabsbenef$metadonnees %>%
          Source.var = source,
          Champ.var = champ,
          Note.var = note)
+
+# pour vérification des modifications d'une année sur l'autre, et faciliter l'actualisation du fichier Excel
+if (FALSE){
+  verif <- ASDEPslbenef_description %>% select(ongletsource,Intitule.var) %>%
+    full_join(infos.onglets, by=c("ongletsource"="NoOngletExcel"))
+  # --> vérifier 1 à 1 que les intitulés en clair sont bien cohérents avec les noms de variable
+}
+
+ASDEPslbenef_description <- ASDEPslbenef_description %>%
+  # prise en compte des changements dans le fichier 2022 -> prise en compte partielle pour l'instant (16/01/2024), A REVOIR !
+  filter(!(ongletsource %in% c('Tab6a-pa','Tab6b-pa')))
+  # (outre l'ajout de ces deux onglets, il faudra revoir l'extraction des titres/métadonnées)
 
 # d'autres métadonnées ont été enregistrées (à la main) dans un fichier Excel auxiliaire
 
@@ -75,9 +101,9 @@ ASDEPslbenef_description <- ASDEPslbenef_description %>%
 # ===================================
 # traitement des bases : 2) indicateurs
 
-ASDEPslbenef <- tabsbenef$tablong %>%
+ASDEPslbenef <- bind_rows(tabsbenef_paph$tablong,tabsbenef_pe$tablong) %>%
   dplyr::rename(Annee = annee) %>%
-  left_join(infos.onglets %>%
+  inner_join(infos.onglets %>%
               select(NoOngletExcel,Nom.var),
             by = c("sheet" = "NoOngletExcel")) %>%
   select(-c(info.annee,sheet)) %>%
@@ -119,6 +145,7 @@ ASDEPslbenef <- ASDEPslbenef %>%
 # vérification
 verif <- unique(ASDEPslbenef$Territoire)
 verif[!(verif %in% asdep::nomscorrectsterritoires$TerritoireCorrect)]
+# --> il faut ici vérifier qu'on trouve uniquement des noms de région ou d'agrégats nationaux (et aucun nom de département)
 
 # ===================================
 # derniers traitements sur les métadonnées
@@ -173,7 +200,7 @@ for (i in (1:nrow(ASDEPslbenef_description))) {
 rownames(ASDEPslbenef_description) <- ASDEPslbenef_description$Nom.var
 
 # ===================================================================================
-# Dernière actualisation de la base réalisée le : 24/06/2022
+# Dernière actualisation de la base réalisée le : 16/01/2024
 
 usethis::use_data(ASDEPslbenef,
                   ASDEPslbenef_description,

@@ -3,7 +3,7 @@
 #' Une base de données issues de l'enquête annuelle 'Aide sociale' de la DREES, contenant les effectifs de bénéficiaires de diverses aides sociales versées par les départements.
 #' Les noms des variables, correspondant aux différents types d'aide, sont décrits dans la table 'ASDEPslbenef_description'.
 #'
-#' @format Un data frame avec 3125 lignes et 51 variables:
+#' @format Un data frame avec 3234 lignes et 51 variables:
 #' \describe{
 #'   \item{Annee}{année (format character)}
 #'   \item{Code.region}{code numérique de la région}
