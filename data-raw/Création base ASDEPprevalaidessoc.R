@@ -165,7 +165,7 @@ extrAPA2010 <- function(an,rangegir="A3:D5",rangeagedom ="B9:G12",
 
 dataApa <- list()
 
-for (an in 2020:2021) {
+for (an in 2020:2022) {
   dataApa[[as.character(an)]] <- extrAPA2020(an)
 }
 for (an in 2016:2019) {
@@ -286,7 +286,8 @@ eff <- ASDEPslbenef[
          PSDEtab = NbBenefPSDEtab,
          EnsAidesDom = TotBenefPADomicile,
          EnsAidesEtab = TotBenefPAEtab) %>%
-  pivot_longer(cols=-annee,names_to="prestation",values_to="nb")
+  pivot_longer(cols=-annee,names_to="prestation",values_to="nb") %>%
+  filter(!is.na(nb))
 
 # calcul des effectifs par age et GIR
 # RQ : on calcule ici les agrégats "APA" et "GIR12" et "GIR34"
@@ -389,16 +390,22 @@ prevalagecompl <- bind_rows(age3, girage3 %>% mutate(recale_gir=FALSE)) %>%
 
 # récupération des populations par tranche d'âge
 
-popnew <- healthexpectancies::FRInseePopulationForecast2021
+
+#popnew <- healthexpectancies::FRInseePopulationForecast2021
+popnew <- healthexpectancies::FRInseePopulation
 
 pop <- popnew %>%
-  filter(sex == "all",type.obs=="observed") %>%
+  #filter(sex == "all",type.obs=="observed") %>%
+  filter(sex %in% c("F","M")) %>%
   dplyr::rename(agefin = age0101,
          annee = year,
          sexe = sex,
-         pop = popx0101) %>%
+         #pop = popx0101
+         pop = popx
+         ) %>%
   mutate(annee = annee-1) %>% #pour passer de la population au 01/01/N à celle au 31/12/N-1
-  select(-sexe,-geo,-type.obs) %>%
+  #select(-sexe,-geo,-type.obs) %>%
+  select(-sexe,-geo) %>%
   filter(agefin>=60,annee>=2000) %>%
   group_by(annee,agefin) %>% summarise_all(sum) %>% ungroup()
 
@@ -489,7 +496,7 @@ ASDEPprevalaidessoc <- prevalences
 # Dernière actualisation de la base réalisée le : 19/08/2022
 
 # == historique des versions :
-# 12/01/2024 : ajout des données au 31/12/2021
+# 16/01/2024 : ajout des données au 31/12/2021
 # 19/08/2022 : ajout données au 31/12/2020 (fichier téléchargé sur data.drees le 11/08/2022)
 # 10/10/2021 : ajout PSD et ensemble des aides sociales PA
 # 17/07/2021 : ajout de la variable "recale_gir" et du calcul de l'APA tous GIR comme sommes de l'APA par GIR

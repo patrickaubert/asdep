@@ -5,7 +5,7 @@
 \alias{ASDEPprevalaidessoc}
 \title{Prévalences par tranches d'âge des aides sociales départementales}
 \format{
-Un data frame avec 2433 lignes et 12 variables:
+Un data frame avec 2655 lignes et 12 variables:
 \describe{
 \item{annee}{année}
 \item{prestation}{nom ou type d'aide sociale}

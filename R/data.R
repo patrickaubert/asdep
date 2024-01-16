@@ -40,7 +40,7 @@
 #'
 #' La version de la base a été compilée en août 2022, et contient les données jusqu'au 31 décembre 2020.
 #'
-#' @format Un data frame avec 2433 lignes et 12 variables:
+#' @format Un data frame avec 2655 lignes et 12 variables:
 #' \describe{
 #'   \item{annee}{année}
 #'   \item{prestation}{nom ou type d'aide sociale}
