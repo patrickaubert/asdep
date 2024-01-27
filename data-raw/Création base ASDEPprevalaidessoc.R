@@ -165,7 +165,7 @@ extrAPA2010 <- function(an,rangegir="A3:D5",rangeagedom ="B9:G12",
 
 dataApa <- list()
 
-for (an in 2020:2022) {
+for (an in 2020:2021) {
   dataApa[[as.character(an)]] <- extrAPA2020(an)
 }
 for (an in 2016:2019) {
@@ -232,8 +232,10 @@ presta <- list("APA à domicile" = "APAdom",
 
 trancheage <- list(
   "Moins de 65 ans" = "[60,65)",
+  "Moins de 65 ans" = "[60,65)",
   "moins de 65 ans" = "[60,65)",
   "de 60 à 65 ans" = "[60,65)",
+  "de 60 à 64 ans" = "[60,65)",
   "de 65 à 69 ans" = "[65,70)",
   "de 70 à 74 ans" = "[70,75)",
   "de 75 à 79 ans" = "[75,80)",
@@ -396,7 +398,7 @@ popnew <- healthexpectancies::FRInseePopulation
 
 pop <- popnew %>%
   #filter(sex == "all",type.obs=="observed") %>%
-  filter(sex %in% c("F","M")) %>%
+  filter(sex %in% c("F","M") & geo=="france") %>%
   dplyr::rename(agefin = age0101,
          annee = year,
          sexe = sex,
@@ -493,9 +495,10 @@ prevalences <- prevalences[,c("prestation", "gir","lieu",
 ASDEPprevalaidessoc <- prevalences
 
 # ===================================================================================
-# Dernière actualisation de la base réalisée le : 19/08/2022
+# Dernière actualisation de la base réalisée le : 27/01/2024
 
 # == historique des versions :
+# 27/01/2024 : correction d'une erreur dans la dernière version
 # 16/01/2024 : ajout des données au 31/12/2021
 # 19/08/2022 : ajout données au 31/12/2020 (fichier téléchargé sur data.drees le 11/08/2022)
 # 10/10/2021 : ajout PSD et ensemble des aides sociales PA
