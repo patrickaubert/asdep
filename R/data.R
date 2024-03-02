@@ -38,9 +38,9 @@
 #' (c'est-à-dire les parts dans la population) des aides sociales départementales (APA, ASH, etc.) La base contient pour l'instant les aides
 #' sociales aux personnes âgées.
 #'
-#' La version de la base a été compilée en août 2022, et contient les données jusqu'au 31 décembre 2020.
+#' La version de la base a été compilée en mars 2024, et contient les données jusqu'au 31 décembre 2022.
 #'
-#' @format Un data frame avec 2655 lignes et 12 variables:
+#' @format Un data frame avec 2889 lignes et 12 variables:
 #' \describe{
 #'   \item{annee}{année}
 #'   \item{prestation}{nom ou type d'aide sociale}

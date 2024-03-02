@@ -30,7 +30,7 @@ ancienneversion <- ASDEPprevalaidessoc
 
 # fonctions pour l'extraction
 
-extrAPA2020 <- function(an,rangegir="A5:V26",rangeage ="A14:I21",rangegirage="A5:J12") {
+extrAPA2020 <- function(an,rangegir="A5:AL26",rangeage ="A14:I21",rangegirage="A5:J12") {
   fich <- paste(#reprawdata,"/data-raw/PA - Bénéficiaires par GIR, sexe et âge - APA-ASH-Aides ménagères - données ",
                 #as.character(an),".xlsx",sep=""
                 "https://data.drees.solidarites-sante.gouv.fr/api/datasets/1.0/les-caracteristiques-des-beneficiaires-de-l-aide-sociale-departementale-aux-pers/attachments/pa_beneficiaires_par_gir_sexe_et_age_apa_ash_aides_menageres_donnees_",
@@ -39,6 +39,7 @@ extrAPA2020 <- function(an,rangegir="A5:V26",rangeage ="A14:I21",rangegirage="A5
   gir <- read_excel(tempfich,sheet = "nat- APA par GIR-%", range = rangegir)
   names(gir)[1:2] <- c("prestation","gir")
   gir <- gir %>%
+    select(prestation,gir,starts_with("20")) %>%
     filter(!is.na(gir),gir!="Total") %>%
     fill(prestation,.direction="down") %>%
     pivot_longer(cols=-c("prestation","gir"),names_to="annee",values_to="part")
@@ -165,7 +166,7 @@ extrAPA2010 <- function(an,rangegir="A3:D5",rangeagedom ="B9:G12",
 
 dataApa <- list()
 
-for (an in 2020:2021) {
+for (an in 2020:2022) {
   dataApa[[as.character(an)]] <- extrAPA2020(an)
 }
 for (an in 2016:2019) {
@@ -180,10 +181,10 @@ for (an in 2010:2013) {
 
 # agrégation des tableaux
 
-rangeAn <- c(2010:2021)
+rangeAn <- c(2010:2022)
 
 # gir <- do.call("rbind", lapply(rangeAn, function(a){dataApa[[as.character(a)]]$gir}))
-gir <- dataApa[["2021"]]$gir
+gir <- dataApa[[as.character(max(rangeAn))]]$gir
 # pour la ventilation par GIR, on utilise juste la dernière année, car tout l'historique y est fourni
 
 age <- do.call("rbind", lapply(rangeAn, function(a){dataApa[[as.character(a)]]$age}))
@@ -495,9 +496,10 @@ prevalences <- prevalences[,c("prestation", "gir","lieu",
 ASDEPprevalaidessoc <- prevalences
 
 # ===================================================================================
-# Dernière actualisation de la base réalisée le : 27/01/2024
+# Dernière actualisation de la base réalisée le : 02/03/2024
 
 # == historique des versions :
+# 02/03/2024 : ajout des données au 31/12/2022
 # 27/01/2024 : correction d'une erreur dans la dernière version
 # 16/01/2024 : ajout des données au 31/12/2021
 # 19/08/2022 : ajout données au 31/12/2020 (fichier téléchargé sur data.drees le 11/08/2022)
@@ -506,3 +508,9 @@ ASDEPprevalaidessoc <- prevalences
 # 20/06/2021 : correction de l'oubli de décalage d'une année de la pop (du 01/01/N+1 au 31/12/N)
 
 usethis::use_data(ASDEPprevalaidessoc,     overwrite = T)
+
+# sauvegarde d'une version en csv
+
+write.csv2(ASDEPprevalaidessoc,
+           file=gzfile(paste0("data-raw/ASDEPprevalaidessoc.csv.gz")),
+           row.names = FALSE, fileEncoding = "UTF-8" )
