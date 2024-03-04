@@ -15,6 +15,25 @@
 #' @source \url{https://data.drees.solidarites-sante.gouv.fr/explore/dataset/375_les-beneficiaires-de-l-aide-sociale-departementale/information/}
 "ASDEPslbenef"
 
+#' Bénéficiaires d'aides sociales départementales (données nationales uniquement)
+#'
+#' Une base de données issues de l'enquête annuelle 'Aide sociale' de la DREES, contenant les effectifs de bénéficiaires de diverses aides sociales versées par les départements.
+#' Cette table contient uniquement les données agrégées au niveau national. En revanche, le recul historique est un peu plus long que dans la table 'ASDEPslbenef'.
+#'
+#' @format Un data frame avec 1159 lignes et 8 variables:
+#' \describe{
+#'   \item{champ_niv1}{champ des aides couvertes}
+#'   \item{champ_niv2}{sous-champ des aides couvertes}
+#'   \item{champ_niv3}{sous-sous-champ des aides couvertes}
+#'   \item{champ_niv4}{sous-sous-sous-champ des aides couvertes}
+#'   \item{annee}{Année d'observation (valeur au 31 décembre)}
+#'   \item{nb_benef}{nombre de bénéficiaires en fin d'année}
+#'   \item{champ}{champ géographique des observations}
+#'   \item{source}{sources des données}
+#' }
+#' @source \url{https://data.drees.solidarites-sante.gouv.fr/explore/dataset/375_les-beneficiaires-de-l-aide-sociale-departementale/information/}
+"ASDEPslbenefnat"
+
 #' Dépenses annuelles d'aides sociales départementales
 #'
 #' Une base de données issues de l'enquête annuelle 'Aide sociale' de la DREES, contenant les montants annuels de dépenses de diverses aides sociales versées par les départements.

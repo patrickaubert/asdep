@@ -25,9 +25,15 @@ nomfich_paph <- "https://data.drees.solidarites-sante.gouv.fr/api/datasets/1.0/l
 #nomfich <- "https://data.drees.solidarites-sante.gouv.fr/api/datasets/1.0/375_les-beneficiaires-de-l-aide-sociale-departementale/attachments/les_beneficiaires_de_l_aide_sociale_departementale_series_longues_1996_2019_xlsx/"
 
 httr::GET(nomfich_paph, write_disk(tempfich <- tempfile(fileext = ".xlsx")))
+# données départementales
 tabsbenef_paph <- readExcelDrees(fich=tempfich,
                             #sheetexclude = c("Corrections Déc 21"),
                             options = "ASDEPslbenef")
+# données nationales (peut contenir des années supplémentaires)
+tabsbenef_paph_nat <- readSheetDrees(fich=tempfich,
+                                 sheet="Données nationales",
+                                 nlignetitre=1,
+                                 options = "ASDEPsldonneesnationales")
 unlink(tempfich)
 
 # partie PE
@@ -35,9 +41,15 @@ unlink(tempfich)
 nomfich_pe <- "https://data.drees.solidarites-sante.gouv.fr/api/datasets/1.0/les-beneficiaires-de-l-aide-sociale-a-l-enfance/attachments/les_beneficiaires_de_l_aide_sociale_a_l_enfance_series_longues_1996_2022_xlsx/"
 
 httr::GET(nomfich_pe, write_disk(tempfich <- tempfile(fileext = ".xlsx")))
+# données départementales
 tabsbenef_pe <- readExcelDrees(fich=tempfich,
                                  #sheetexclude = c("Corrections Déc 21"),
                                  options = "ASDEPslbenef")
+# données nationales (peut contenir des années supplémentaires)
+tabsbenef_pe_nat <- readSheetDrees(fich=tempfich,
+                                   sheet="Données nationales",
+                                   nlignetitre=1,
+                                   options = "ASDEPsldonneesnationales")
 unlink(tempfich)
 
 
@@ -199,11 +211,27 @@ for (i in (1:nrow(ASDEPslbenef_description))) {
 
 rownames(ASDEPslbenef_description) <- ASDEPslbenef_description$Nom.var
 
+# ===================================
+# Table complémentaire : données nationales uniquement
+# (cette table a pour intérêt de contenir quelques années supplémentaires)
+
+ASDEPslbenefnat <- bind_rows(
+  tabsbenef_paph_nat$tablong %>%
+    mutate(champ = tabsbenef_paph_nat$champ,
+           source = tabsbenef_paph_nat$source),
+  tabsbenef_pe_nat$tablong %>%
+    mutate(champ = tabsbenef_pe_nat$champ,
+           source = tabsbenef_pe_nat$source)
+  ) %>%
+  select(-info.annee) %>%
+  rename(nb_benef = valeur)
+
 # ===================================================================================
 # Dernière actualisation de la base réalisée le : 02/03/2024
 
 usethis::use_data(ASDEPslbenef,
                   ASDEPslbenef_description,
+                  ASDEPslbenefnat,
                   overwrite = T)
 
 

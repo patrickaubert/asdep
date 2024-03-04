@@ -27,7 +27,7 @@ un autre élément "tablong" est disponible, dans lequel les années sont transp
 }
 \details{
 La fonction inclut des traitements complémentaires de mise en forme pour certains fichiers Excel
-particuliers ('options' = "ASDEPslbenef", "ASDEPsldepenses", "OARSAsl", etc.)
+particuliers ('options' = "ASDEPslbenef", "ASDEPsldepenses", "OARSAsl", "ASDEPsldonneesnationales", etc.)
 }
 \examples{
 readSheetDrees(fich="data-raw/DonnÃ©es mensuelles des prestations de solidaritÃ©.xlsx", sheet="Tableau 1" , nlignetitre=2, options="PrestaSolMens")

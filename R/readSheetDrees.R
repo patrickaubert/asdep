@@ -7,7 +7,7 @@
 #' un autre élément "tablong" est disponible, dans lequel les années sont transposées en ligne plutôt qu'en colonnes.
 #'
 #' La fonction inclut des traitements complémentaires de mise en forme pour certains fichiers Excel
-#' particuliers ('options' = "ASDEPslbenef", "ASDEPsldepenses", "OARSAsl", etc.)
+#' particuliers ('options' = "ASDEPslbenef", "ASDEPsldepenses", "OARSAsl", "ASDEPsldonneesnationales", etc.)
 #'
 #' @param fich nom du fichier Excel
 #' @param sheet nom de l'onglet
@@ -128,6 +128,42 @@ readSheetDrees <- function(fich , sheet, nlignetitre = NULL, options = "") {
              Code.departement = NA)
 
     tab <- bind_rows(departements, regions, nation)
+
+  } else if (options %in% c("asdepsldonneesnationales","asdepsldonnéesnationales","asdepsldonneesnat","asdepsldonneesnationales")) {
+
+    # Onglet "données nationales" dans les fichiers de séries longues de bénéficiaires et de dépenses de l'aide sociale
+    tab <- tab %>%
+      mutate(
+        #X1 = case_when(
+        #  !is.na(X1) ~ X1,
+        #  is.na(X1) & !is.na(X2) & grepl("^Total",X2) ~ X2,
+        #  TRUE ~ X1   ),
+        X2 = case_when(
+          !is.na(X2) ~ X2,
+          is.na(X2) & !is.na(X1) ~ "Ensemble",
+          TRUE ~ X2)
+        )
+    if ("X3" %in% names(tab)){
+      tab <- tab %>%
+        mutate(
+          X3 = case_when(
+            !is.na(X3) ~ X3,
+            is.na(X3) & !is.na(X2) ~ "Ensemble",
+            TRUE ~ X3)
+        )
+    }
+    if ("X4" %in% names(tab)){
+      tab <- tab %>%
+        mutate(
+          X4 = case_when(
+            !is.na(X4) ~ X4,
+            is.na(X4) & !is.na(X3) ~ "Ensemble",
+            TRUE ~ X4)
+        )
+    }
+    tab <- tab %>%
+      fill( c(intersect(names(tab),paste0("X",1:6))), .direction="down") %>%
+      rename_at(vars(starts_with("X")), ~str_replace(.,"^X","champ_niv"))
 
   } else if (options %in% c("asdepslperso","asdepslpersonnel","asdepslpersonnels")) {
 
@@ -252,7 +288,7 @@ readSheetDrees <- function(fich , sheet, nlignetitre = NULL, options = "") {
   if (NROW(colsannee)>=1) {
     tablong <- tab %>%
       mutate_at(vars(colsannee),as.numeric) %>%
-      pivot_longer(cols=c(colsannee),
+      pivot_longer(cols=c(all_of(colsannee)),
                    names_to="annee",
                    values_to="valeur",
                    values_drop_na = TRUE) %>%
