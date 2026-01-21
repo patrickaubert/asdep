@@ -166,7 +166,10 @@ extrAPA2010 <- function(an,rangegir="A3:D5",rangeagedom ="B9:G12",
 
 dataApa <- list()
 
-for (an in 2020:2022) {
+for (an in 2024:2024) {
+  dataApa[[as.character(an)]] <- extrAPA2020(an,rangeage="A13:I20")
+}
+for (an in 2020:2023) {
   dataApa[[as.character(an)]] <- extrAPA2020(an)
 }
 for (an in 2016:2019) {
@@ -181,7 +184,7 @@ for (an in 2010:2013) {
 
 # agrégation des tableaux
 
-rangeAn <- c(2010:2022)
+rangeAn <- c(2010:2024)
 
 # gir <- do.call("rbind", lapply(rangeAn, function(a){dataApa[[as.character(a)]]$gir}))
 gir <- dataApa[[as.character(max(rangeAn))]]$gir
@@ -291,6 +294,58 @@ eff <- ASDEPslbenef[
          EnsAidesEtab = TotBenefPAEtab) %>%
   pivot_longer(cols=-annee,names_to="prestation",values_to="nb") %>%
   filter(!is.na(nb))
+
+# (2026/01/21) alternative : extraction directement de la série historique complète mise à jour
+
+fich_sl <- "https://data.drees.solidarites-sante.gouv.fr/api/datasets/1.0/les-beneficiaires-de-l-aide-sociale-departementale-aux-personnes-agees-ou-handic/attachments/paph_les_beneficiaires_de_l_aide_sociale_departementale_series_longues_1996_2024_xlsx/"
+
+GET(fich_sl, write_disk(tempfich <- tempfile(fileext = ".xlsx")))
+eff_new <- read_excel(tempfich,sheet = 3, range = "B6:AM42")
+eff_new <- eff_new %>%
+  janitor::clean_names() %>%
+  mutate(
+    x2 = ifelse(!is.na(x2),x2,x1),
+    x3 = ifelse(!is.na(x3),x3,x2),
+    x4 = ifelse(!is.na(x4),x4,x3)
+    ) %>%
+  fill( c("x1","x2","x3","x4"), .direction="down") %>%
+  mutate(
+    serie = paste(x1,x2,x3,x4, sep="_")
+  ) %>%
+  select(-x1,-x2,-x3,-x4) %>%
+  #mutate_all(as.character) %>%
+  pivot_longer(cols=-"serie",names_to="annee",values_to="nb") %>%
+  filter(!is.na(nb)) %>%
+  mutate(annee = str_replace(annee,"^x","") %>% as.numeric() )
+unlink(tempfich)
+
+eff_new <- eff_new %>%
+  rename(prestation = serie) %>%
+  mutate(
+    prestation = recode(
+      prestation,
+      #'' = 'NbBenefPSD',
+      "Aide aux personnes âgées_Aides à domicile des personnes âgées_Prestation spécifique dépendance (PSD)_Prestation spécifique dépendance (PSD)" = 'PSDDom',
+      "Aide aux personnes âgées_Aides à l'accueil des personnes âgées_Prestation spécifique dépendance (PSD)_Prestation spécifique dépendance (PSD)" = 'PSDEtab',
+      "Aide aux personnes âgées_Aides à l'accueil des personnes âgées_Aide sociale à l'hébergement (ASH) en établissement_Aide sociale à l'hébergement (ASH) en établissement" = 'ASH',
+      "Aide aux personnes âgées_Aides à domicile des personnes âgées_Aides ménagères_Aides ménagères" = 'AidesMenag',
+      "Aide aux personnes âgées_Aides à domicile des personnes âgées_Aides à domicile des personnes âgées_Aides à domicile des personnes âgées" = 'EnsAidesDom',
+      "Aide aux personnes âgées_Aides à l'accueil des personnes âgées_Aides à l'accueil des personnes âgées_Aides à l'accueil des personnes âgées" = 'EnsAidesEtab',
+      "Aide aux personnes âgées_Aides à domicile des personnes âgées_Allocation personnalisée d'autonomie (APA)_Allocation personnalisée d'autonomie (APA)" = 'APAdom',
+      "Aide aux personnes âgées_Aides à l'accueil des personnes âgées_APA_APA" = 'APAetab'
+                )
+  )
+
+if (FALSE){
+eff <- eff %>%
+  full_join(
+    eff_new %>% filter(prestation %in% unique(eff$prestation)), by=c("prestation",'annee')
+  ) %>%
+  arrange(prestation,annee)
+# --> on vérifie que c'est bien cohérent
+}
+
+eff <- eff_new %>% filter(prestation %in% unique(eff$prestation))
 
 # calcul des effectifs par age et GIR
 # RQ : on calcule ici les agrégats "APA" et "GIR12" et "GIR34"
@@ -499,6 +554,7 @@ ASDEPprevalaidessoc <- prevalences
 # Dernière actualisation de la base réalisée le : 02/03/2024
 
 # == historique des versions :
+# 21/01/2026 : ajout des données fin 2023 et fin 2024
 # 02/03/2024 : ajout des données au 31/12/2022
 # 27/01/2024 : correction d'une erreur dans la dernière version
 # 16/01/2024 : ajout des données au 31/12/2021
